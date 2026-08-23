@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const base = new URL(`${protocol}://${host}`);
   return {
     metadataBase: base,
-    title: "不動産簡易査定書メーカー｜関西不動産販売株式会社",
+    title: "不動産簡易査定書メーカー｜関西不動産販売",
     description: "土地・中古戸建て・マンションに対応した、周辺事例取込と自動計算ができる不動産簡易査定書作成ツールです。",
     icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
     openGraph: {
