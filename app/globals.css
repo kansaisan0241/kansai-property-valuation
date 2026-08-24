@@ -19,20 +19,17 @@ button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 
 .editor-toolbar {
-  position: sticky; top: 0; z-index: 50; min-height: 76px; padding: 12px max(22px, calc((100vw - 1420px) / 2));
+  position: sticky; top: 0; z-index: 50; min-height: 70px; padding: 10px max(22px, calc((100vw - 1420px) / 2));
   display: flex; align-items: center; gap: 28px; color: white; background: rgba(5, 22, 52, .96);
   box-shadow: 0 8px 30px rgba(5, 20, 45, .24); backdrop-filter: blur(14px);
   font-family: "Yu Gothic", "Noto Sans JP", sans-serif;
 }
-.toolbar-brand { display: flex; align-items: center; gap: 12px; min-width: 270px; }
-.toolbar-brand div { display: grid; gap: 2px; }
-.toolbar-brand strong { font-size: 16px; letter-spacing: .08em; }
-.toolbar-brand small { color: #b9c7de; font-size: 11px; }
-.brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid #d2ad67; color: #d2ad67; font: 700 22px Georgia, serif; }
-.type-switch { display: flex; flex: 1; max-width: 520px; padding: 4px; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; background: rgba(255,255,255,.05); }
+.type-switch { display: flex; flex: 1; max-width: 650px; padding: 4px; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; background: rgba(255,255,255,.05); }
+.toolbar-type-label { flex: none; padding: 10px 16px 10px 12px; color: #d8e1ee; font-weight: 700; font-size: 12px; letter-spacing: .08em; }
 .type-switch button { flex: 1; padding: 10px 14px; border: 0; border-radius: 3px; color: #cfdae9; background: transparent; font-weight: 700; font-size: 13px; transition: .2s; }
 .type-switch button.active { color: #071a43; background: linear-gradient(135deg, #dec287, #b98931); box-shadow: 0 2px 12px rgba(0,0,0,.2); }
-.toolbar-actions { display: flex; gap: 9px; margin-left: auto; }
+.toolbar-actions { display: flex; align-items: center; gap: 9px; margin-left: auto; }
+.toolbar-actions > small { color: #b9c7de; font-size: 10px; white-space: nowrap; }
 .primary-button, .ghost-button { min-height: 42px; padding: 0 18px; border-radius: 4px; font-family: "Yu Gothic", sans-serif; font-weight: 700; }
 .primary-button { border: 1px solid #be923f; color: white; background: linear-gradient(135deg, #bb8a31, #976312); box-shadow: 0 5px 14px rgba(0,0,0,.18); }
 .primary-button:disabled { opacity: .45; cursor: not-allowed; }
@@ -67,9 +64,11 @@ button { cursor: pointer; }
 .cover-fields .field { min-height: 41px; }
 .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 clamp(11px,1.22vw,19px) "Yu Mincho", serif; }
 .cover-fields .field-control input { height: 37px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); font: 500 clamp(12px,1.35vw,21px) "Yu Mincho", serif; }
+.cover-date-start { margin-top: 15px; }
+.cover-mansion-field.field > span:first-child { font-size: clamp(10px,1.08vw,16px); letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
-.cover-company b { width: 44px; height: 44px; display: grid; place-items: center; border: 2px solid var(--navy); font: 700 24px Georgia, serif; }
+.cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 1000 / 316; display: block; background: url("/casa.png") center / contain no-repeat; }
 .cover-company span { font-size: clamp(13px,1.5vw,23px); font-weight: 700; letter-spacing: .04em; }
 
 .page-rail { position: absolute; z-index: 4; top: 0; left: 0; width: 8.4%; height: 21.5%; display: flex; flex-direction: column; align-items: center; padding-top: 4%; color: white; background: linear-gradient(140deg, #061a42, #092a59); }
@@ -84,7 +83,7 @@ button { cursor: pointer; }
 .header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; }
 .result-photo { position: absolute; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); }
 
-.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 34%; padding: 5.3% 3.7% 2.5%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
+.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 34%; padding: 4.15% 3.35% 2.2%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
 .section-tab { position: absolute; top: -24px; left: 3%; padding: 10px 18px; color: white; background: var(--navy); font-size: clamp(11px,1.45vw,21px); letter-spacing: .08em; }
 .section-tab small { font-size: .75em; }
 .valuation-range { display: flex; align-items: center; gap: 12px; }
@@ -92,24 +91,28 @@ button { cursor: pointer; }
 .valuation-range input { flex: 1 1 auto; min-width: 0; width: 100%; height: auto; padding: 0 3px; border: 0; border-bottom: 1px dashed #c8a86b; border-radius: 0; color: var(--gold); background: transparent; font: 500 clamp(42px,5.9vw,88px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .valuation-range .money-editor span { flex: none; margin: 0; color: var(--gold); font: 500 clamp(15px,2.15vw,32px)/1 "Yu Mincho", serif; }
 .valuation-range > b { color: var(--gold); font-size: clamp(24px,3vw,45px); font-weight: 400; }
-.valuation-box > p { margin: 9px 1.7% 0; padding-bottom: 15px; border-bottom: 1px solid #ded6c6; font: 500 clamp(8px,.95vw,14px) "Yu Gothic", sans-serif; }
-.recommended-row { display: grid; grid-template-columns: 27% 43% 1fr; align-items: center; gap: 20px; margin-top: 18px; }
+.valuation-box > p { margin: 4px 1.7% 0; padding-bottom: 11px; border-bottom: 1px solid #ded6c6; font: 500 clamp(8px,.95vw,14px) "Yu Gothic", sans-serif; }
+.recommended-row { display: grid; grid-template-columns: 25% minmax(0,48%) 1fr; align-items: center; gap: 12px; margin-top: 10px; }
 .recommended-row > span { padding: 14px 10px; color: white; background: linear-gradient(100deg, #a56c10, #c29849); font-size: clamp(11px,1.4vw,21px); text-align: center; letter-spacing: .12em; }
 .recommended-row .money-editor { min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 5px; }
-.recommended-row .money-editor input { min-width: 0; width: 100%; height: auto; padding: 0; border: 0; color: var(--gold); background: transparent; font: 500 clamp(32px,4.35vw,64px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
+.recommended-row .money-editor input { min-width: 0; width: 100%; height: auto; padding: 0; border: 0; color: var(--gold); background: transparent; font: 500 clamp(40px,5.4vw,80px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .recommended-row .money-editor span { flex: none; margin: 0; color: var(--gold); font: 500 clamp(13px,1.6vw,24px)/1 "Yu Mincho", serif; }
 .recommended-row p { margin: 0; font: 600 clamp(7px,.75vw,11px)/1.7 "Yu Gothic", sans-serif; }
 .mini-reset { position: absolute; right: 4px; bottom: -27px; padding: 4px 8px; border: 1px solid #9bb9dd; border-radius: 3px; color: #375e8c; background: #f3f8ff; font: 700 10px "Yu Gothic", sans-serif; }
-.property-details { position: absolute; top: 62.8%; left: 3.2%; right: 3.2%; height: 29%; }
+.property-details { position: absolute; top: 62.2%; left: 3.2%; right: 3.2%; height: 29%; }
 .section-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 26px; font-size: clamp(15px,1.85vw,28px); letter-spacing: .13em; }
 .section-heading span { height: 1px; background: var(--navy); }
-.detail-grid { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 60px; border-top: 1px solid #c9ced7; border-left: 1px solid #c9ced7; }
-.detail-item { min-width: 0; padding: 6px 11px; display: flex; align-items: center; gap: 11px; border-right: 1px solid #c9ced7; border-bottom: 1px solid #c9ced7; font-family: "Yu Gothic", sans-serif; }
+.detail-grid { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 60px; column-gap: 24px; }
+.detail-item { min-width: 0; padding: 6px 8px; display: flex; align-items: center; gap: 11px; border: 0; font-family: "Yu Gothic", sans-serif; }
 .detail-item i { flex: 0 0 clamp(29px,2.9vw,43px); height: clamp(29px,2.9vw,43px); display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: clamp(12px,1.4vw,21px); }
 .detail-item div { min-width: 0; flex: 1; display: grid; gap: 4px; }
-.detail-item strong { font-size: clamp(9px,1vw,15px); }
+.detail-item strong { font-size: clamp(10px,1.1vw,16.5px); }
 .detail-item input, .detail-item select { min-width: 0; width: 100%; height: 27px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); font-size: clamp(8px,.9vw,13px); }
-.detail-item small { color: #596b83; font-size: clamp(7px,.72vw,10px); }
+.detail-item small { color: #596b83; font-size: clamp(8px,.82vw,12px); white-space: nowrap; }
+.detail-print-value { display: none; }
+.area-detail > div { grid-template-columns: minmax(0, 1fr) auto; column-gap: 2px; }
+.area-detail > div > strong { grid-column: 1 / -1; }
+.area-detail input { text-align: right; }
 .disclaimer-box { position: absolute; left: 3.2%; right: 3.2%; bottom: 2.2%; min-height: 6.6%; padding: 9px 20px; display: flex; align-items: center; gap: 17px; border: 1px solid #e1cda7; font: 500 clamp(7px,.8vw,12px)/1.6 "Yu Gothic", sans-serif; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
@@ -125,14 +128,15 @@ button { cursor: pointer; }
 .case-controls strong { min-width: 35px; color: var(--gold); text-align: center; }
 .case-controls small { color: #69778a; font-weight: 500; }
 .comparison-table-wrap { position: absolute; top: 25.3%; left: 2.4%; right: 2.4%; height: 49%; }
-.comparison-table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; font: 500 clamp(9px,1.02vw,15.5px) "Yu Gothic", sans-serif; }
+.comparison-table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; font: 500 clamp(9.5px,1.08vw,16.5px) "Yu Gothic", sans-serif; }
 .comparison-table th, .comparison-table td { border: 1px solid #ccd1d8; padding: 4px 7px; text-align: center; vertical-align: middle; }
 .comparison-table thead th { height: 48px; color: white; background: linear-gradient(110deg, #09214b, #0d315f); font: 600 clamp(11px,1.25vw,19px) "Yu Mincho", serif; }
 .comparison-table th:first-child { width: 11.5%; color: white; background: linear-gradient(110deg, #102852, #173965); }
 .comparison-table td { background: rgba(255,255,255,.92); }
 .comparison-table input { width: 100%; min-width: 0; padding: 4px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; font-size: inherit; }
-.comparison-table input[type="date"] { font-size: .9em; text-align: center; text-align-last: center; }
-.comparison-table input[type="date"]::-webkit-datetime-edit { width: 100%; text-align: center; }
+.comparison-table input[type="date"], .comparison-table input[type="month"] { font-size: .9em; text-align: center; text-align-last: center; }
+.comparison-table input[type="date"]::-webkit-datetime-edit, .comparison-table input[type="month"]::-webkit-datetime-edit { width: 100%; text-align: center; }
+.centered-date { text-align: center !important; text-align-last: center !important; }
 .comparison-table td small { display: block; margin-top: 2px; color: #58677c; font-size: .86em; }
 .area-inline, .price-inline { display: flex; align-items: center; justify-content: center; gap: 2px; white-space: nowrap; }
 .area-inline input { flex: 0 1 5.7em; width: 5.7em; }
@@ -149,11 +153,12 @@ button { cursor: pointer; }
 .market-range-box > div small { display: block; }
 .market-range-editor { position: relative; display: grid; place-items: center; gap: 3px; color: var(--gold); }
 .market-range-editor > div { width: 100%; display: flex; align-items: center; justify-content: center; gap: 3px; }
-.market-range-editor input { min-width: 0; width: 42%; padding: 2px; border: 1px solid var(--edit-border); border-radius: 3px; color: var(--gold); background: var(--edit); font: 500 clamp(22px,3.15vw,47px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
+.market-range-editor input { min-width: 0; width: 42%; padding: 2px; border: 1px solid var(--edit-border); border-radius: 3px; color: var(--gold); background: white; font: 500 clamp(22px,3.15vw,47px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .market-range-editor b { font-size: clamp(17px,2vw,30px); font-weight: 400; }
 .market-range-editor > small { font: 600 clamp(9px,1vw,15px) "Yu Mincho", serif; }
 .market-range-editor .inline-auto { top: -17px; right: 4px; }
 .market-range-box > p { margin: 0; padding: 0 25px; font: 500 clamp(7px,.85vw,13px)/1.8 "Yu Gothic", sans-serif; }
+.market-range-box > .market-commentary { padding: 0 18px; font-size: clamp(6.5px,.76vw,11.5px); line-height: 1.65; }
 .page-note { position: absolute; bottom: 2.1%; left: 2.6%; font: 500 clamp(6px,.7vw,10px) "Yu Gothic", sans-serif; }
 
 .factor-columns { position: absolute; top: 23%; left: 2.5%; width: 60.5%; height: 50.3%; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -177,9 +182,10 @@ button { cursor: pointer; }
 .flow-box > strong { font: 500 clamp(18px,2.5vw,37px) Georgia, serif; }
 .flow-box > strong small { margin-left: 6px; font: 500 .48em "Yu Mincho", serif; }
 .flow-symbol { position: relative; z-index: 2; width: 38px; height: 38px; margin: -5px auto; display: grid; place-items: center; border: 1px solid #cbd0d8; border-radius: 50%; background: white; font-size: 24px; font-weight: 400; }
+.equals-symbol { transform: rotate(90deg); }
 .editable-flow > div, .unit-edit-row, .target-unit-edit { display: flex; align-items: center; justify-content: center; gap: 4px; }
 .editable-flow input, .unit-edit-row input, .target-unit-edit input { min-width: 0; width: 35%; height: 34px; padding: 3px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; }
-.editable-flow input, .unit-edit-row input { color: var(--navy); font: 600 clamp(12px,1.4vw,20px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.editable-flow input, .unit-edit-row input { color: var(--navy); font: 600 clamp(15px,1.72vw,26px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .editable-flow > div > small, .unit-edit-row > small, .target-unit-edit > small { font-size: 10px; }
 .inline-auto { position: absolute; top: 6px; right: 7px; padding: 2px 5px; border: 1px solid #a8bdd5; border-radius: 3px; color: #41678e; background: #f4f8ff; font: 700 8px "Yu Gothic", sans-serif; }
 .gold-box { border-color: #d6a64e; color: var(--gold); }
@@ -188,7 +194,7 @@ button { cursor: pointer; }
 .target-unit-edit b { font-size: clamp(15px,1.8vw,27px); font-weight: 400; }
 .down-arrow { margin: 4px 0; color: var(--gold); text-align: center; font-size: 22px; }
 .final-flow { min-height: 126px; border: 2px solid var(--navy); }
-.final-flow strong { font-size: clamp(13px,2vw,30px); white-space: nowrap; }
+.final-flow strong { font: 500 clamp(18px,2.35vw,35px) "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
 .final-flow > small { font-size: 9px; }
 .overall-box { position: absolute; left: 2.5%; top: 76%; width: 60.5%; height: 13%; display: flex; align-items: center; border: 1px solid var(--navy); }
 .overall-box i { align-self: stretch; flex: 0 0 110px; display: grid; place-items: center; color: white; background: var(--navy); font-style: normal; font-size: 38px; }
@@ -200,11 +206,11 @@ button { cursor: pointer; }
 .building-flow { position: absolute; top: 23.5%; left: 3.3%; width: 42.5%; height: 59%; display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .building-step { position: relative; width: 100%; min-height: 74px; display: grid; grid-template-columns: 45% 1fr; border: 1px solid #d8d8d8; }
 .building-step > span { display: grid; place-items: center; padding: 8px; color: white; background: var(--navy); font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
-.building-step .field, .building-step > strong, .building-step select { align-self: stretch; padding: 0 16px; }
+.building-step .field, .building-step > strong, .building-step select, .building-step > input { align-self: stretch; padding: 0 16px; }
 .building-step .field input { height: 100%; border: 0; color: var(--gold); background: transparent; font: 500 clamp(23px,3.2vw,48px) Georgia, serif; text-align: right; }
 .building-step .field small, .building-step > strong small { color: inherit; font-size: .48em; }
 .building-flow > b { width: 100%; min-height: 19px; display: grid; place-items: center; color: #bd9349; line-height: 1; text-align: center; }
-.dual-step > strong { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--gold); font: 500 clamp(23px,3vw,44px) Georgia, serif; white-space: nowrap; }
+.dual-step > strong { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--gold); font: 500 clamp(23px,3vw,44px) "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
 .building-money { align-self: stretch; min-width: 0; padding: 0 17px; display: flex; align-items: baseline; justify-content: center; gap: 6px; }
 .building-money input { min-width: 0; width: 78%; height: 100%; padding: 0; border: 0; color: var(--gold); background: transparent; font: 500 clamp(26px,3.25vw,49px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .building-money span { flex: none; color: var(--gold); font: 500 clamp(12px,1.35vw,20px) "Yu Mincho", serif; }
@@ -213,7 +219,7 @@ button { cursor: pointer; }
 .residual-copy > span { font-size: clamp(10px,1.05vw,16px); font-weight: 500; }
 .residual-copy > b { color: var(--gold); font-size: clamp(23px,2.65vw,40px); font-weight: 500; }
 .residual-copy > small { color: var(--gold); font-size: clamp(10px,1.15vw,17px); }
-.structure-step select { border: 0; border-radius: 0; background: var(--edit); text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.structure-step select, .structure-step > input { border: 0; border-radius: 0; background: var(--edit); text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .building-config { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .building-config .field { padding: 6px; border: 1px dashed #9bb9dd; background: #f5f9ff; }
 .building-total { width: 100%; min-height: 104px; display: grid; grid-template-columns: 40% 1fr; color: white; background: linear-gradient(120deg, #061a42, #0c3569); }
@@ -247,7 +253,7 @@ button { cursor: pointer; }
 .recommended-card { border-color: var(--gold); }
 .recommended-card h4 { background: linear-gradient(110deg, #a87314, #c19746); }
 .recommended-card > strong, .recommended-card li::before { color: var(--gold); }
-.recommended-card em { position: absolute; z-index: 2; top: 2px; right: 2px; color: white; font: 700 9px "Yu Gothic", sans-serif; transform: rotate(43deg); }
+.recommended-card em { position: absolute; z-index: 2; top: 3px; right: -6px; width: 58px; color: white; font: 700 9px "Yu Gothic", sans-serif; text-align: center; transform: rotate(43deg); }
 .sales-flow { position: absolute; top: 22.5%; right: 3.5%; width: 27%; height: 47%; padding-left: 26px; border-left: 1px solid var(--navy); }
 .sales-flow h3 { margin-bottom: 10px; }
 .sales-flow h3 small { font-size: .65em; }
@@ -277,8 +283,8 @@ button { cursor: pointer; }
 
 @media (max-width: 900px) {
   .editor-toolbar { flex-wrap: wrap; gap: 9px 16px; }
-  .toolbar-brand { min-width: 0; flex: 1; }
-  .type-switch { order: 3; width: 100%; max-width: none; flex-basis: 100%; }
+  .type-switch { width: 100%; max-width: none; flex-basis: 100%; }
+  .toolbar-actions > small { display: none; }
   .toolbar-actions .ghost-button { display: none; }
   .setup-panel { margin: 18px 16px; grid-template-columns: 1fr; gap: 18px; }
   .quick-inputs { grid-template-columns: 1fr; }
@@ -303,8 +309,12 @@ button { cursor: pointer; }
   .report-page:last-child { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
-  input[type="date"] { appearance: none !important; -webkit-appearance: none !important; }
+  input[type="month"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
+  input[type="date"], input[type="month"] { appearance: none !important; -webkit-appearance: none !important; }
   textarea { overflow: hidden; resize: none; }
   .cover-fields { background: transparent !important; backdrop-filter: none; }
+  .detail-item input[type="month"] { display: none !important; }
+  .detail-print-value { display: block; min-height: 27px; padding: 3px 7px; font-size: clamp(8px,.9vw,13px); }
+  .print-hidden-preserve { visibility: hidden !important; }
   .comparison-table input { padding: 0; }
 }

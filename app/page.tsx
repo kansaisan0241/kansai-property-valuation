@@ -114,6 +114,12 @@ function formatDateJa(value: string) {
   return `${year}年${month}月${day ? `${day}日` : ""}`;
 }
 
+function formatMonthJa(value: string) {
+  if (!value) return "—";
+  const [year, month] = value.split("-").map(Number);
+  return year && month ? `${year}年${month}月` : "—";
+}
+
 function normalizeReins(raw: string) {
   return raw.replace(/&amp;/g, "&").replace(/&#x20;/g, " ").split(/\r?\n/).map((line) => toHalfWidth(line).trim()).filter(Boolean);
 }
@@ -189,18 +195,7 @@ function floorEnding80(value: number) { return value ? Math.max(80, Math.floor((
 
 function residualRateAtAge(age: number, life: number) {
   const safeLife = Math.max(1, life);
-  const ratio = Math.max(0, age) / safeLife;
-  const curve = [[0, 1], [.2, .8], [.4, .6], [.6, .45], [.8, .3], [1, 0]];
-  if (ratio >= 1) return 0;
-  for (let i = 1; i < curve.length; i += 1) {
-    const [rightX, rightY] = curve[i];
-    const [leftX, leftY] = curve[i - 1];
-    if (ratio <= rightX) {
-      const progress = (ratio - leftX) / (rightX - leftX);
-      return leftY + (rightY - leftY) * progress;
-    }
-  }
-  return 0;
+  return Math.max(0, 1 - Math.max(0, age) / safeLife);
 }
 
 function Field({ label, value, onChange, type = "text", suffix, className = "" }: { label?: string; value: string | number; onChange: (value: string) => void; type?: string; suffix?: string; className?: string }) {
@@ -219,7 +214,8 @@ function MoneyEditor({ value, onChange, className = "" }: { value: number; onCha
 }
 
 function DetailEditor({ icon, label, value, onChange, type = "text", secondary, options, className = "" }: { icon: string; label: string; value: string | number; onChange: (value: string) => void; type?: string; secondary?: string; options?: { value: string; label: string }[]; className?: string }) {
-  return <label className={`detail-item ${className}`}><i>{icon}</i><div><strong>{label}</strong>{options ? <select value={value} onChange={(event) => onChange(event.target.value)}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : <input type={type} value={value} onChange={(event) => onChange(event.target.value)} />}{secondary && <small>{secondary}</small>}</div></label>;
+  const listId = `detail-options-${label}`;
+  return <label className={`detail-item ${className}`}><i>{icon}</i><div><strong>{label}</strong>{type === "area" ? <FormattedNumberInput value={Number(value)} decimals={2} onChange={(next) => onChange(String(next))} ariaLabel={label} /> : options ? <><input list={listId} value={value} onChange={(event) => onChange(event.target.value)} /><datalist id={listId}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</datalist></> : <input type={type} value={value} onChange={(event) => onChange(event.target.value)} />}{secondary && <small>{secondary}</small>}{type === "month" && <span className="detail-print-value">{formatMonthJa(String(value))}</span>}</div></label>;
 }
 
 function PageHeader({ number, title, english, description }: { number: string; title: string; english: string; description: string }) {
@@ -250,7 +246,8 @@ function DepreciationChart({ age, life }: { age: number; life: number }) {
     ctx.stroke(); const pointAge = Math.min(safeLife, Math.max(0, age)); const pointRate = residualRateAtAge(age, safeLife); const pointX = left + (pointAge / safeLife) * (right - left); const pointY = bottom - pointRate * (bottom - top);
     ctx.strokeStyle = "#b17a16"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(pointX, pointY); ctx.lineTo(pointX, bottom); ctx.stroke(); ctx.fillStyle = "#b17a16"; ctx.beginPath(); ctx.arc(pointX, pointY, 8, 0, Math.PI * 2); ctx.fill();
     ctx.font = 'bold 16px "Yu Mincho", serif'; ctx.fillText(`${Math.round(pointRate * 100)}%`, Math.min(pointX + 12, right - 45), pointY - 10); ctx.font = '12px "Yu Gothic", sans-serif';
-    [0, 5, 10, 15, 20, 25, 30].filter((y) => y <= safeLife).forEach((year) => { const x = left + (year / safeLife) * (right - left); ctx.fillStyle = "#30343b"; ctx.fillText(year === 0 ? "新築" : `${year}年`, x - 12, bottom + 24); });
+    const ticks = Array.from(new Set(Array.from({ length: 6 }, (_, index) => index === 5 ? safeLife : Math.round((safeLife * index) / 5))));
+    ticks.forEach((year) => { const x = left + (year / safeLife) * (right - left); ctx.fillStyle = "#30343b"; const label = year === 0 ? "新築" : `${year}年`; const offset = year === safeLife ? ctx.measureText(label).width : 12; ctx.fillText(label, Math.max(left - 4, x - offset), bottom + 24); });
   }, [age, life]);
   return <canvas ref={canvasRef} className="depreciation-canvas" />;
 }
@@ -293,57 +290,48 @@ export default function Home() {
   function removeComparable() { setComparables((current) => current.length <= 1 ? current : current.slice(0, -1)); }
   function importReins() { if (activeImport === null || !pasteText.trim()) return; const parsed = parseReins(pasteText, activeImport, type); setComparables((current) => current.map((comp) => comp.id === activeImport ? { ...comp, ...parsed } : comp)); setPasteText(""); setActiveImport(null); setUnitManual(false); }
   function updateFactor(side: "plus" | "minus", index: number, key: keyof Factor, value: string) { setFactors((current) => ({ ...current, [side]: current[side].map((factor, i) => i === index ? { ...factor, [key]: value } : factor) })); }
+  function handleStructureChange(next: string) {
+    setStructure(next);
+    if (next === "木造") { setBuildingUnit(66); setUsefulLife(25); }
+    if (["軽量鉄骨造", "鉄骨造", "鉄筋コンクリート造", "鉄骨鉄筋コンクリート造"].includes(next)) { setBuildingUnit(90); setUsefulLife(30); }
+  }
 
   const structureOptions = ["木造", "軽量鉄骨造", "鉄骨造", "鉄筋コンクリート造", "鉄骨鉄筋コンクリート造", "その他"].map((item) => ({ value: item, label: item }));
+  const floorOptions = ["平屋", "2階建て", "3階建て"].map((item) => ({ value: item, label: item }));
   const detailEditors = type === "land" ? [
     <DetailEditor key="address" icon="⌖" label="所在地" value={address} onChange={setAddress} />,
-    <DetailEditor key="land" icon="▦" label="土地面積" type="number" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`${formatNumber(landArea / TSUBO, 2)}坪`} />,
+    <DetailEditor key="land" icon="▦" label="土地面積" type="area" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`㎡（約${formatNumber(landArea / TSUBO, 2)}坪）`} className="area-detail" />,
     <DetailEditor key="road" icon="▤" label="接道状況" value={road} onChange={setRoad} />,
     <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" value={transport} onChange={setTransport} />,
   ] : type === "mansion" ? [
     <DetailEditor key="address" icon="⌖" label="所在地" value={address} onChange={setAddress} />,
     <DetailEditor key="mansion" icon="⌂" label="マンション名" value={mansionName} onChange={setMansionName} />,
-    <DetailEditor key="exclusive" icon="▦" label="専有面積" type="number" value={exclusiveArea || ""} onChange={(value) => setExclusiveArea(Number(value))} secondary={`${formatNumber(exclusiveArea / TSUBO, 2)}坪`} />,
+    <DetailEditor key="exclusive" icon="▦" label="専有面積" type="area" value={exclusiveArea || ""} onChange={(value) => setExclusiveArea(Number(value))} secondary={`㎡（約${formatNumber(exclusiveArea / TSUBO, 2)}坪）`} className="area-detail" />,
     <DetailEditor key="layout" icon="▥" label="間取り" value={layout} onChange={setLayout} />,
-    <DetailEditor key="built" icon="▣" label="築年月" type="date" value={builtDate} onChange={setBuiltDate} />,
-    <DetailEditor key="floors" icon="◫" label="所在階・階数" value={floors} onChange={setFloors} />,
-    <DetailEditor key="structure" icon="▤" label="構造" value={structure} onChange={setStructure} options={structureOptions} />,
+    <DetailEditor key="built" icon="▣" label="築年月" type="month" value={builtDate.slice(0, 7)} onChange={setBuiltDate} />,
+    <DetailEditor key="floors" icon="◫" label="所在階・階数" value={floors} onChange={setFloors} options={floorOptions} />,
+    <DetailEditor key="structure" icon="▤" label="構造" value={structure} onChange={handleStructureChange} options={structureOptions} />,
     <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" value={transport} onChange={setTransport} />,
   ] : [
     <DetailEditor key="address" icon="⌖" label="所在地" value={address} onChange={setAddress} />,
-    <DetailEditor key="land" icon="▦" label="土地面積" type="number" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`${formatNumber(landArea / TSUBO, 2)}坪`} />,
-    <DetailEditor key="building" icon="▥" label="建物面積" type="number" value={buildingArea || ""} onChange={(value) => setBuildingArea(Number(value))} secondary={`${formatNumber(buildingArea / TSUBO, 2)}坪`} />,
+    <DetailEditor key="land" icon="▦" label="土地面積" type="area" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`㎡（約${formatNumber(landArea / TSUBO, 2)}坪）`} className="area-detail" />,
+    <DetailEditor key="building" icon="▥" label="建物面積" type="area" value={buildingArea || ""} onChange={(value) => setBuildingArea(Number(value))} secondary={`㎡（約${formatNumber(buildingArea / TSUBO, 2)}坪）`} className="area-detail" />,
     <DetailEditor key="layout" icon="▤" label="間取り" value={layout} onChange={setLayout} />,
-    <DetailEditor key="built" icon="▣" label="築年月" type="date" value={builtDate} onChange={setBuiltDate} />,
-    <DetailEditor key="structure" icon="⌂" label="構造" value={structure} onChange={setStructure} options={structureOptions} />,
-    <DetailEditor key="floors" icon="◫" label="階数" value={floors} onChange={setFloors} />,
+    <DetailEditor key="built" icon="▣" label="築年月" type="month" value={builtDate.slice(0, 7)} onChange={setBuiltDate} />,
+    <DetailEditor key="structure" icon="⌂" label="構造" value={structure} onChange={handleStructureChange} options={structureOptions} />,
+    <DetailEditor key="floors" icon="◫" label="階数" value={floors} onChange={setFloors} options={floorOptions} />,
     <DetailEditor key="road" icon="▰" label="接道状況" value={road} onChange={setRoad} />,
     <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" value={transport} onChange={setTransport} />,
   ];
 
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="toolbar-brand"><span className="brand-mark">K</span><div><strong>簡易査定書メーカー</strong><small>{saved ? "自動保存しました" : "入力内容はこの端末に自動保存"}</small></div></div><div className="type-switch" aria-label="物件種別">{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
-    <section className="setup-panel no-print">
-      <div><span className="eyebrow">STEP 01</span><h1>物件種別を選び、査定書を編集</h1><p>青い入力欄を編集してください。金額と坪単価は入力に合わせて自動更新されます。</p></div>
-      <div className="quick-inputs"><Field label="お客様名" value={propertyName} onChange={setPropertyName} /><Field label="所在地" value={address} onChange={setAddress} />{type === "mansion" && <Field label="マンション名" value={mansionName} onChange={setMansionName} />}<Field label="担当者" value={staff} onChange={setStaff} /></div>
-      <div className="target-inputs">
-        {type !== "mansion" && <Field label="土地面積" value={landArea || ""} type="number" onChange={(v) => setLandArea(Number(v))} suffix="㎡" />}
-        {type === "house" && <Field label="建物面積" value={buildingArea || ""} type="number" onChange={(v) => setBuildingArea(Number(v))} suffix="㎡" />}
-        {type === "mansion" && <Field label="専有面積" value={exclusiveArea || ""} type="number" onChange={(v) => setExclusiveArea(Number(v))} suffix="㎡" />}
-        {type !== "land" && <Field label="間取り" value={layout} onChange={setLayout} />}
-        {type !== "land" && <Field label="築年月" value={builtDate} type="date" onChange={setBuiltDate} />}
-        {type !== "land" && <label className="field"><span>構造</span><span className="field-control"><select value={structure} onChange={(e) => setStructure(e.target.value)}><option>木造</option><option>軽量鉄骨造</option><option>鉄骨造</option><option>鉄筋コンクリート造</option><option>鉄骨鉄筋コンクリート造</option><option>その他</option></select></span></label>}
-        {type !== "land" && <Field label="階数・所在階" value={floors} onChange={setFloors} />}
-        <Field label="最寄り駅・交通" value={transport} onChange={setTransport} />
-        {type !== "mansion" && <Field label="接道状況" value={road} onChange={setRoad} />}
-      </div>
-    </section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><small>{saved ? "自動保存しました" : "入力内容は自動保存されます"}</small><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
     <div className="report-stack">
-      <article id="page-1" className="report-page cover-page">
+      <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産査定報告書</h1><i /></header>
-        <div className="cover-fields"><Field label="お客様名" value={propertyName} onChange={setPropertyName} /><Field label="所在地" value={address} onChange={setAddress} />{type === "mansion" && <Field label="マンション名" value={mansionName} onChange={setMansionName} />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} /><Field label="担当者" value={staff} onChange={setStaff} /></div>
+        <div className="cover-fields"><Field label="お客様名" value={propertyName} onChange={setPropertyName} /><Field label="所在地" value={address} onChange={setAddress} />{type === "mansion" && <Field label="マンション名" value={mansionName} onChange={setMansionName} className="cover-mansion-field" />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} className="cover-date-start" /><Field label="担当者" value={staff} onChange={setStaff} /></div>
         <p className="cover-message">市場動向・周辺成約事例をもとに、<br />現在の市場価値を分析しました。</p>
-        <footer className="cover-company"><b>K</b><span>関西不動産販売</span></footer>
+        <footer className="cover-company"><i className="cover-company-logo" role="img" aria-label="CASA" /><span>関西不動産販売</span></footer>
       </article>
       <article id="page-2" className="report-page result-page">
         <PageHeader number="02" title="査定結果" english="VALUATION RESULT" description="周辺の市場動向や類似物件の成約事例をもとに、対象不動産の市場価値を算出しました。" /><div className="result-photo" />
@@ -353,7 +341,7 @@ export default function Home() {
       </article>
       <article id="page-3" className="report-page comps-page">
         <PageHeader number="03" title="周辺成約事例との比較" english="MARKET COMPARISON" description="対象物件と条件の近い周辺の成約事例を比較しました。" />
-        <aside className="target-summary"><b>対象物件</b><p>所在地　：{address || "—"}</p><p>{type === "mansion" ? "専有面積" : "土地面積"}：<AreaValue value={type === "mansion" ? exclusiveArea : landArea} /></p>{type === "house" && <p>建物面積：<AreaValue value={buildingArea} /></p>}{type !== "land" && <p>間取り　：{layout || "—"}</p>}{type !== "land" && <p>築年月　：{formatDateJa(builtDate)}</p>}</aside>
+        <aside className="target-summary"><b>対象物件</b><p>所在地　：{address || "—"}</p><p>{type === "mansion" ? "専有面積" : "土地面積"}：<AreaValue value={type === "mansion" ? exclusiveArea : landArea} /></p>{type === "house" && <p>建物面積：<AreaValue value={buildingArea} /></p>}{type !== "land" && <p>間取り　：{layout || "—"}</p>}{type !== "land" && <p>築年月　：{formatMonthJa(builtDate)}</p>}</aside>
         <p className="unit-lead">類似物件は <strong>坪単価 {formatNumber(surroundLow, 1)}〜{formatNumber(surroundHigh, 1)} 万円</strong> で成約しています。</p>
         <div className="case-controls no-print"><span>事例数</span><button onClick={removeComparable} disabled={comparables.length <= 1}>−</button><strong>{comparables.length}件</strong><button onClick={addComparable} disabled={comparables.length >= 5}>＋</button><small>1〜5件まで調整できます</small></div>
         <section className="comparison-table-wrap"><table className="comparison-table"><thead><tr><th>事例</th>{comparables.map((comp, index) => <th key={comp.id}><span>事例 {index + 1}</span><button className="import-button no-print" onClick={() => setActiveImport(comp.id)}>レインズ取込</button></th>)}</tr></thead><tbody>
@@ -362,23 +350,23 @@ export default function Home() {
           {type === "house" && <tr><th>建物面積</th>{comparables.map((comp) => <td key={comp.id}><div className="area-inline"><FormattedNumberInput value={comp.buildingArea} decimals={2} onChange={(value) => updateComp(comp.id, "buildingArea", value)} ariaLabel="建物面積" /><small>㎡（約{formatNumber(comp.buildingArea / TSUBO, 2)}坪）</small></div></td>)}</tr>}
           {type === "mansion" && <tr><th>専有面積</th>{comparables.map((comp) => <td key={comp.id}><div className="area-inline"><FormattedNumberInput value={comp.exclusiveArea} decimals={2} onChange={(value) => updateComp(comp.id, "exclusiveArea", value)} ariaLabel="専有面積" /><small>㎡（約{formatNumber(comp.exclusiveArea / TSUBO, 2)}坪）</small></div></td>)}</tr>}
           {type !== "land" && <tr><th>間取り</th>{comparables.map((comp) => <td key={comp.id}><input value={comp.layout} onChange={(e) => updateComp(comp.id, "layout", e.target.value)} placeholder="4LDK" /></td>)}</tr>}
-          {type !== "land" && <tr><th>築年月</th>{comparables.map((comp) => <td key={comp.id}><input type="date" value={comp.builtDate} onChange={(e) => updateComp(comp.id, "builtDate", e.target.value)} /></td>)}</tr>}
+          {type !== "land" && <tr><th>築年月</th>{comparables.map((comp) => <td key={comp.id}><input className="centered-date" type="month" value={comp.builtDate.slice(0, 7)} onChange={(e) => updateComp(comp.id, "builtDate", e.target.value)} /></td>)}</tr>}
           <tr><th>成約価格</th>{comparables.map((comp) => <td key={comp.id}><div className="price-inline"><FormattedNumberInput className="price-input" value={comp.soldPrice} onChange={(value) => updateComp(comp.id, "soldPrice", value)} ariaLabel="成約価格" /><small>万円</small></div></td>)}</tr>
-          <tr><th>成約時期</th>{comparables.map((comp) => <td key={comp.id}><input type="date" value={comp.soldDate} onChange={(e) => updateComp(comp.id, "soldDate", e.target.value)} /></td>)}</tr>
+          <tr><th>成約時期</th>{comparables.map((comp) => <td key={comp.id}><input className="centered-date" type="date" value={comp.soldDate} onChange={(e) => updateComp(comp.id, "soldDate", e.target.value)} /></td>)}</tr>
           {type === "house" && <tr className="compact-settings no-print"><th>建物基準</th>{comparables.map((comp) => <td key={comp.id}><input type="number" value={comp.constructionUnit} onChange={(e) => updateComp(comp.id, "constructionUnit", Number(e.target.value))} /><small>万円/坪</small><input type="number" value={comp.usefulLife} onChange={(e) => updateComp(comp.id, "usefulLife", Number(e.target.value))} /><small>年</small></td>)}</tr>}
           <tr className="unit-row"><th>坪単価<br /><small>{type === "house" ? "（土地相当）" : type === "mansion" ? "（専有面積）" : "（土地）"}</small></th>{comparables.map((comp) => <td key={comp.id}><strong>{compUnit(comp, type) ? formatNumber(compUnit(comp, type), 1) : "—"}</strong><small>万円／坪</small></td>)}</tr>
         </tbody></table></section>
-        <section className="market-range-box"><div>周辺の成約坪単価<small>（{type === "house" ? "土地相当" : propertyLabels[type]}）</small></div><div className="market-range-editor"><div><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /></div><small>万円／坪</small><button className="inline-auto no-print" onClick={() => setUnitManual(false)}>自動値に戻す</button></div><p>有効な事例 {validUnits.length} 件の平均値に対して±5％を目安に自動算出しています。</p></section><footer className="page-note">※成約価格は市場事例をもとに作成しており、実際の成約価格を保証するものではありません。</footer>
+        <section className="market-range-box"><div>周辺の成約坪単価<small>（{type === "house" ? "土地相当" : propertyLabels[type]}）</small></div><div className="market-range-editor"><div><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /></div><small>万円／坪</small><button className="inline-auto no-print" onClick={() => setUnitManual(false)}>自動値に戻す</button></div><p className="market-commentary">上記成約は、対象物件と立地・土地広さ・建物面積・築年数・間取り等が<br />近い物件を抽出したものです。<br />周辺の{type === "mansion" ? "マンション" : "土地"}成約坪単価は{formatNumber(surroundLow, 1)}～{formatNumber(surroundHigh, 1)}万円で推移しており、<br />対象物件の条件を踏まえた価格水準の判断材料としています。</p></section><footer className="page-note">※成約価格は市場事例をもとに作成しており、実際の成約価格を保証するものではありません。</footer>
       </article>
       <article id="page-4" className="report-page analysis-page">
         <PageHeader number="04" title={type === "mansion" ? "マンション評点" : "土地評点"} english="VALUE ANALYSIS" description="対象物件の特徴や市場動向をもとに、プラス要因・マイナス要因を整理し、査定価格を算出しました。" />
         <section className="factor-columns">{(["plus", "minus"] as const).map((side) => <div className={`factor-column ${side}`} key={side}><h3>{side === "plus" ? "+ PLUS（プラス要因）" : "− MINUS（マイナス要因）"}</h3>{factors[side].map((factor, index) => <div className="factor-item" key={index}><i>{side === "plus" ? ["◎", "☀", "⌂", "▦"][index] : ["▣", "▥", "▰", "▲"][index]}</i><div><input value={factor.title} onChange={(e) => updateFactor(side, index, "title", e.target.value)} /><textarea value={factor.description} onChange={(e) => updateFactor(side, index, "description", e.target.value)} /></div></div>)}</div>)}</section>
-        <aside className="calculation-flow"><h3>査定価格の算出フロー</h3><div className="flow-box"><span>周辺成約坪単価</span><div className="unit-edit-row"><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /><small>万円／坪</small></div><button className="inline-auto no-print" onClick={() => setUnitManual(false)}>平均±5％へ戻す</button></div><b className="flow-symbol">×</b><div className="flow-box editable-flow"><span>対象物件の評価補正</span><div><FormattedNumberInput value={adjustLow} decimals={1} showPlus showZero onChange={setAdjustLow} ariaLabel="評価補正 下限" /><b>〜</b><FormattedNumberInput value={adjustHigh} decimals={1} showPlus showZero onChange={setAdjustHigh} ariaLabel="評価補正 上限" /><small>万円／坪</small></div></div><b className="flow-symbol">＝</b><div className="flow-box gold-box"><span>対象物件の査定坪単価</span><div className="target-unit-edit"><FormattedNumberInput value={adjustedLow} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(value); setTargetUnitHighManual(targetUnitManual ? targetUnitHighManual : adjustedHigh); }} ariaLabel="対象物件の査定坪単価 下限" /><b>〜</b><FormattedNumberInput value={adjustedHigh} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(targetUnitManual ? targetUnitLowManual : adjustedLow); setTargetUnitHighManual(value); }} ariaLabel="対象物件の査定坪単価 上限" /><small>万円／坪</small></div><button className="inline-auto no-print" onClick={() => setTargetUnitManual(false)}>自動値に戻す</button></div><div className="down-arrow">▼</div><div className="flow-box final-flow"><span>対象物件の査定価格</span><strong><PriceValue value={appraisalLow} />〜<PriceValue value={appraisalHigh} /></strong>{type === "house" && <small>土地相当額に建物評価額を加算</small>}</div></aside>
+        <aside className="calculation-flow"><h3>査定価格の算出フロー</h3><div className="flow-box"><span>周辺成約坪単価</span><div className="unit-edit-row"><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /><small>万円／坪</small></div><button className="inline-auto no-print" onClick={() => setUnitManual(false)}>平均±5％へ戻す</button></div><b className="flow-symbol">×</b><div className="flow-box editable-flow"><span>対象物件の評価補正</span><div><FormattedNumberInput value={adjustLow} decimals={1} showPlus showZero onChange={setAdjustLow} ariaLabel="評価補正 下限" /><b>〜</b><FormattedNumberInput value={adjustHigh} decimals={1} showPlus showZero onChange={setAdjustHigh} ariaLabel="評価補正 上限" /><small>万円／坪</small></div></div><b className="flow-symbol equals-symbol">＝</b><div className="flow-box gold-box"><span>対象物件の査定坪単価</span><div className="target-unit-edit"><FormattedNumberInput value={adjustedLow} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(value); setTargetUnitHighManual(targetUnitManual ? targetUnitHighManual : adjustedHigh); }} ariaLabel="対象物件の査定坪単価 下限" /><b>〜</b><FormattedNumberInput value={adjustedHigh} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(targetUnitManual ? targetUnitLowManual : adjustedLow); setTargetUnitHighManual(value); }} ariaLabel="対象物件の査定坪単価 上限" /><small>万円／坪</small></div><button className="inline-auto no-print" onClick={() => setTargetUnitManual(false)}>自動値に戻す</button></div><div className="down-arrow">▼</div><div className="flow-box final-flow"><span>対象物件の査定価格</span><strong><PriceValue value={appraisalLow} />〜<PriceValue value={appraisalHigh} /></strong>{type === "house" && <small>土地相当額に建物評価額を加算</small>}</div></aside>
         <section className="overall-box"><i>!</i><div><strong>総合評価</strong><p>周辺成約事例から算出した坪単価に、対象物件固有の評価補正を加え、現在の市場性を総合的に反映した査定価格です。</p></div></section><footer className="wide-note">※実際の成約価格は、売却時期・市場動向・物件の状態・交渉条件等により変動する可能性があります。</footer>
       </article>
       {type === "house" && <article id="page-5" className="report-page building-page">
         <PageHeader number="05" title="建物の経年減価による評価" english="PROPERTY VALUE ANALYSIS" description="築年数・構造・建物状態・設備仕様等を考慮し、建物の経年減価を反映した評価額を算出しました。" />
-        <section className="building-flow"><div className="building-step"><span>新築時想定建物価格</span><MoneyEditor className="building-money" value={Math.round(newBuildingPrice)} onChange={setNewBuildingPriceManual} /><button className="mini-reset no-print" onClick={() => setNewBuildingPriceManual(0)}>面積×単価へ戻す</button></div><b>▼</b><div className="building-step dual-step"><span>築年数</span><strong>{targetAge}<small>年</small></strong></div><b>▼</b><div className="building-step structure-step"><span>構造</span><select value={structure} onChange={(e) => { const next = e.target.value; setStructure(next); if (next === "木造") { setBuildingUnit(66); setUsefulLife(25); } else { setBuildingUnit(90); setUsefulLife(30); } }}><option>木造</option><option>軽量鉄骨造</option><option>鉄筋コンクリート造</option><option>その他</option></select></div><div className="building-config no-print"><Field label="建物単価" value={buildingUnit} type="number" onChange={(v) => setBuildingUnit(Number(v))} suffix="万円/坪" /><Field label="耐用年数" value={usefulLife} type="number" onChange={(v) => setUsefulLife(Number(v))} suffix="年" /></div><b>▼</b><div className="building-step dual-step depreciation-step"><span>経年による減価を考慮</span><strong className="residual-copy"><span>残存価値率　約</span><b>{Math.round(residualRate * 100)}</b><small>％</small></strong></div><b>▼</b><div className="building-total"><span>建物評価額</span><strong>{formatNumber(Math.round(buildingValue))}<small>万円</small></strong></div></section>
+        <section className="building-flow"><div className="building-step"><span>新築時想定建物価格</span><MoneyEditor className="building-money" value={Math.round(newBuildingPrice)} onChange={setNewBuildingPriceManual} /><button className="mini-reset no-print" onClick={() => setNewBuildingPriceManual(0)}>面積×単価へ戻す</button></div><b>▼</b><div className="building-step dual-step"><span>築年数</span><strong>{targetAge}<small>年</small></strong></div><b>▼</b><div className="building-step structure-step"><span>構造</span><input list="building-structure-options" value={structure} onChange={(e) => handleStructureChange(e.target.value)} /><datalist id="building-structure-options">{structureOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</datalist></div><div className="building-config print-hidden-preserve"><Field label="建物単価" value={buildingUnit} type="number" onChange={(v) => setBuildingUnit(Number(v))} suffix="万円/坪" /><Field label="耐用年数" value={usefulLife} type="number" onChange={(v) => setUsefulLife(Number(v))} suffix="年" /></div><b>▼</b><div className="building-step dual-step depreciation-step"><span>経年による減価を考慮</span><strong className="residual-copy"><span>残存価値率　約</span><b>{Math.round(residualRate * 100)}</b><small>％</small></strong></div><b>▼</b><div className="building-total"><span>建物評価額</span><strong>{formatNumber(Math.round(buildingValue))}<small>万円</small></strong></div></section>
         <section className="building-chart"><h3>建物の残存価値の目安（{structure}の場合）</h3><DepreciationChart age={targetAge} life={usefulLife} /><div className="chart-label">対象物件　築{targetAge}年</div></section><section className="evaluation-points"><strong>評価のポイント</strong><p>✓ 建物の維持管理状況・劣化状況を確認</p><p>✓ 設備のグレード・仕様を考慮</p><p>✓ リフォーム・修繕履歴を考慮</p><p>✓ 周辺の中古建物の取引動向を参考</p></section><footer className="building-note"><b>i</b><p>建物評価額は、税務上の減価償却費を算出するものではありません。築年数・構造・施工状況・維持管理状態・設備仕様・リフォーム履歴等を総合的に考慮した査定上の参考価格です。</p></footer>
       </article>}
       <article id="page-strategy" className="report-page strategy-page">
