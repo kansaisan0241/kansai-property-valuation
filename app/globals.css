@@ -83,7 +83,7 @@ button { cursor: pointer; }
 .header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; }
 .result-photo { position: absolute; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); }
 
-.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 34%; padding: 4.15% 3.35% 2.2%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
+.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 34%; padding: 3.2% 3.35% 2.2%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
 .section-tab { position: absolute; top: -24px; left: 3%; padding: 10px 18px; color: white; background: var(--navy); font-size: clamp(11px,1.45vw,21px); letter-spacing: .08em; }
 .section-tab small { font-size: .75em; }
 .valuation-range { display: flex; align-items: center; gap: 12px; }
@@ -91,8 +91,8 @@ button { cursor: pointer; }
 .valuation-range input { flex: 1 1 auto; min-width: 0; width: 100%; height: auto; padding: 0 3px; border: 0; border-bottom: 1px dashed #c8a86b; border-radius: 0; color: var(--gold); background: transparent; font: 500 clamp(42px,5.9vw,88px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .valuation-range .money-editor span { flex: none; margin: 0; color: var(--gold); font: 500 clamp(15px,2.15vw,32px)/1 "Yu Mincho", serif; }
 .valuation-range > b { color: var(--gold); font-size: clamp(24px,3vw,45px); font-weight: 400; }
-.valuation-box > p { margin: 4px 1.7% 0; padding-bottom: 11px; border-bottom: 1px solid #ded6c6; font: 500 clamp(8px,.95vw,14px) "Yu Gothic", sans-serif; }
-.recommended-row { display: grid; grid-template-columns: 25% minmax(0,48%) 1fr; align-items: center; gap: 12px; margin-top: 10px; }
+.valuation-box > p { margin: 0 1.7%; padding-bottom: 8px; border-bottom: 1px solid #ded6c6; font: 500 clamp(8px,.95vw,14px) "Yu Gothic", sans-serif; }
+.recommended-row { display: grid; grid-template-columns: 25% minmax(0,48%) 1fr; align-items: center; gap: 12px; margin-top: 5px; }
 .recommended-row > span { padding: 14px 10px; color: white; background: linear-gradient(100deg, #a56c10, #c29849); font-size: clamp(11px,1.4vw,21px); text-align: center; letter-spacing: .12em; }
 .recommended-row .money-editor { min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 5px; }
 .recommended-row .money-editor input { min-width: 0; width: 100%; height: auto; padding: 0; border: 0; color: var(--gold); background: transparent; font: 500 clamp(40px,5.4vw,80px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
@@ -107,12 +107,20 @@ button { cursor: pointer; }
 .detail-item i { flex: 0 0 clamp(29px,2.9vw,43px); height: clamp(29px,2.9vw,43px); display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: clamp(12px,1.4vw,21px); }
 .detail-item div { min-width: 0; flex: 1; display: grid; gap: 4px; }
 .detail-item strong { font-size: clamp(10px,1.1vw,16.5px); }
-.detail-item input, .detail-item select { min-width: 0; width: 100%; height: 27px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); font-size: clamp(8px,.9vw,13px); }
-.detail-item small { color: #596b83; font-size: clamp(8px,.82vw,12px); white-space: nowrap; }
+.detail-item input, .detail-item select { min-width: 0; width: 100%; height: 29px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); font-size: clamp(10px,1.08vw,16px); }
+.detail-item small { color: #596b83; font-size: clamp(9px,.96vw,14px); white-space: nowrap; }
 .detail-print-value { display: none; }
-.area-detail > div { grid-template-columns: minmax(0, 1fr) auto; column-gap: 2px; }
+.area-detail > div { grid-template-columns: auto auto; justify-content: start; column-gap: 0; }
 .area-detail > div > strong { grid-column: 1 / -1; }
-.area-detail input { text-align: right; }
+.area-detail input { width: 6.3em !important; text-align: left; }
+.area-detail small { align-self: center; }
+.editable-choice { position: relative; min-width: 0; display: block; }
+.editable-choice > input { padding-right: 35px; }
+.choice-toggle { position: absolute; z-index: 3; top: 0; right: 0; width: 32px; height: 29px; padding: 0; border: 0; border-left: 1px solid var(--edit-border); border-radius: 0 3px 3px 0; color: var(--navy); background: #dceaff; font-size: 10px; }
+.choice-menu { position: absolute; z-index: 30; top: calc(100% + 3px); right: 0; width: max(100%, 180px); padding: 4px; display: grid; gap: 2px; border: 1px solid #8caacb; border-radius: 4px; background: white; box-shadow: 0 10px 24px rgba(7,26,67,.2); }
+.choice-menu button { width: 100%; padding: 6px 9px; border: 0; border-radius: 2px; color: var(--navy); background: white; font: 600 12px "Yu Gothic", sans-serif; text-align: left; white-space: nowrap; }
+.choice-menu button:hover { background: #eaf3ff; }
+.detail-item:nth-child(n+7) .choice-menu { top: auto; bottom: calc(100% + 3px); }
 .disclaimer-box { position: absolute; left: 3.2%; right: 3.2%; bottom: 2.2%; min-height: 6.6%; padding: 9px 20px; display: flex; align-items: center; gap: 17px; border: 1px solid #e1cda7; font: 500 clamp(7px,.8vw,12px)/1.6 "Yu Gothic", sans-serif; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
@@ -207,6 +215,7 @@ button { cursor: pointer; }
 .building-step { position: relative; width: 100%; min-height: 74px; display: grid; grid-template-columns: 45% 1fr; border: 1px solid #d8d8d8; }
 .building-step > span { display: grid; place-items: center; padding: 8px; color: white; background: var(--navy); font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .building-step .field, .building-step > strong, .building-step select, .building-step > input { align-self: stretch; padding: 0 16px; }
+.building-step > .editable-choice { align-self: stretch; min-width: 0; }
 .building-step .field input { height: 100%; border: 0; color: var(--gold); background: transparent; font: 500 clamp(23px,3.2vw,48px) Georgia, serif; text-align: right; }
 .building-step .field small, .building-step > strong small { color: inherit; font-size: .48em; }
 .building-flow > b { width: 100%; min-height: 19px; display: grid; place-items: center; color: #bd9349; line-height: 1; text-align: center; }
@@ -219,7 +228,8 @@ button { cursor: pointer; }
 .residual-copy > span { font-size: clamp(10px,1.05vw,16px); font-weight: 500; }
 .residual-copy > b { color: var(--gold); font-size: clamp(23px,2.65vw,40px); font-weight: 500; }
 .residual-copy > small { color: var(--gold); font-size: clamp(10px,1.15vw,17px); }
-.structure-step select, .structure-step > input { border: 0; border-radius: 0; background: var(--edit); text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.structure-step select, .structure-step > input, .structure-step .editable-choice > input { height: 100%; border: 0; border-radius: 0; background: var(--edit); text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.structure-step .choice-toggle { width: 42px; height: 100%; }
 .building-config { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .building-config .field { padding: 6px; border: 1px dashed #9bb9dd; background: #f5f9ff; }
 .building-total { width: 100%; min-height: 104px; display: grid; grid-template-columns: 40% 1fr; color: white; background: linear-gradient(120deg, #061a42, #0c3569); }
