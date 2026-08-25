@@ -62,14 +62,14 @@ button { cursor: pointer; }
 .cover-title i { display: block; width: 100%; height: 1px; margin-top: 24px; background: var(--gold-light); }
 .cover-fields { position: absolute; top: 38.5%; left: 6.2%; width: 38%; padding: 7px; display: grid; gap: 7px; background: rgba(255,255,255,.76); backdrop-filter: blur(4px); }
 .cover-fields .field { min-height: 41px; }
-.cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 clamp(11px,1.22vw,19px) "Yu Mincho", serif; }
-.cover-fields .field-control input { height: 37px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); font: 500 clamp(12px,1.35vw,21px) "Yu Mincho", serif; }
+.cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 clamp(12px,1.32vw,20.5px) "Yu Mincho", serif; }
+.cover-fields .field-control input { height: 37px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); font: 500 clamp(13px,1.45vw,22.5px) "Yu Mincho", serif; }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: clamp(10px,1.08vw,16px); letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
 .cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 1000 / 316; display: block; background: url("/casa.png") center / contain no-repeat; }
-.cover-company span { font-size: clamp(13px,1.5vw,23px); font-weight: 700; letter-spacing: .04em; }
+.cover-company span { font-size: clamp(14px,1.62vw,25px); font-weight: 700; letter-spacing: .04em; }
 
 .page-rail { position: absolute; z-index: 4; top: 0; left: 0; width: 8.4%; height: 21.5%; display: flex; flex-direction: column; align-items: center; padding-top: 4%; color: white; background: linear-gradient(140deg, #061a42, #092a59); }
 .page-rail strong { font: 400 clamp(24px,3.5vw,51px) Georgia, serif; letter-spacing: .04em; }
@@ -121,7 +121,7 @@ button { cursor: pointer; }
 .choice-menu button { width: 100%; padding: 7px 10px; border: 0; border-radius: 2px; color: var(--navy); background: white; font: 600 14px "Yu Gothic", sans-serif; text-align: left; white-space: nowrap; }
 .choice-menu button:hover { background: #eaf3ff; }
 .detail-item:nth-child(n+7) .choice-menu { top: auto; bottom: calc(100% + 3px); }
-.disclaimer-box { position: absolute; left: 3.2%; right: 3.2%; bottom: 2.2%; min-height: 6.6%; padding: 9px 20px; display: flex; align-items: center; gap: 17px; border: 1px solid #e1cda7; font: 500 clamp(8px,.9vw,13.5px)/1.6 "Yu Gothic", sans-serif; }
+.disclaimer-box { position: absolute; left: 3.2%; right: 3.2%; bottom: 2.2%; min-height: 6.6%; padding: 9px 20px; display: flex; align-items: center; gap: 17px; border: 1px solid #e1cda7; font: 500 clamp(9px,1.02vw,15.5px)/1.55 "Yu Gothic", sans-serif; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
 
@@ -143,9 +143,10 @@ button { cursor: pointer; }
 .comparison-table td { background: rgba(255,255,255,.92); }
 .comparison-table input { width: 100%; min-width: 0; padding: 4px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; font-size: inherit; }
 .comparison-table td, .comparison-table td input, .comparison-table td small { text-align: center; }
-.comparison-table input[type="date"], .comparison-table input[type="month"] { font-size: .9em; text-align: center; text-align-last: center; }
+.comparison-table input[type="date"], .comparison-table input[type="month"] { font-size: 1em; text-align: center; text-align-last: center; }
 .comparison-table input[type="date"]::-webkit-datetime-edit, .comparison-table input[type="month"]::-webkit-datetime-edit { width: 100%; text-align: center; }
 .centered-date { text-align: center !important; text-align-last: center !important; }
+.comparison-print-date { display: none; }
 .comparison-table td small { display: block; margin-top: 2px; color: #58677c; font-size: .86em; }
 .area-inline, .price-inline { display: flex; align-items: center; justify-content: center; gap: 2px; white-space: nowrap; }
 .area-inline input { flex: 0 1 5.7em; width: 5.7em; }
@@ -168,7 +169,7 @@ button { cursor: pointer; }
 .market-range-editor > small { font: 600 clamp(9px,1vw,15px) "Yu Mincho", serif; }
 .market-range-editor .inline-auto { top: -17px; right: 4px; }
 .market-range-box > p { margin: 0; padding: 0 25px; font: 500 clamp(7px,.85vw,13px)/1.8 "Yu Gothic", sans-serif; }
-.market-range-box > .market-commentary { padding: 0 18px; font-size: clamp(6.5px,.76vw,11.5px); line-height: 1.65; }
+.market-range-box > .market-commentary { padding: 0 18px; font-size: clamp(8px,.9vw,13.5px); line-height: 1.62; }
 .page-note { position: absolute; bottom: 2.1%; left: 2.6%; font: 500 clamp(6px,.7vw,10px) "Yu Gothic", sans-serif; }
 
 .factor-columns { position: absolute; top: 23%; left: 2.5%; width: 60.5%; height: 50.3%; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -205,7 +206,7 @@ button { cursor: pointer; }
 .down-arrow { margin: 4px 0; color: var(--gold); text-align: center; font-size: 22px; }
 .final-flow { min-height: 108px; border: 2px solid var(--navy); }
 .final-flow strong { font: 500 clamp(17px,1.95vw,29px)/1.15 "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
-.final-flow > small { font-size: 9px; }
+.final-flow > small { font-size: clamp(7px,.66vw,10px); line-height: 1.35; }
 .overall-box { position: absolute; left: 2.5%; top: 76%; width: 60.5%; height: 13%; display: flex; align-items: center; border: 1px solid var(--navy); }
 .overall-box i { align-self: stretch; flex: 0 0 110px; display: grid; place-items: center; color: white; background: var(--navy); font-style: normal; font-size: 38px; }
 .overall-box div { padding: 12px 25px; }
@@ -230,6 +231,7 @@ button { cursor: pointer; }
 .residual-copy > span { font-size: clamp(10px,1.05vw,16px); font-weight: 500; }
 .residual-copy > b { color: var(--gold); font-size: clamp(23px,2.65vw,40px); font-weight: 500; }
 .residual-copy > small { color: var(--gold); font-size: clamp(10px,1.15vw,17px); }
+.structure-step, .structure-step > .editable-choice { background: white; }
 .structure-step select, .structure-step > input, .structure-step .editable-choice > input { height: 100%; border: 0; border-radius: 0; color: var(--navy); background: white; text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .structure-step .choice-toggle { width: 42px; height: 100%; }
 .building-config { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
@@ -241,7 +243,7 @@ button { cursor: pointer; }
 .building-chart { position: absolute; top: 23.5%; right: 5.2%; width: 43%; height: 40%; }
 .building-chart h3 { margin: 0; padding: 10px; color: white; background: var(--navy); font-size: clamp(9px,1.1vw,16px); text-align: center; }
 .depreciation-canvas { width: 100%; height: 310px; }
-.chart-label { width: max-content; margin: -18px auto 0; padding: 7px 16px; color: white; background: var(--gold); font: 700 11px "Yu Gothic", sans-serif; }
+.chart-label { width: max-content; margin: -3px auto 0; padding: 7px 16px; color: white; background: var(--gold); font: 700 11px "Yu Gothic", sans-serif; }
 .evaluation-points { position: absolute; right: 5.2%; bottom: 15.7%; width: 43%; height: 14.7%; padding: 17px 25px; display: grid; grid-template-columns: 150px 1fr 1fr; gap: 7px 15px; align-content: center; border: 1px solid #dcc9a8; font: 500 clamp(7px,.8vw,12px) "Yu Gothic", sans-serif; }
 .evaluation-points strong { grid-row: span 2; color: var(--gold); }
 .evaluation-points p { margin: 0; }
@@ -265,7 +267,7 @@ button { cursor: pointer; }
 .recommended-card { border-color: var(--gold); }
 .recommended-card h4 { background: linear-gradient(110deg, #a87314, #c19746); }
 .recommended-card > strong, .recommended-card li::before { color: var(--gold); }
-.recommended-card em { position: absolute; z-index: 2; top: 3px; right: -6px; width: 58px; color: white; font: 700 9px "Yu Gothic", sans-serif; text-align: center; transform: rotate(43deg); }
+.recommended-card em { position: absolute; z-index: 2; top: 3px; right: -10px; width: 58px; color: white; font: 700 9px "Yu Gothic", sans-serif; text-align: center; transform: rotate(43deg); }
 .sales-flow { position: absolute; top: 22.5%; right: 3.5%; width: 27%; height: 47%; padding-left: 26px; border-left: 1px solid var(--navy); }
 .sales-flow h3 { margin-bottom: 10px; }
 .sales-flow h3 small { font-size: .65em; }
@@ -326,9 +328,12 @@ button { cursor: pointer; }
   textarea { overflow: hidden; resize: none; }
   .cover-fields { background: transparent !important; backdrop-filter: none; }
   .detail-item input[type="month"] { display: none !important; }
-  .detail-print-value { display: block; min-height: 27px; padding: 3px 7px; font-size: clamp(8px,.9vw,13px); }
+  .detail-print-value { display: block; min-height: 27px; padding: 3px 7px; font-size: clamp(11px,1.18vw,17.5px); }
   .area-detail input, .area-detail small { display: none !important; }
   .area-print-value { display: block; grid-column: 1 / -1; min-height: 27px; padding: 3px 0; color: var(--navy); font-size: clamp(11px,1.18vw,17.5px); white-space: nowrap; }
+  .comparison-date-input { display: none !important; }
+  .comparison-print-date { display: block; width: 100%; color: var(--navy); font-size: 1em; text-align: center; }
+  .structure-step, .structure-step > .editable-choice, .structure-step .editable-choice > input { background: white !important; }
   .print-hidden-preserve { visibility: hidden !important; }
   .comparison-table input { padding: 0; }
 }
