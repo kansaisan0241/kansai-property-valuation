@@ -53,6 +53,7 @@ button { cursor: pointer; }
 
 .report-stack { display: grid; gap: 44px; padding: 0 16px 80px; }
 .report-page { position: relative; width: min(1480px, calc(100vw - 32px)); aspect-ratio: 297 / 210; margin: 0 auto; overflow: hidden; color: var(--ink); background: var(--paper); box-shadow: 0 20px 55px rgba(21,39,68,.2), 0 2px 6px rgba(21,39,68,.1); border: 1px solid #cfd5df; }
+.report-page:not(.cover-page) { background: white; }
 
 .cover-page { background: white url("/cover-report.png") center/100% 100% no-repeat; }
 .cover-title { position: absolute; top: 11.7%; left: 5.2%; width: 56%; padding-left: 3.7%; }
@@ -105,7 +106,7 @@ button { cursor: pointer; }
 .detail-grid { margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 70px; column-gap: 24px; row-gap: 4px; }
 .detail-item { min-width: 0; padding: 6px 8px; display: flex; align-items: center; gap: 11px; border: 0; font-family: "Yu Gothic", sans-serif; }
 .detail-item i { flex: 0 0 clamp(29px,2.9vw,43px); height: clamp(29px,2.9vw,43px); display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: clamp(12px,1.4vw,21px); }
-.detail-item div { min-width: 0; flex: 1; display: grid; gap: 4px; }
+.detail-item div { min-width: 0; flex: 1; display: grid; gap: 2px; }
 .detail-item strong { font-size: clamp(12px,1.28vw,19.5px); }
 .detail-item input, .detail-item select, .detail-item textarea { min-width: 0; width: 100%; height: 31px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); color: var(--navy); font: 500 clamp(12px,1.27vw,19px)/1.3 "Yu Gothic", sans-serif; }
 .detail-item textarea { height: 42px; overflow: hidden; resize: none; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -143,11 +144,15 @@ button { cursor: pointer; }
 .comparison-table th:first-child { width: 11.5%; color: white; background: linear-gradient(110deg, #102852, #173965); }
 .comparison-table td { background: rgba(255,255,255,.92); }
 .comparison-table input { width: 100%; min-width: 0; padding: 4px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; font-size: inherit; }
+.comparison-table tr:first-child td input { font-size: clamp(8px,1vw,15px); }
+.comparison-table input.address-long { font-size: .82em !important; }
+.comparison-table input.address-very-long { font-size: .68em !important; letter-spacing: -.02em; }
 .comparison-table td, .comparison-table td input, .comparison-table td small { text-align: center; }
 .comparison-table input[type="date"], .comparison-table input[type="month"] { font-size: 1em; text-align: center; text-align-last: center; }
 .comparison-table input[type="date"]::-webkit-datetime-edit, .comparison-table input[type="month"]::-webkit-datetime-edit { width: 100%; text-align: center; }
 .centered-date { text-align: center !important; text-align-last: center !important; }
 .comparison-print-date { display: none; }
+.empty-value { display: block; color: #58677c; font-size: 1.08em; text-align: center; }
 .comparison-table td small { display: block; margin-top: 2px; color: #58677c; font-size: .9em; }
 .area-inline, .price-inline { display: flex; align-items: center; justify-content: center; gap: 2px; white-space: nowrap; }
 .area-inline input { flex: 0 1 5.7em; width: 5.7em; }
@@ -268,8 +273,8 @@ button { cursor: pointer; }
 .strategy-card h4 small { display: block; margin-top: 5px; font: 500 .68em "Yu Mincho", serif; }
 .strategy-card > strong { display: block; margin: 25px 15px 14px; padding-bottom: 19px; border-bottom: 1px solid #dadde2; font: 500 clamp(25px,3.5vw,52px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .strategy-card > strong small { margin-left: 5px; font: 500 .42em "Yu Mincho", serif; }
-.strategy-card > p { min-height: 58px; margin: 0 18px; padding-bottom: 17px; border-bottom: 1px solid #dadde2; font: 600 clamp(7px,.78vw,11px)/1.7 "Yu Gothic", sans-serif; }
-.strategy-card ul { margin: 15px 18px; padding: 0; list-style: none; text-align: left; font: 500 clamp(7px,.74vw,11px)/1.95 "Yu Gothic", sans-serif; }
+.strategy-card > p { min-height: 62px; margin: 0 18px; padding-bottom: 14px; border-bottom: 1px solid #dadde2; font: 600 clamp(9px,.92vw,14px)/1.55 "Yu Gothic", sans-serif; }
+.strategy-card ul { margin: 13px 18px; padding: 0; list-style: none; text-align: left; font: 500 clamp(8px,.86vw,13px)/1.85 "Yu Gothic", sans-serif; }
 .strategy-card li::before { content: "●"; margin-right: 8px; color: var(--navy); }
 .recommended-card { border-color: var(--gold); }
 .recommended-card h4 { background: linear-gradient(110deg, #a87314, #c19746); }
@@ -326,7 +331,7 @@ button { cursor: pointer; }
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
   .report-stack { display: block; padding: 0; }
-  .report-page { width: 297mm; height: 210mm; margin: 0; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
+  .report-page { width: 296mm; height: 209mm; margin: .5mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
   .report-page:last-child { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
@@ -339,12 +344,12 @@ button { cursor: pointer; }
   .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
   .detail-item { padding: 2px 6px; }
   .detail-item strong { font-size: 16.5px; }
-  .detail-item input, .detail-item select, .detail-item textarea, .detail-print-value, .area-print-value { color: var(--navy); font-size: 18px !important; line-height: 1.22; }
+  .detail-item input, .detail-item select, .detail-item textarea, .detail-print-value, .area-print-value { color: var(--navy); line-height: 1.22; }
   .detail-item textarea { height: 42px; }
   .detail-item small { font-size: 16px; }
-  .detail-print-value { display: block; min-height: 27px; padding: 3px 7px; }
+  .detail-print-value { display: block; min-height: 27px; padding: 3px 7px; font-size: clamp(12px,1.27vw,19px); }
   .area-detail input, .area-detail small { display: none !important; }
-  .area-print-value { display: block; grid-column: 1 / -1; min-height: 27px; padding: 3px 0; color: var(--navy); font-size: clamp(11px,1.18vw,17.5px); white-space: nowrap; }
+  .area-print-value { display: block; grid-column: 1 / -1; min-height: 27px; padding: 3px 0; color: var(--navy); font-size: clamp(12px,1.27vw,19px); white-space: nowrap; }
   .comparison-date-input { display: none !important; }
   .comparison-print-date { display: block; width: 100%; color: var(--navy); font-size: 1em; text-align: center; }
   .structure-step, .structure-step > .editable-choice, .structure-step .editable-choice > input { background: white !important; }
@@ -355,4 +360,6 @@ button { cursor: pointer; }
   .strategy-card > strong { margin: 14px 13px 10px; padding-bottom: 10px; }
   .strategy-card > p { min-height: 48px; margin: 0 14px; padding-bottom: 9px; line-height: 1.55; }
   .strategy-card ul { margin: 9px 14px; line-height: 1.65; }
+  .depreciation-canvas { height: 310px; }
+  .sales-step { height: 68px; }
 }
