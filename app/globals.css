@@ -97,7 +97,7 @@ button { cursor: pointer; }
 .recommended-row .money-editor { min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 5px; }
 .recommended-row .money-editor input { min-width: 0; width: 100%; height: auto; padding: 0; border: 0; color: var(--gold); background: transparent; font: 500 clamp(40px,5.4vw,80px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .recommended-row .money-editor span { flex: none; margin: 0; color: var(--gold); font: 500 clamp(13px,1.6vw,24px)/1 "Yu Mincho", serif; }
-.recommended-row p { margin: 0; font: 600 clamp(7px,.75vw,11px)/1.7 "Yu Gothic", sans-serif; }
+.recommended-row p { margin: 0; font: 600 clamp(8px,.86vw,13px)/1.65 "Yu Gothic", sans-serif; white-space: nowrap; }
 .mini-reset { position: absolute; right: 4px; bottom: -27px; padding: 4px 8px; border: 1px solid #9bb9dd; border-radius: 3px; color: #375e8c; background: #f3f8ff; font: 700 10px "Yu Gothic", sans-serif; }
 .property-details { position: absolute; top: 62.2%; left: 3.2%; right: 3.2%; height: 29%; }
 .section-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 26px; font-size: clamp(15px,1.85vw,28px); letter-spacing: .13em; }
@@ -106,22 +106,22 @@ button { cursor: pointer; }
 .detail-item { min-width: 0; padding: 6px 8px; display: flex; align-items: center; gap: 11px; border: 0; font-family: "Yu Gothic", sans-serif; }
 .detail-item i { flex: 0 0 clamp(29px,2.9vw,43px); height: clamp(29px,2.9vw,43px); display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: clamp(12px,1.4vw,21px); }
 .detail-item div { min-width: 0; flex: 1; display: grid; gap: 4px; }
-.detail-item strong { font-size: clamp(10px,1.1vw,16.5px); }
-.detail-item input, .detail-item select { min-width: 0; width: 100%; height: 29px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); font-size: clamp(10px,1.08vw,16px); }
-.detail-item small { color: #596b83; font-size: clamp(9px,.96vw,14px); white-space: nowrap; }
-.detail-print-value { display: none; }
+.detail-item strong { font-size: clamp(11px,1.2vw,18px); }
+.detail-item input, .detail-item select { min-width: 0; width: 100%; height: 30px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); font-size: clamp(11px,1.18vw,17.5px); }
+.detail-item small { color: #596b83; font-size: clamp(10px,1.06vw,15.5px); white-space: nowrap; }
+.detail-print-value, .area-print-value { display: none; }
 .area-detail > div { grid-template-columns: auto auto; justify-content: start; column-gap: 0; }
 .area-detail > div > strong { grid-column: 1 / -1; }
 .area-detail input { width: 6.3em !important; text-align: left; }
 .area-detail small { align-self: center; }
 .editable-choice { position: relative; min-width: 0; display: block; }
 .editable-choice > input { padding-right: 35px; }
-.choice-toggle { position: absolute; z-index: 3; top: 0; right: 0; width: 32px; height: 29px; padding: 0; border: 0; border-left: 1px solid var(--edit-border); border-radius: 0 3px 3px 0; color: var(--navy); background: #dceaff; font-size: 10px; }
+.choice-toggle { position: absolute; z-index: 3; top: 0; right: 0; width: 32px; height: 30px; padding: 0; border: 0; border-left: 1px solid var(--edit-border); border-radius: 0 3px 3px 0; color: var(--navy); background: #dceaff; font-size: 12px; }
 .choice-menu { position: absolute; z-index: 30; top: calc(100% + 3px); right: 0; width: max(100%, 180px); padding: 4px; display: grid; gap: 2px; border: 1px solid #8caacb; border-radius: 4px; background: white; box-shadow: 0 10px 24px rgba(7,26,67,.2); }
-.choice-menu button { width: 100%; padding: 6px 9px; border: 0; border-radius: 2px; color: var(--navy); background: white; font: 600 12px "Yu Gothic", sans-serif; text-align: left; white-space: nowrap; }
+.choice-menu button { width: 100%; padding: 7px 10px; border: 0; border-radius: 2px; color: var(--navy); background: white; font: 600 14px "Yu Gothic", sans-serif; text-align: left; white-space: nowrap; }
 .choice-menu button:hover { background: #eaf3ff; }
 .detail-item:nth-child(n+7) .choice-menu { top: auto; bottom: calc(100% + 3px); }
-.disclaimer-box { position: absolute; left: 3.2%; right: 3.2%; bottom: 2.2%; min-height: 6.6%; padding: 9px 20px; display: flex; align-items: center; gap: 17px; border: 1px solid #e1cda7; font: 500 clamp(7px,.8vw,12px)/1.6 "Yu Gothic", sans-serif; }
+.disclaimer-box { position: absolute; left: 3.2%; right: 3.2%; bottom: 2.2%; min-height: 6.6%; padding: 9px 20px; display: flex; align-items: center; gap: 17px; border: 1px solid #e1cda7; font: 500 clamp(8px,.9vw,13.5px)/1.6 "Yu Gothic", sans-serif; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
 
@@ -142,6 +142,7 @@ button { cursor: pointer; }
 .comparison-table th:first-child { width: 11.5%; color: white; background: linear-gradient(110deg, #102852, #173965); }
 .comparison-table td { background: rgba(255,255,255,.92); }
 .comparison-table input { width: 100%; min-width: 0; padding: 4px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; font-size: inherit; }
+.comparison-table td, .comparison-table td input, .comparison-table td small { text-align: center; }
 .comparison-table input[type="date"], .comparison-table input[type="month"] { font-size: .9em; text-align: center; text-align-last: center; }
 .comparison-table input[type="date"]::-webkit-datetime-edit, .comparison-table input[type="month"]::-webkit-datetime-edit { width: 100%; text-align: center; }
 .centered-date { text-align: center !important; text-align-last: center !important; }
@@ -160,6 +161,7 @@ button { cursor: pointer; }
 .market-range-box > div { align-self: stretch; display: grid; place-items: center; padding: 18px; color: white; background: var(--navy); font-size: clamp(10px,1.3vw,19px); text-align: center; }
 .market-range-box > div small { display: block; }
 .market-range-editor { position: relative; display: grid; place-items: center; gap: 3px; color: var(--gold); }
+.market-range-box > .market-range-editor { color: var(--gold); background: white; }
 .market-range-editor > div { width: 100%; display: flex; align-items: center; justify-content: center; gap: 3px; }
 .market-range-editor input { min-width: 0; width: 42%; padding: 2px; border: 1px solid var(--edit-border); border-radius: 3px; color: var(--gold); background: white; font: 500 clamp(22px,3.15vw,47px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .market-range-editor b { font-size: clamp(17px,2vw,30px); font-weight: 400; }
@@ -179,13 +181,13 @@ button { cursor: pointer; }
 .minus .factor-item i { color: var(--gold); }
 .factor-item div { min-width: 0; display: grid; }
 .factor-item input, .factor-item textarea { padding: 3px 7px; border: 1px solid transparent; background: transparent; resize: none; }
-.factor-item input { color: var(--navy); font: 700 clamp(9px,1vw,15px) "Yu Gothic", sans-serif; }
-.factor-item textarea { height: 34px; font: 500 clamp(7px,.78vw,12px)/1.45 "Yu Gothic", sans-serif; }
+.factor-item input { color: var(--navy); font: 700 clamp(10px,1.1vw,16.5px) "Yu Gothic", sans-serif; }
+.factor-item textarea { height: 38px; font: 500 clamp(8px,.88vw,13.5px)/1.4 "Yu Gothic", sans-serif; }
 .factor-item input:hover, .factor-item textarea:hover, .factor-item input:focus, .factor-item textarea:focus { border-color: var(--edit-border); background: var(--edit); }
-.calculation-flow { position: absolute; top: 12.7%; right: 2.5%; width: 32.3%; height: 76.5%; padding: 23px 20px; border: 1px solid #d9c8a9; }
-.calculation-flow h3 { margin: 0 0 19px; display: flex; align-items: center; gap: 15px; font-size: clamp(11px,1.35vw,20px); text-align: center; }
+.calculation-flow { position: absolute; top: 12.7%; right: 2.5%; width: 32.3%; height: 76.5%; padding: 18px 16px; border: 1px solid #d9c8a9; }
+.calculation-flow h3 { margin: 0 0 12px; display: flex; align-items: center; gap: 15px; font-size: clamp(11px,1.35vw,20px); text-align: center; }
 .calculation-flow h3::before, .calculation-flow h3::after { content: ""; flex: 1; height: 1px; background: var(--navy); }
-.flow-box { position: relative; min-height: 112px; padding: 21px 14px 12px; display: grid; align-content: center; gap: 10px; border: 1px solid #d4d8df; text-align: center; }
+.flow-box { position: relative; min-height: 96px; padding: 15px 12px 9px; display: grid; align-content: center; gap: 6px; border: 1px solid #d4d8df; text-align: center; }
 .flow-box > span { color: var(--navy); font: 600 clamp(13px,1.42vw,21px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .flow-box > strong { font: 500 clamp(18px,2.5vw,37px) Georgia, serif; }
 .flow-box > strong small { margin-left: 6px; font: 500 .48em "Yu Mincho", serif; }
@@ -201,15 +203,15 @@ button { cursor: pointer; }
 .target-unit-edit input { color: var(--gold); background: #fffaf0; font: 500 clamp(18px,2.35vw,35px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .target-unit-edit b { font-size: clamp(15px,1.8vw,27px); font-weight: 400; }
 .down-arrow { margin: 4px 0; color: var(--gold); text-align: center; font-size: 22px; }
-.final-flow { min-height: 126px; border: 2px solid var(--navy); }
-.final-flow strong { font: 500 clamp(18px,2.35vw,35px) "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
+.final-flow { min-height: 108px; border: 2px solid var(--navy); }
+.final-flow strong { font: 500 clamp(17px,1.95vw,29px)/1.15 "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
 .final-flow > small { font-size: 9px; }
 .overall-box { position: absolute; left: 2.5%; top: 76%; width: 60.5%; height: 13%; display: flex; align-items: center; border: 1px solid var(--navy); }
 .overall-box i { align-self: stretch; flex: 0 0 110px; display: grid; place-items: center; color: white; background: var(--navy); font-style: normal; font-size: 38px; }
 .overall-box div { padding: 12px 25px; }
 .overall-box strong { font-size: clamp(11px,1.2vw,18px); }
-.overall-box p { margin: 5px 0 0; font: 600 clamp(8px,.85vw,13px)/1.65 "Yu Gothic", sans-serif; }
-.wide-note { position: absolute; left: 2.5%; right: 2.5%; bottom: 3%; padding: 12px 28px; border: 1px solid #dfcfb1; font: 500 clamp(7px,.78vw,12px) "Yu Gothic", sans-serif; }
+.overall-box p { margin: 5px 0 0; font: 600 clamp(9px,.96vw,14.5px)/1.55 "Yu Gothic", sans-serif; }
+.wide-note { position: absolute; left: 2.5%; right: 2.5%; bottom: 3%; padding: 12px 28px; border: 1px solid #dfcfb1; font: 500 clamp(8px,.9vw,13.5px) "Yu Gothic", sans-serif; }
 
 .building-flow { position: absolute; top: 23.5%; left: 3.3%; width: 42.5%; height: 59%; display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .building-step { position: relative; width: 100%; min-height: 74px; display: grid; grid-template-columns: 45% 1fr; border: 1px solid #d8d8d8; }
@@ -228,7 +230,7 @@ button { cursor: pointer; }
 .residual-copy > span { font-size: clamp(10px,1.05vw,16px); font-weight: 500; }
 .residual-copy > b { color: var(--gold); font-size: clamp(23px,2.65vw,40px); font-weight: 500; }
 .residual-copy > small { color: var(--gold); font-size: clamp(10px,1.15vw,17px); }
-.structure-step select, .structure-step > input, .structure-step .editable-choice > input { height: 100%; border: 0; border-radius: 0; background: var(--edit); text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.structure-step select, .structure-step > input, .structure-step .editable-choice > input { height: 100%; border: 0; border-radius: 0; color: var(--navy); background: white; text-align: center; font: 500 clamp(11px,1.22vw,18px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .structure-step .choice-toggle { width: 42px; height: 100%; }
 .building-config { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .building-config .field { padding: 6px; border: 1px dashed #9bb9dd; background: #f5f9ff; }
@@ -243,7 +245,7 @@ button { cursor: pointer; }
 .evaluation-points { position: absolute; right: 5.2%; bottom: 15.7%; width: 43%; height: 14.7%; padding: 17px 25px; display: grid; grid-template-columns: 150px 1fr 1fr; gap: 7px 15px; align-content: center; border: 1px solid #dcc9a8; font: 500 clamp(7px,.8vw,12px) "Yu Gothic", sans-serif; }
 .evaluation-points strong { grid-row: span 2; color: var(--gold); }
 .evaluation-points p { margin: 0; }
-.building-note { position: absolute; left: 3.3%; right: 5.2%; bottom: 3.7%; min-height: 9.5%; padding: 15px 24px; display: flex; align-items: center; gap: 20px; border: 1px solid #decaa7; font: 500 clamp(7px,.82vw,12px)/1.65 "Yu Gothic", sans-serif; }
+.building-note { position: absolute; left: 3.3%; right: 5.2%; bottom: 3.7%; min-height: 9.5%; padding: 15px 24px; display: flex; align-items: center; gap: 20px; border: 1px solid #decaa7; font: 500 clamp(8px,.92vw,14px)/1.65 "Yu Gothic", sans-serif; }
 .building-note b { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font: italic 700 20px Georgia, serif; }
 .building-note p { margin: 0; }
 
@@ -325,6 +327,8 @@ button { cursor: pointer; }
   .cover-fields { background: transparent !important; backdrop-filter: none; }
   .detail-item input[type="month"] { display: none !important; }
   .detail-print-value { display: block; min-height: 27px; padding: 3px 7px; font-size: clamp(8px,.9vw,13px); }
+  .area-detail input, .area-detail small { display: none !important; }
+  .area-print-value { display: block; grid-column: 1 / -1; min-height: 27px; padding: 3px 0; color: var(--navy); font-size: clamp(11px,1.18vw,17.5px); white-space: nowrap; }
   .print-hidden-preserve { visibility: hidden !important; }
   .comparison-table input { padding: 0; }
 }
