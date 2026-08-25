@@ -83,7 +83,7 @@ button { cursor: pointer; }
 .header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; }
 .result-photo { position: absolute; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); }
 
-.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 34%; padding: 3.2% 3.35% 2.2%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
+.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 32%; padding: 2.2% 3.35% 1.5%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
 .section-tab { position: absolute; top: -24px; left: 3%; padding: 10px 18px; color: white; background: var(--navy); font-size: clamp(11px,1.45vw,21px); letter-spacing: .08em; }
 .section-tab small { font-size: .75em; }
 .valuation-range { display: flex; align-items: center; gap: 12px; }
@@ -99,10 +99,10 @@ button { cursor: pointer; }
 .recommended-row .money-editor span { flex: none; margin: 0; color: var(--gold); font: 500 clamp(13px,1.6vw,24px)/1 "Yu Mincho", serif; }
 .recommended-row p { margin: 0; font: 600 clamp(8px,.86vw,13px)/1.65 "Yu Gothic", sans-serif; white-space: nowrap; }
 .mini-reset { position: absolute; right: 4px; bottom: -27px; padding: 4px 8px; border: 1px solid #9bb9dd; border-radius: 3px; color: #375e8c; background: #f3f8ff; font: 700 10px "Yu Gothic", sans-serif; }
-.property-details { position: absolute; top: 62.2%; left: 3.2%; right: 3.2%; height: 29%; }
+.property-details { position: absolute; top: 59.2%; left: 3.2%; right: 3.2%; height: 32%; }
 .section-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 26px; font-size: clamp(15px,1.85vw,28px); letter-spacing: .13em; }
 .section-heading span { height: 1px; background: var(--navy); }
-.detail-grid { margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 68px; column-gap: 24px; }
+.detail-grid { margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 70px; column-gap: 24px; row-gap: 4px; }
 .detail-item { min-width: 0; padding: 6px 8px; display: flex; align-items: center; gap: 11px; border: 0; font-family: "Yu Gothic", sans-serif; }
 .detail-item i { flex: 0 0 clamp(29px,2.9vw,43px); height: clamp(29px,2.9vw,43px); display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: clamp(12px,1.4vw,21px); }
 .detail-item div { min-width: 0; flex: 1; display: grid; gap: 4px; }
@@ -126,7 +126,7 @@ button { cursor: pointer; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
 
-.target-summary { position: absolute; top: 3.6%; right: 2.8%; width: 29%; min-height: 18%; padding: 19px 25px; border: 1px solid #d3ba8b; font: 500 clamp(9px,1vw,15px)/1.55 "Yu Gothic", sans-serif; }
+.target-summary { position: absolute; top: 3.6%; right: 2.8%; width: 29%; min-height: 18%; padding: 19px 25px; border: 1px solid #d3ba8b; background: rgba(255,255,255,.97); font: 500 clamp(9px,1vw,15px)/1.55 "Yu Gothic", sans-serif; }
 .target-summary b { display: block; width: 95px; margin-bottom: 9px; padding: 6px; color: white; background: var(--navy); text-align: center; }
 .target-summary p { margin: 2px 0; }
 .unit-lead { position: absolute; top: 15.7%; left: 10.7%; margin: 0; font: 600 clamp(10px,1.2vw,18px) "Yu Gothic", sans-serif; }
@@ -251,8 +251,8 @@ button { cursor: pointer; }
 .building-chart h3 { margin: 0; padding: 10px; color: white; background: var(--navy); font-size: clamp(9px,1.1vw,16px); text-align: center; }
 .depreciation-canvas { width: 100%; height: 310px; }
 .chart-label { width: max-content; margin: 10px auto 0; padding: 7px 16px; color: white; background: var(--gold); font: 700 11px "Yu Gothic", sans-serif; }
-.evaluation-points { position: absolute; right: 5.2%; bottom: 15.7%; width: 43%; height: 14.7%; padding: 12px 18px; display: grid; grid-template-columns: 135px 1fr; gap: 4px 13px; align-content: center; border: 1px solid #dcc9a8; font: 500 clamp(9px,.98vw,15px)/1.35 "Yu Gothic", sans-serif; }
-.evaluation-points strong { grid-row: 1 / span 4; color: var(--gold); }
+.evaluation-points { position: absolute; right: 5.2%; bottom: 15.7%; width: 43%; height: 14.7%; padding: 11px 17px; display: grid; grid-template-columns: 145px 1fr; gap: 4px 13px; align-content: center; border: 1px solid #dcc9a8; font: 500 clamp(10px,1.1vw,17px)/1.3 "Yu Gothic", sans-serif; }
+.evaluation-points strong { grid-row: 1 / span 4; color: var(--gold); font-size: clamp(11px,1.18vw,18px); }
 .evaluation-points p { margin: 0; }
 .building-note { position: absolute; left: 3.3%; right: 5.2%; bottom: 3.7%; min-height: 9.5%; padding: 15px 24px; display: flex; align-items: center; gap: 20px; border: 1px solid #decaa7; font: 500 clamp(8px,.92vw,14px)/1.65 "Yu Gothic", sans-serif; }
 .building-note b { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font: italic 700 20px Georgia, serif; }
@@ -335,8 +335,8 @@ button { cursor: pointer; }
   textarea { overflow: hidden; resize: none; }
   .cover-fields { background: transparent !important; backdrop-filter: none; }
   .detail-item input[type="month"] { display: none !important; }
-  .property-details { top: 61.8%; }
-  .detail-grid { margin-top: 4px; grid-auto-rows: 60px; }
+  .property-details { top: 58.8%; }
+  .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
   .detail-item { padding: 2px 6px; }
   .detail-item strong { font-size: 16.5px; }
   .detail-item input, .detail-item select, .detail-item textarea, .detail-print-value, .area-print-value { color: var(--navy); font-size: 18px !important; line-height: 1.22; }
@@ -350,4 +350,9 @@ button { cursor: pointer; }
   .structure-step, .structure-step > .editable-choice, .structure-step .editable-choice > input { background: white !important; }
   .print-hidden-preserve { display: none !important; }
   .comparison-table input { padding: 0; }
+  .strategy-card { height: 310px; }
+  .strategy-card h4 { padding: 10px 7px 8px; }
+  .strategy-card > strong { margin: 14px 13px 10px; padding-bottom: 10px; }
+  .strategy-card > p { min-height: 48px; margin: 0 14px; padding-bottom: 9px; line-height: 1.55; }
+  .strategy-card ul { margin: 9px 14px; line-height: 1.65; }
 }
