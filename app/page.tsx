@@ -278,7 +278,7 @@ export default function Home() {
   const [comparables, setComparables] = useState<Comparable[]>(() => Array.from({ length: 5 }, (_, i) => emptyComp(i + 1)));
   const [surroundLow, setSurroundLow] = useState(0); const [surroundHigh, setSurroundHigh] = useState(0); const [unitManual, setUnitManual] = useState(false); const [adjustLow, setAdjustLow] = useState(0); const [adjustHigh, setAdjustHigh] = useState(0); const [targetUnitLowManual, setTargetUnitLowManual] = useState(0); const [targetUnitHighManual, setTargetUnitHighManual] = useState(0); const [targetUnitManual, setTargetUnitManual] = useState(false);
   const [buildingUnit, setBuildingUnit] = useState(66); const [usefulLife, setUsefulLife] = useState(25); const [buildingAdjustmentUnit, setBuildingAdjustmentUnit] = useState(0); const [newBuildingPriceManual, setNewBuildingPriceManual] = useState(0); const [appraisalLowManual, setAppraisalLowManual] = useState(0); const [appraisalHighManual, setAppraisalHighManual] = useState(0); const [recommendedManual, setRecommendedManual] = useState(0);
-  const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState(""); const [saved, setSaved] = useState(false); const loadedRef = useRef(false);
+  const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState(""); const loadedRef = useRef(false);
 
   useEffect(() => {
     try {
@@ -297,7 +297,7 @@ export default function Home() {
   useEffect(() => {
     if (!loadedRef.current) return;
     const payload = { type, propertyName, address, mansionName, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, factors };
-    const timer = window.setTimeout(() => { localStorage.setItem("kansai-valuation-report-v1", JSON.stringify(payload)); setSaved(true); window.setTimeout(() => setSaved(false), 1200); }, 350);
+    const timer = window.setTimeout(() => { localStorage.setItem("kansai-valuation-report-v1", JSON.stringify(payload)); }, 1200);
     return () => window.clearTimeout(timer);
   }, [type, propertyName, address, mansionName, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, factors]);
 
@@ -344,7 +344,7 @@ export default function Home() {
   ];
 
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><small>{saved ? "自動保存しました" : "入力内容は自動保存されます"}</small><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><small>入力内容は自動保存されます</small><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産査定報告書</h1><i /></header>
