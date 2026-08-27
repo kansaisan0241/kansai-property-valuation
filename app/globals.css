@@ -70,7 +70,6 @@ button { cursor: pointer; }
 .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 22px/1.25 "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
 .cover-address-field.field { min-height: 58px; align-items: stretch; }
-.cover-fields .cover-address-field .field-control { max-width: 295px; }
 .cover-fields .cover-address-field textarea { height: 64px; font-size: 22px; line-height: 1.18; }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: 22px; letter-spacing: .03em; }
@@ -313,19 +312,20 @@ button { cursor: pointer; }
 .sales-flow h3 { margin-bottom: 10px; }
 .sales-flow h3 small { font-size: .65em; }
 .sales-step { height: 82px; display: grid; grid-template-columns: 52px 42px 1fr; align-items: center; border-bottom: 1px dotted #b4bdca; font-family: "Yu Gothic", sans-serif; }
-.sales-step > i { width: 48px; height: 48px; display: block; border-radius: 50%; background-color: var(--navy); background-image: url("/sales-flow-icons.png"); background-repeat: no-repeat; background-size: 300% 100%; font-style: normal; }
-.sales-icon-0 { background-position: 0 center; }
-.sales-icon-1 { background-position: 25% center; }
-.sales-icon-2 { background-position: 50% center; }
-.sales-icon-3 { background-position: 75% center; }
-.sales-icon-4 { background-position: 100% center; }
+.sales-step > i { position: relative; width: 48px; height: 48px; display: block; overflow: hidden; border-radius: 50%; background: var(--navy); font-style: normal; }
+.sales-step > i::before { content: ""; position: absolute; top: 50%; left: 50%; width: 28px; height: 47px; background-image: url("/sales-flow-icons.png"); background-repeat: no-repeat; background-size: 500% 100%; transform: translate(-50%, -50%); }
+.sales-icon-0::before { background-position: 0 center; }
+.sales-icon-1::before { background-position: 25% center; }
+.sales-icon-2::before { background-position: 50% center; }
+.sales-icon-3::before { background-position: 75% center; }
+.sales-icon-4::before { background-position: 100% center; }
 .sales-step > b { color: var(--gold); font: 500 24px Georgia, serif; }
 .sales-step div strong { font-size: clamp(8px,.95vw,14px); }
 .sales-step div p { margin: 4px 0 0; font-size: clamp(6px,.68vw,10px); line-height: 1.5; }
 .strengths { position: absolute; left: 3.5%; right: 3.5%; bottom: 11.2%; height: 16.8%; display: grid; grid-template-columns: 110px repeat(5, 1fr); border: 1px solid var(--navy); }
-.strengths > b { align-self: stretch; padding: 10px; display: grid; align-items: start; color: white; background: var(--navy); text-align: center; }
-.strengths > div { padding: 15px 14px; display: grid; align-content: center; gap: 5px; border-left: 1px dotted #b9c1cd; text-align: center; font-family: "Yu Gothic", sans-serif; }
-.strengths i { width: 62px; height: 48px; margin: 0 auto; display: block; background-image: url("/strength-icons.png"); background-repeat: no-repeat; background-size: 300% 100%; font-style: normal; }
+.strengths > b { align-self: stretch; padding: 10px; display: grid; place-items: center; color: white; background: var(--navy); text-align: center; }
+.strengths > div { padding: 5px 10px; display: grid; align-content: center; gap: 3px; border-left: 1px dotted #b9c1cd; text-align: center; font-family: "Yu Gothic", sans-serif; }
+.strengths i { width: 46px; height: 77px; margin: 0 auto; display: block; background-image: url("/strength-icons.png"); background-repeat: no-repeat; background-size: 500% 100%; font-style: normal; }
 .strength-icon-0 { background-position: 0 center; }
 .strength-icon-1 { background-position: 25% center; }
 .strength-icon-2 { background-position: 50% center; }
