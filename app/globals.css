@@ -68,7 +68,8 @@ button { cursor: pointer; }
 .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 clamp(14px,1.5cqw,22px) "Yu Mincho", serif; }
 .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 clamp(15px,1.65cqw,24.5px)/1.25 "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
-.cover-address-field.field { min-height: 52px; align-items: stretch; }
+.cover-address-field.field { min-height: 58px; align-items: stretch; }
+.cover-fields .cover-address-field textarea { height: 58px; font-size: 17px; line-height: 1.2; }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: clamp(10px,1.08vw,16px); letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
@@ -85,7 +86,7 @@ button { cursor: pointer; }
 .title-line h2 { margin: 0; font-size: clamp(22px,3.2vw,48px); font-weight: 500; letter-spacing: .08em; line-height: 1; }
 .title-line p { margin: 0; color: var(--gold); font: 600 clamp(8px,1.1vw,16px) Georgia, serif; letter-spacing: .08em; }
 .header-rule { width: 81%; height: 1px; margin-top: 19px; background: linear-gradient(90deg, var(--gold-light), rgba(195,154,75,0)); }
-.header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; }
+.header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; white-space: pre-line; }
 .result-page { isolation: isolate; }
 .result-photo { position: absolute; z-index: 0; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); pointer-events: none; }
 .result-page > *:not(.result-photo) { z-index: 1; }
@@ -153,6 +154,8 @@ button { cursor: pointer; }
 .comparison-table tr:first-child td input { font-size: clamp(8px,1vw,15px); }
 .comparison-table input.address-long { font-size: .82em !important; }
 .comparison-table input.address-very-long { font-size: .68em !important; letter-spacing: -.02em; }
+.comparison-print-only { display: none; }
+.comparison-address-print { width: 100%; overflow: visible; white-space: nowrap; letter-spacing: -.02em; }
 .comparison-table td, .comparison-table td input, .comparison-table td small { text-align: center; }
 .comparison-table input[type="date"], .comparison-table input[type="month"] { font-size: 1em; text-align: center; text-align-last: center; }
 .comparison-table input[type="date"]::-webkit-datetime-edit, .comparison-table input[type="month"]::-webkit-datetime-edit { width: 100%; text-align: center; }
@@ -167,6 +170,9 @@ button { cursor: pointer; }
 .comparison-table .unit-row td strong { display: inline-block; color: var(--gold); font: 600 clamp(15px,1.85vw,28px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .comparison-table .unit-row td small { display: inline; margin-left: 4px; color: var(--gold); }
 .case-header-actions { margin: 4px auto -1px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.case-move-actions { margin: 3px auto 0; display: flex; justify-content: center; gap: 3px; }
+.case-move-actions button { width: 22px; height: 18px; padding: 0; border: 1px solid rgba(255,255,255,.48); border-radius: 2px; color: white; background: rgba(255,255,255,.12); font-size: 9px; line-height: 1; }
+.case-move-actions button:disabled { opacity: .2; cursor: not-allowed; }
 .import-button, .clear-case-button { padding: 4px 7px; border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.15); font: 700 clamp(7px,.68vw,10px) "Yu Gothic", sans-serif; white-space: nowrap; }
 .import-button { border: 1px solid #dfbc72; color: #fff; background: linear-gradient(110deg, #a56d11, #c39848); }
 .clear-case-button { border: 1px solid #aebbc9; color: #334d6d; background: #f4f7fa; }
@@ -174,6 +180,7 @@ button { cursor: pointer; }
 .compact-settings input { width: 40%; }
 .compact-settings td small { display: inline; margin: 0 3px; }
 .market-range-box { position: absolute; left: 2.4%; right: 2.4%; bottom: 6.8%; height: 15%; display: grid; grid-template-columns: 22% 28% 1fr; align-items: center; border: 1px solid var(--gold-light); background: white; }
+.market-range-box::after { content: ""; position: absolute; z-index: 4; left: -1px; right: -1px; bottom: -1px; height: 2px; background: var(--gold-light); }
 .market-range-box > div { align-self: stretch; display: grid; place-items: center; padding: 18px; color: white; background: var(--navy); font-size: clamp(13px,1.55vw,23px); text-align: center; }
 .market-range-box > div small { display: block; font-size: .82em; }
 .market-range-box > div:first-child { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
@@ -203,6 +210,8 @@ button { cursor: pointer; }
 .factor-icon-minus-1 { background-position: 100% 50%; }
 .factor-icon-minus-2 { background-position: 0 100%; }
 .factor-icon-minus-3 { background-position: 50% 100%; }
+.factor-icon-plus-1 { filter: brightness(0) saturate(100%) invert(10%) sepia(24%) saturate(4730%) hue-rotate(194deg) brightness(89%) contrast(107%); }
+.factor-icon-minus-2 { filter: brightness(0) saturate(100%) invert(49%) sepia(98%) saturate(548%) hue-rotate(359deg) brightness(87%) contrast(89%); }
 .factor-item div { min-width: 0; display: grid; }
 .factor-item input, .factor-item textarea { padding: 3px 7px; border: 1px solid transparent; background: transparent; resize: none; }
 .factor-item input { color: var(--navy); font: 700 clamp(11px,1.18vw,18px) "Yu Gothic", sans-serif; }
@@ -231,7 +240,8 @@ button { cursor: pointer; }
 .final-flow strong { font: 500 clamp(17px,1.95vw,29px)/1.15 "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
 .final-flow > small { font-size: clamp(7px,.66vw,10px); line-height: 1.35; }
 .overall-box { position: absolute; left: 2.5%; top: 76%; width: 60.5%; height: 13%; display: flex; align-items: center; border: 1px solid var(--navy); }
-.overall-box i { align-self: stretch; flex: 0 0 110px; display: block; background-color: var(--navy); background-image: url("/valuation-icons.png"); background-repeat: no-repeat; background-size: 300% auto; background-position: 100% 100%; font-style: normal; }
+.overall-box i { position: relative; align-self: stretch; flex: 0 0 110px; display: block; background: var(--navy); font-style: normal; }
+.overall-box i::before { content: ""; position: absolute; inset: 12px; background: url("/valuation-icons.png") 100% 100% / 300% auto no-repeat; filter: brightness(0) invert(1); }
 .overall-box div { padding: 12px 25px; }
 .overall-box strong { font-size: clamp(12px,1.3vw,19.5px); }
 .overall-box p { margin: 5px 0 0; font: 600 clamp(10px,1.08vw,16.5px)/1.5 "Yu Gothic", sans-serif; }
@@ -310,7 +320,7 @@ button { cursor: pointer; }
 .sales-step div strong { font-size: clamp(8px,.95vw,14px); }
 .sales-step div p { margin: 4px 0 0; font-size: clamp(6px,.68vw,10px); line-height: 1.5; }
 .strengths { position: absolute; left: 3.5%; right: 3.5%; bottom: 11.2%; height: 16.8%; display: grid; grid-template-columns: 110px repeat(5, 1fr); border: 1px solid var(--navy); }
-.strengths > b { align-self: start; padding: 10px; color: white; background: var(--navy); text-align: center; }
+.strengths > b { align-self: stretch; padding: 10px; display: grid; align-items: start; color: white; background: var(--navy); text-align: center; }
 .strengths > div { padding: 15px 14px; display: grid; align-content: center; gap: 5px; border-left: 1px dotted #b9c1cd; text-align: center; font-family: "Yu Gothic", sans-serif; }
 .strengths i { width: 62px; height: 42px; margin: 0 auto; display: block; background-image: url("/strength-icons.png"); background-repeat: no-repeat; background-size: 500% auto; font-style: normal; }
 .strength-icon-0 { background-position: 0 center; }
@@ -346,7 +356,7 @@ button { cursor: pointer; }
   .cover-fields .field { min-height: 27px; }
   .cover-fields .field > span:first-child { width: 76px; padding: 4px; letter-spacing: .04em; }
   .cover-fields .field-control input, .cover-fields .field-control textarea { height: 24px; padding: 2px 4px; }
-  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 36px; height: 36px; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 52px; height: 52px; }
   .comparison-table th, .comparison-table td { padding: 2px; }
   .strategy-card { height: 285px; }
   .sales-step { height: 57px; }
@@ -369,7 +379,7 @@ button { cursor: pointer; }
   .cover-fields .field { min-height: 41px; }
   .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; font-size: 22px; letter-spacing: .1em; }
   .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; font-size: 24.5px; }
-  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 52px; height: 52px; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 58px; height: 58px; font-size: 17px; line-height: 1.2; }
   .detail-item input[type="month"] { display: none !important; }
   .property-details { top: 58.8%; }
   .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
@@ -386,7 +396,9 @@ button { cursor: pointer; }
   .structure-step, .structure-step > .editable-choice, .structure-step .editable-choice > input { background: white !important; }
   .print-hidden-preserve { display: none !important; }
   .comparison-table input { padding: 0; }
-  .strategy-card { height: 310px; }
+  .comparison-edit-only { display: none !important; }
+  .comparison-print-only { display: block; width: 100%; color: var(--navy); text-align: center; }
+  .strategy-card { height: 295px; }
   .strategy-card h4 { padding: 10px 7px 8px; }
   .strategy-card > strong { margin: 14px 13px 10px; padding-bottom: 10px; }
   .strategy-card > p { min-height: 48px; margin: 0 14px; padding-bottom: 9px; line-height: 1.55; }
