@@ -56,7 +56,8 @@ button { cursor: pointer; }
 .report-page { container-type: inline-size; position: relative; width: min(1480px, calc(100vw - 32px)); aspect-ratio: 297 / 210; margin: 0 auto; overflow: hidden; color: var(--ink); background: var(--paper); box-shadow: 0 20px 55px rgba(21,39,68,.2), 0 2px 6px rgba(21,39,68,.1); border: 1px solid #cfd5df; }
 .report-page:not(.cover-page) { background: white; }
 
-.cover-page { isolation: isolate; background: white url("/cover-report.png") center/100% 100% no-repeat; }
+.cover-page { isolation: isolate; background: white; }
+.cover-page::before { content: ""; position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; background: url("/cover-report.png") center / 100% 100% no-repeat; transform: translateX(1.2%); pointer-events: none; }
 .cover-page > * { position: absolute; z-index: 1; }
 .cover-title { position: absolute; top: 11.7%; left: 5.2%; width: 56%; padding-left: 3.7%; }
 .cover-title::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 10px; background: var(--navy); }
@@ -65,13 +66,14 @@ button { cursor: pointer; }
 .cover-title i { display: block; width: 100%; height: 1px; margin-top: 24px; background: var(--gold-light); }
 .cover-fields { position: absolute; top: 38.5%; left: 6.2%; width: 38%; padding: 7px; display: grid; gap: 7px; background: rgba(255,255,255,.76); backdrop-filter: blur(4px); }
 .cover-fields .field { min-height: 41px; }
-.cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 clamp(14px,1.5cqw,22px) "Yu Mincho", serif; }
-.cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 clamp(15px,1.65cqw,24.5px)/1.25 "Yu Mincho", serif; }
+.cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 22px "Yu Mincho", serif; }
+.cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 22px/1.25 "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
 .cover-address-field.field { min-height: 58px; align-items: stretch; }
-.cover-fields .cover-address-field textarea { height: 58px; font-size: 17px; line-height: 1.2; }
+.cover-fields .cover-address-field .field-control { max-width: 295px; }
+.cover-fields .cover-address-field textarea { height: 64px; font-size: 22px; line-height: 1.18; }
 .cover-date-start { margin-top: 15px; }
-.cover-mansion-field.field > span:first-child { font-size: clamp(10px,1.08vw,16px); letter-spacing: .03em; }
+.cover-mansion-field.field > span:first-child { font-size: 22px; letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
 .cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 3 / 1; display: block; background: url("/casa-transparent.png") center / contain no-repeat; }
@@ -147,7 +149,7 @@ button { cursor: pointer; }
 .comparison-table-wrap { position: absolute; top: 25.6%; left: 2.4%; right: 2.4%; height: 48.5%; }
 .comparison-table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; font: 500 clamp(10.5px,1.17vw,18px) "Yu Gothic", sans-serif; }
 .comparison-table th, .comparison-table td { border: 1px solid #ccd1d8; padding: 4px 7px; text-align: center; vertical-align: middle; }
-.comparison-table thead th { height: 48px; color: white; background: linear-gradient(110deg, #09214b, #0d315f); font: 600 clamp(11px,1.25vw,19px) "Yu Mincho", serif; }
+.comparison-table thead th { position: relative; height: 48px; color: white; background: linear-gradient(110deg, #09214b, #0d315f); font: 600 clamp(11px,1.25vw,19px) "Yu Mincho", serif; }
 .comparison-table th:first-child { width: 11.5%; color: white; background: linear-gradient(110deg, #102852, #173965); }
 .comparison-table td { background: rgba(255,255,255,.92); }
 .comparison-table input { width: 100%; min-width: 0; padding: 4px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; font-size: inherit; }
@@ -170,8 +172,9 @@ button { cursor: pointer; }
 .comparison-table .unit-row td strong { display: inline-block; color: var(--gold); font: 600 clamp(15px,1.85vw,28px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .comparison-table .unit-row td small { display: inline; margin-left: 4px; color: var(--gold); }
 .case-header-actions { margin: 4px auto -1px; display: flex; align-items: center; justify-content: center; gap: 4px; }
-.case-move-actions { margin: 3px auto 0; display: flex; justify-content: center; gap: 3px; }
+.case-move-actions { position: absolute; z-index: 3; top: 5px; left: 5px; right: 5px; display: flex; justify-content: space-between; pointer-events: none; }
 .case-move-actions button { width: 22px; height: 18px; padding: 0; border: 1px solid rgba(255,255,255,.48); border-radius: 2px; color: white; background: rgba(255,255,255,.12); font-size: 9px; line-height: 1; }
+.case-move-actions button { pointer-events: auto; }
 .case-move-actions button:disabled { opacity: .2; cursor: not-allowed; }
 .import-button, .clear-case-button { padding: 4px 7px; border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.15); font: 700 clamp(7px,.68vw,10px) "Yu Gothic", sans-serif; white-space: nowrap; }
 .import-button { border: 1px solid #dfbc72; color: #fff; background: linear-gradient(110deg, #a56d11, #c39848); }
@@ -179,8 +182,8 @@ button { cursor: pointer; }
 .compact-settings td { padding: 2px 5px; }
 .compact-settings input { width: 40%; }
 .compact-settings td small { display: inline; margin: 0 3px; }
-.market-range-box { position: absolute; left: 2.4%; right: 2.4%; bottom: 6.8%; height: 15%; display: grid; grid-template-columns: 22% 28% 1fr; align-items: center; border: 1px solid var(--gold-light); background: white; }
-.market-range-box::after { content: ""; position: absolute; z-index: 4; left: -1px; right: -1px; bottom: -1px; height: 2px; background: var(--gold-light); }
+.market-range-box { position: absolute; left: 2.4%; right: 2.4%; bottom: 6.8%; height: 15%; display: grid; grid-template-columns: 22% 28% 1fr; align-items: center; overflow: hidden; border: 1px solid var(--gold-light); background: white; }
+.market-range-box::after { content: ""; position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 2px; background: var(--gold-light); }
 .market-range-box > div { align-self: stretch; display: grid; place-items: center; padding: 18px; color: white; background: var(--navy); font-size: clamp(13px,1.55vw,23px); text-align: center; }
 .market-range-box > div small { display: block; font-size: .82em; }
 .market-range-box > div:first-child { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
@@ -241,7 +244,7 @@ button { cursor: pointer; }
 .final-flow > small { font-size: clamp(7px,.66vw,10px); line-height: 1.35; }
 .overall-box { position: absolute; left: 2.5%; top: 76%; width: 60.5%; height: 13%; display: flex; align-items: center; border: 1px solid var(--navy); }
 .overall-box i { position: relative; align-self: stretch; flex: 0 0 110px; display: block; background: var(--navy); font-style: normal; }
-.overall-box i::before { content: ""; position: absolute; inset: 12px; background: url("/valuation-icons.png") 100% 100% / 300% auto no-repeat; filter: brightness(0) invert(1); }
+.overall-box i::before { content: ""; position: absolute; top: 50%; left: 50%; width: 72px; height: 72px; background: url("/valuation-icons.png") 100% 100% / 300% 300% no-repeat; filter: brightness(0) invert(1); transform: translate(-50%, -50%); }
 .overall-box div { padding: 12px 25px; }
 .overall-box strong { font-size: clamp(12px,1.3vw,19.5px); }
 .overall-box p { margin: 5px 0 0; font: 600 clamp(10px,1.08vw,16.5px)/1.5 "Yu Gothic", sans-serif; }
@@ -310,7 +313,7 @@ button { cursor: pointer; }
 .sales-flow h3 { margin-bottom: 10px; }
 .sales-flow h3 small { font-size: .65em; }
 .sales-step { height: 82px; display: grid; grid-template-columns: 52px 42px 1fr; align-items: center; border-bottom: 1px dotted #b4bdca; font-family: "Yu Gothic", sans-serif; }
-.sales-step > i { width: 48px; height: 48px; display: block; border-radius: 50%; background-color: var(--navy); background-image: url("/sales-flow-icons.png"); background-repeat: no-repeat; background-size: 500% auto; font-style: normal; }
+.sales-step > i { width: 48px; height: 48px; display: block; border-radius: 50%; background-color: var(--navy); background-image: url("/sales-flow-icons.png"); background-repeat: no-repeat; background-size: 300% 100%; font-style: normal; }
 .sales-icon-0 { background-position: 0 center; }
 .sales-icon-1 { background-position: 25% center; }
 .sales-icon-2 { background-position: 50% center; }
@@ -322,7 +325,7 @@ button { cursor: pointer; }
 .strengths { position: absolute; left: 3.5%; right: 3.5%; bottom: 11.2%; height: 16.8%; display: grid; grid-template-columns: 110px repeat(5, 1fr); border: 1px solid var(--navy); }
 .strengths > b { align-self: stretch; padding: 10px; display: grid; align-items: start; color: white; background: var(--navy); text-align: center; }
 .strengths > div { padding: 15px 14px; display: grid; align-content: center; gap: 5px; border-left: 1px dotted #b9c1cd; text-align: center; font-family: "Yu Gothic", sans-serif; }
-.strengths i { width: 62px; height: 42px; margin: 0 auto; display: block; background-image: url("/strength-icons.png"); background-repeat: no-repeat; background-size: 500% auto; font-style: normal; }
+.strengths i { width: 62px; height: 48px; margin: 0 auto; display: block; background-image: url("/strength-icons.png"); background-repeat: no-repeat; background-size: 300% 100%; font-style: normal; }
 .strength-icon-0 { background-position: 0 center; }
 .strength-icon-1 { background-position: 25% center; }
 .strength-icon-2 { background-position: 50% center; }
@@ -352,11 +355,11 @@ button { cursor: pointer; }
   .quick-inputs { grid-template-columns: 1fr; }
   .target-inputs { grid-template-columns: 1fr; }
   .report-stack { gap: 22px; }
-  .cover-fields { gap: 2px; }
-  .cover-fields .field { min-height: 27px; }
+  .cover-fields { gap: 7px; }
+  .cover-fields .field { min-height: 41px; }
   .cover-fields .field > span:first-child { width: 76px; padding: 4px; letter-spacing: .04em; }
-  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 24px; padding: 2px 4px; }
-  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 52px; height: 52px; }
+  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 64px; height: 64px; }
   .comparison-table th, .comparison-table td { padding: 2px; }
   .strategy-card { height: 285px; }
   .sales-step { height: 57px; }
@@ -378,8 +381,8 @@ button { cursor: pointer; }
   .cover-fields { gap: 7px; background: transparent !important; backdrop-filter: none; }
   .cover-fields .field { min-height: 41px; }
   .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; font-size: 22px; letter-spacing: .1em; }
-  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; font-size: 24.5px; }
-  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 58px; height: 58px; font-size: 17px; line-height: 1.2; }
+  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; font-size: 22px; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 64px; height: 64px; font-size: 22px; line-height: 1.18; }
   .detail-item input[type="month"] { display: none !important; }
   .property-details { top: 58.8%; }
   .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
