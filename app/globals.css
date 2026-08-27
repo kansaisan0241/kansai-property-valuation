@@ -30,6 +30,7 @@ button { cursor: pointer; }
 .type-switch button.active { color: #071a43; background: linear-gradient(135deg, #dec287, #b98931); box-shadow: 0 2px 12px rgba(0,0,0,.2); }
 .toolbar-actions { display: flex; align-items: center; gap: 9px; margin-left: auto; }
 .toolbar-actions > small { color: #b9c7de; font-size: 10px; white-space: nowrap; }
+.reins-link { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid #d6b46f; border-radius: 4px; color: white; background: linear-gradient(110deg, #9a6812, #bd9347); font: 700 12px "Yu Gothic", sans-serif; text-decoration: none; white-space: nowrap; }
 .primary-button, .ghost-button { min-height: 42px; padding: 0 18px; border-radius: 4px; font-family: "Yu Gothic", sans-serif; font-weight: 700; }
 .primary-button { border: 1px solid #be923f; color: white; background: linear-gradient(135deg, #bb8a31, #976312); box-shadow: 0 5px 14px rgba(0,0,0,.18); }
 .primary-button:disabled { opacity: .45; cursor: not-allowed; }
@@ -55,7 +56,8 @@ button { cursor: pointer; }
 .report-page { container-type: inline-size; position: relative; width: min(1480px, calc(100vw - 32px)); aspect-ratio: 297 / 210; margin: 0 auto; overflow: hidden; color: var(--ink); background: var(--paper); box-shadow: 0 20px 55px rgba(21,39,68,.2), 0 2px 6px rgba(21,39,68,.1); border: 1px solid #cfd5df; }
 .report-page:not(.cover-page) { background: white; }
 
-.cover-page { background: white url("/cover-report.png") center/100% 100% no-repeat; }
+.cover-page { isolation: isolate; background: white url("/cover-report.png") center/100% 100% no-repeat; }
+.cover-page > * { position: absolute; z-index: 1; }
 .cover-title { position: absolute; top: 11.7%; left: 5.2%; width: 56%; padding-left: 3.7%; }
 .cover-title::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 10px; background: var(--navy); }
 .cover-title p { margin: 0 0 16px; font: 600 clamp(12px,1.55vw,23px) Georgia, serif; letter-spacing: .05em; }
@@ -64,12 +66,14 @@ button { cursor: pointer; }
 .cover-fields { position: absolute; top: 38.5%; left: 6.2%; width: 38%; padding: 7px; display: grid; gap: 7px; background: rgba(255,255,255,.76); backdrop-filter: blur(4px); }
 .cover-fields .field { min-height: 41px; }
 .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 clamp(14px,1.5cqw,22px) "Yu Mincho", serif; }
-.cover-fields .field-control input { height: 37px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); font: 500 clamp(15px,1.65cqw,24.5px) "Yu Mincho", serif; }
+.cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 clamp(15px,1.65cqw,24.5px)/1.25 "Yu Mincho", serif; }
+.cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
+.cover-address-field.field { min-height: 52px; align-items: stretch; }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: clamp(10px,1.08vw,16px); letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
-.cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 1000 / 316; display: block; background: url("/casa.png") center / contain no-repeat; }
+.cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 3 / 1; display: block; background: url("/casa-transparent.png") center / contain no-repeat; }
 .cover-company span { font-size: clamp(14px,1.62vw,25px); font-weight: 700; letter-spacing: .04em; }
 
 .page-rail { position: absolute; z-index: 4; top: 0; left: 0; width: 8.4%; height: 21.5%; display: flex; flex-direction: column; align-items: center; padding-top: 4%; color: white; background: linear-gradient(140deg, #061a42, #092a59); }
@@ -82,7 +86,9 @@ button { cursor: pointer; }
 .title-line p { margin: 0; color: var(--gold); font: 600 clamp(8px,1.1vw,16px) Georgia, serif; letter-spacing: .08em; }
 .header-rule { width: 81%; height: 1px; margin-top: 19px; background: linear-gradient(90deg, var(--gold-light), rgba(195,154,75,0)); }
 .header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; }
-.result-photo { position: absolute; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); }
+.result-page { isolation: isolate; }
+.result-photo { position: absolute; z-index: 0; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); pointer-events: none; }
+.result-page > *:not(.result-photo) { z-index: 1; }
 
 .valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 32%; padding: 2.2% 3.35% 1.5%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
 .section-tab { position: absolute; top: -24px; left: 3%; padding: 10px 18px; color: white; background: var(--navy); font-size: clamp(11px,1.45vw,21px); letter-spacing: .08em; }
@@ -127,7 +133,7 @@ button { cursor: pointer; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
 
-.target-summary { position: absolute; top: 3.6%; right: 2.8%; width: 29%; min-height: 18%; padding: 19px 25px; border: 1px solid #d3ba8b; background: rgba(255,255,255,.97); font: 500 clamp(9px,1vw,15px)/1.55 "Yu Gothic", sans-serif; }
+.target-summary { position: absolute; top: 3.2%; right: 2.8%; width: 29%; height: 19%; min-height: 0; padding: 14px 25px; overflow: hidden; border: 1px solid #d3ba8b; background: white; font: 500 clamp(9px,1vw,15px)/1.4 "Yu Gothic", sans-serif; }
 .target-summary b { display: block; width: 95px; margin-bottom: 9px; padding: 6px; color: white; background: var(--navy); text-align: center; }
 .target-summary p { margin: 2px 0; }
 .unit-lead { position: absolute; top: 15.7%; left: 10.7%; margin: 0; font: 600 clamp(10px,1.2vw,18px) "Yu Gothic", sans-serif; }
@@ -137,7 +143,7 @@ button { cursor: pointer; }
 .case-controls button:disabled { opacity: .3; cursor: not-allowed; }
 .case-controls strong { min-width: 35px; color: var(--gold); text-align: center; }
 .case-controls small { color: #69778a; font-weight: 500; }
-.comparison-table-wrap { position: absolute; top: 25.3%; left: 2.4%; right: 2.4%; height: 49%; }
+.comparison-table-wrap { position: absolute; top: 25.6%; left: 2.4%; right: 2.4%; height: 48.5%; }
 .comparison-table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; font: 500 clamp(10.5px,1.17vw,18px) "Yu Gothic", sans-serif; }
 .comparison-table th, .comparison-table td { border: 1px solid #ccd1d8; padding: 4px 7px; text-align: center; vertical-align: middle; }
 .comparison-table thead th { height: 48px; color: white; background: linear-gradient(110deg, #09214b, #0d315f); font: 600 clamp(11px,1.25vw,19px) "Yu Mincho", serif; }
@@ -167,7 +173,7 @@ button { cursor: pointer; }
 .compact-settings td { padding: 2px 5px; }
 .compact-settings input { width: 40%; }
 .compact-settings td small { display: inline; margin: 0 3px; }
-.market-range-box { position: absolute; left: 2.4%; right: 2.4%; bottom: 6.2%; height: 15.8%; display: grid; grid-template-columns: 22% 28% 1fr; align-items: center; border: 1px solid var(--gold-light); }
+.market-range-box { position: absolute; left: 2.4%; right: 2.4%; bottom: 6.8%; height: 15%; display: grid; grid-template-columns: 22% 28% 1fr; align-items: center; border: 1px solid var(--gold-light); background: white; }
 .market-range-box > div { align-self: stretch; display: grid; place-items: center; padding: 18px; color: white; background: var(--navy); font-size: clamp(13px,1.55vw,23px); text-align: center; }
 .market-range-box > div small { display: block; font-size: .82em; }
 .market-range-box > div:first-child { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
@@ -188,8 +194,15 @@ button { cursor: pointer; }
 .factor-column.minus h3 { background: linear-gradient(100deg, #986811, #bb8b30); }
 .factor-item { height: calc((100% - 48px) / 4); padding: 10px 14px; display: grid; grid-template-columns: 55px 1fr; align-items: center; border-bottom: 1px solid #dedede; }
 .factor-item:last-child { border-bottom: 0; }
-.factor-item i { color: var(--navy); font-style: normal; font-size: clamp(27px,3vw,44px); text-align: center; }
-.minus .factor-item i { color: var(--gold); }
+.factor-item i { width: 48px; height: 48px; display: block; background-image: url("/valuation-icons.png"); background-repeat: no-repeat; background-size: 300% 300%; font-style: normal; }
+.factor-icon-plus-0 { background-position: 0 0; }
+.factor-icon-plus-1 { background-position: 50% 0; }
+.factor-icon-plus-2 { background-position: 100% 0; }
+.factor-icon-plus-3 { background-position: 0 50%; }
+.factor-icon-minus-0 { background-position: 50% 50%; }
+.factor-icon-minus-1 { background-position: 100% 50%; }
+.factor-icon-minus-2 { background-position: 0 100%; }
+.factor-icon-minus-3 { background-position: 50% 100%; }
 .factor-item div { min-width: 0; display: grid; }
 .factor-item input, .factor-item textarea { padding: 3px 7px; border: 1px solid transparent; background: transparent; resize: none; }
 .factor-item input { color: var(--navy); font: 700 clamp(11px,1.18vw,18px) "Yu Gothic", sans-serif; }
@@ -218,7 +231,7 @@ button { cursor: pointer; }
 .final-flow strong { font: 500 clamp(17px,1.95vw,29px)/1.15 "Yu Mincho", "Hiragino Mincho ProN", serif; white-space: nowrap; }
 .final-flow > small { font-size: clamp(7px,.66vw,10px); line-height: 1.35; }
 .overall-box { position: absolute; left: 2.5%; top: 76%; width: 60.5%; height: 13%; display: flex; align-items: center; border: 1px solid var(--navy); }
-.overall-box i { align-self: stretch; flex: 0 0 110px; display: grid; place-items: center; color: white; background: var(--navy); font-style: normal; font-size: 38px; }
+.overall-box i { align-self: stretch; flex: 0 0 110px; display: block; background-color: var(--navy); background-image: url("/valuation-icons.png"); background-repeat: no-repeat; background-size: 300% auto; background-position: 100% 100%; font-style: normal; }
 .overall-box div { padding: 12px 25px; }
 .overall-box strong { font-size: clamp(12px,1.3vw,19.5px); }
 .overall-box p { margin: 5px 0 0; font: 600 clamp(10px,1.08vw,16.5px)/1.5 "Yu Gothic", sans-serif; }
@@ -287,14 +300,24 @@ button { cursor: pointer; }
 .sales-flow h3 { margin-bottom: 10px; }
 .sales-flow h3 small { font-size: .65em; }
 .sales-step { height: 82px; display: grid; grid-template-columns: 52px 42px 1fr; align-items: center; border-bottom: 1px dotted #b4bdca; font-family: "Yu Gothic", sans-serif; }
-.sales-step > i { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: 22px; }
+.sales-step > i { width: 48px; height: 48px; display: block; border-radius: 50%; background-color: var(--navy); background-image: url("/sales-flow-icons.png"); background-repeat: no-repeat; background-size: 500% auto; font-style: normal; }
+.sales-icon-0 { background-position: 0 center; }
+.sales-icon-1 { background-position: 25% center; }
+.sales-icon-2 { background-position: 50% center; }
+.sales-icon-3 { background-position: 75% center; }
+.sales-icon-4 { background-position: 100% center; }
 .sales-step > b { color: var(--gold); font: 500 24px Georgia, serif; }
 .sales-step div strong { font-size: clamp(8px,.95vw,14px); }
 .sales-step div p { margin: 4px 0 0; font-size: clamp(6px,.68vw,10px); line-height: 1.5; }
 .strengths { position: absolute; left: 3.5%; right: 3.5%; bottom: 11.2%; height: 16.8%; display: grid; grid-template-columns: 110px repeat(5, 1fr); border: 1px solid var(--navy); }
 .strengths > b { align-self: start; padding: 10px; color: white; background: var(--navy); text-align: center; }
 .strengths > div { padding: 15px 14px; display: grid; align-content: center; gap: 5px; border-left: 1px dotted #b9c1cd; text-align: center; font-family: "Yu Gothic", sans-serif; }
-.strengths i { color: var(--gold); font-style: normal; font-size: clamp(22px,2.6vw,38px); }
+.strengths i { width: 62px; height: 42px; margin: 0 auto; display: block; background-image: url("/strength-icons.png"); background-repeat: no-repeat; background-size: 500% auto; font-style: normal; }
+.strength-icon-0 { background-position: 0 center; }
+.strength-icon-1 { background-position: 25% center; }
+.strength-icon-2 { background-position: 50% center; }
+.strength-icon-3 { background-position: 75% center; }
+.strength-icon-4 { background-position: 100% center; }
 .strengths strong { font-size: clamp(8px,.85vw,13px); }
 .strengths p { margin: 0; font-size: clamp(6px,.65vw,9px); line-height: 1.5; }
 .strategy-footer { position: absolute; left: 3.5%; right: 3.5%; bottom: 2.2%; height: 6.8%; display: grid; place-items: center; border: 1px solid #d8bb82; }
@@ -322,7 +345,8 @@ button { cursor: pointer; }
   .cover-fields { gap: 2px; }
   .cover-fields .field { min-height: 27px; }
   .cover-fields .field > span:first-child { width: 76px; padding: 4px; letter-spacing: .04em; }
-  .cover-fields .field-control input { height: 24px; padding: 2px 4px; }
+  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 24px; padding: 2px 4px; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 36px; height: 36px; }
   .comparison-table th, .comparison-table td { padding: 2px; }
   .strategy-card { height: 285px; }
   .sales-step { height: 57px; }
@@ -334,7 +358,7 @@ button { cursor: pointer; }
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
   .report-stack { display: block; padding: 0; }
-  .report-page { width: 296mm; height: 209mm; margin: .5mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
+  .report-page { width: 295mm; height: 208mm; margin: 1mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
   .report-page:last-child { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
@@ -343,8 +367,9 @@ button { cursor: pointer; }
   textarea { overflow: hidden; resize: none; }
   .cover-fields { gap: 7px; background: transparent !important; backdrop-filter: none; }
   .cover-fields .field { min-height: 41px; }
-  .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; font-size: clamp(14px,1.5cqw,22px); letter-spacing: .1em; }
-  .cover-fields .field-control input { height: 37px; padding: 5px 9px; font-size: clamp(15px,1.65cqw,24.5px); }
+  .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; font-size: 22px; letter-spacing: .1em; }
+  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; font-size: 24.5px; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 52px; height: 52px; }
   .detail-item input[type="month"] { display: none !important; }
   .property-details { top: 58.8%; }
   .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
