@@ -64,15 +64,15 @@ button { cursor: pointer; }
 .cover-title p { margin: 0 0 16px; font: 600 clamp(12px,1.55vw,23px) Georgia, serif; letter-spacing: .05em; }
 .cover-title h1 { margin: 0; white-space: nowrap; color: var(--navy); font-size: clamp(34px,5.15vw,76px); font-weight: 500; line-height: 1.05; letter-spacing: .07em; }
 .cover-title i { display: block; width: 100%; height: 1px; margin-top: 24px; background: var(--gold-light); }
-.cover-fields { position: absolute; top: 38.5%; left: 6.2%; width: 38%; padding: 7px; display: grid; gap: 7px; background: rgba(255,255,255,.76); backdrop-filter: blur(4px); }
-.cover-fields .field { min-height: 41px; }
-.cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 22px "Yu Mincho", serif; }
-.cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 22px/1.25 "Yu Mincho", serif; }
+.cover-fields { position: absolute; top: 38.5%; left: 6.2%; width: 38%; padding: .47cqw; display: grid; gap: .47cqw; background: rgba(255,255,255,.76); backdrop-filter: blur(4px); }
+.cover-fields .field { min-height: 2.8cqw; gap: .61cqw; }
+.cover-fields .field > span:first-child { width: 8.5cqw; padding: .47cqw .68cqw; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 1.7cqw "Yu Mincho", serif; }
+.cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 1.7cqw/1.25 "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
-.cover-address-field.field { min-height: 58px; align-items: stretch; }
-.cover-fields .cover-address-field textarea { height: 64px; font-size: 22px; line-height: 1.18; }
+.cover-address-field.field { min-height: 4.35cqw; align-items: stretch; }
+.cover-fields .cover-address-field textarea { height: 4.35cqw; font-size: 1.7cqw; line-height: 1.18; }
 .cover-date-start { margin-top: 15px; }
-.cover-mansion-field.field > span:first-child { font-size: 22px; letter-spacing: .03em; }
+.cover-mansion-field.field > span:first-child { font-size: 1.7cqw; letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
 .cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 3 / 1; display: block; background: url("/casa-transparent.png") center / contain no-repeat; }
@@ -312,6 +312,7 @@ button { cursor: pointer; }
 .sales-flow h3 { margin-bottom: 10px; }
 .sales-flow h3 small { font-size: .65em; }
 .sales-step { height: 82px; display: grid; grid-template-columns: 52px 42px 1fr; align-items: center; border-bottom: 1px dotted #b4bdca; font-family: "Yu Gothic", sans-serif; }
+.sales-step:last-child { border-bottom: 0; }
 .sales-step > i { position: relative; width: 48px; height: 48px; display: block; overflow: hidden; border-radius: 50%; background: var(--navy); font-style: normal; }
 .sales-step > i::before { content: ""; position: absolute; top: 50%; left: 50%; width: 28px; height: 47px; background-image: url("/sales-flow-icons.png"); background-repeat: no-repeat; background-size: 500% 100%; transform: translate(-50%, -50%); }
 .sales-icon-0::before { background-position: 0 center; }
@@ -355,15 +356,16 @@ button { cursor: pointer; }
   .quick-inputs { grid-template-columns: 1fr; }
   .target-inputs { grid-template-columns: 1fr; }
   .report-stack { gap: 22px; }
-  .cover-fields { gap: 7px; }
-  .cover-fields .field { min-height: 41px; }
-  .cover-fields .field > span:first-child { width: 76px; padding: 4px; letter-spacing: .04em; }
-  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; }
-  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 64px; height: 64px; }
   .comparison-table th, .comparison-table td { padding: 2px; }
   .strategy-card { height: 285px; }
   .sales-step { height: 57px; }
   .depreciation-canvas { height: 190px; }
+}
+
+@media screen {
+  .market-range-box { bottom: 4.5%; height: 14.5%; }
+  .comparison-table tbody tr:last-child th, .comparison-table tbody tr:last-child td { border-bottom-color: transparent; }
+  .calculation-flow { height: 64%; }
 }
 
 @page { size: A4 landscape; margin: 0; }
@@ -378,11 +380,13 @@ button { cursor: pointer; }
   input[type="month"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
   input[type="date"], input[type="month"] { appearance: none !important; -webkit-appearance: none !important; }
   textarea { overflow: hidden; resize: none; }
-  .cover-fields { gap: 7px; background: transparent !important; backdrop-filter: none; }
-  .cover-fields .field { min-height: 41px; }
-  .cover-fields .field > span:first-child { width: 126px; padding: 7px 10px; font-size: 22px; letter-spacing: .1em; }
-  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 37px; padding: 5px 9px; font-size: 22px; }
-  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 64px; height: 64px; font-size: 22px; line-height: 1.18; }
+  .cover-fields { padding: .47cqw; gap: .47cqw; background: transparent !important; backdrop-filter: none; }
+  .cover-fields .field { min-height: 2.8cqw; gap: .61cqw; }
+  .cover-fields .field > span:first-child { width: 8.5cqw; padding: .47cqw .68cqw; font-size: 1.7cqw; letter-spacing: .1em; }
+  .cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; font-size: 1.7cqw; }
+  .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 4.35cqw; height: 4.35cqw; font-size: 1.7cqw; line-height: 1.18; }
+  .market-range-box { bottom: 6.8%; height: 15%; }
+  .calculation-flow { height: 76.5%; }
   .detail-item input[type="month"] { display: none !important; }
   .property-details { top: 58.8%; }
   .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
