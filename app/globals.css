@@ -69,8 +69,10 @@ button { cursor: pointer; }
 .cover-fields .field > span:first-child { width: 8.5cqw; padding: .47cqw .68cqw; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 1.7cqw "Yu Mincho", serif; }
 .cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 1.7cqw/1.25 "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
-.cover-address-field.field { min-height: 4.35cqw; align-items: stretch; }
-.cover-fields .cover-address-field textarea { height: 4.35cqw; font-size: 1.7cqw; line-height: 1.18; }
+.cover-address-field.field { min-height: 4.35cqw; align-items: center; }
+.cover-address-field.field > span:first-child { align-self: stretch; display: grid; place-items: center; }
+.cover-address-field .field-control { align-self: stretch; }
+.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; font-size: 1.7cqw; line-height: 1.18; }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: 1.7cqw; letter-spacing: .03em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
@@ -106,7 +108,7 @@ button { cursor: pointer; }
 .recommended-row .money-editor { min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 5px; }
 .recommended-row .money-editor input { min-width: 0; width: 100%; height: auto; padding: 0; border: 0; color: var(--gold); background: transparent; font: 500 clamp(40px,5.4vw,80px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .recommended-row .money-editor span { flex: none; margin: 0; color: var(--gold); font: 500 clamp(13px,1.6vw,24px)/1 "Yu Mincho", serif; }
-.recommended-row p { margin: 0; font: 600 clamp(8px,.86vw,13px)/1.65 "Yu Gothic", sans-serif; white-space: nowrap; }
+.recommended-row p { margin: 0; font: 600 clamp(8px,.86vw,13px)/1.65 "Yu Gothic", sans-serif; white-space: nowrap; transform: translateX(12px); }
 .mini-reset { position: absolute; right: 4px; bottom: -27px; padding: 4px 8px; border: 1px solid #9bb9dd; border-radius: 3px; color: #375e8c; background: #f3f8ff; font: 700 10px "Yu Gothic", sans-serif; }
 .property-details { position: absolute; top: 59.2%; left: 3.2%; right: 3.2%; height: 32%; }
 .section-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 26px; font-size: clamp(15px,1.85vw,28px); letter-spacing: .13em; }
@@ -114,8 +116,11 @@ button { cursor: pointer; }
 .detail-grid { margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 70px; column-gap: 24px; row-gap: 4px; }
 .detail-item { min-width: 0; padding: 6px 8px; display: flex; align-items: center; gap: 11px; border: 0; font-family: "Yu Gothic", sans-serif; }
 .detail-item i { flex: 0 0 clamp(29px,2.9vw,43px); height: clamp(29px,2.9vw,43px); display: grid; place-items: center; border-radius: 50%; color: white; background: var(--navy); font-style: normal; font-size: clamp(12px,1.4vw,21px); }
+.detail-item i svg { width: 62%; height: 62%; display: block; }
 .detail-item div { min-width: 0; flex: 1; display: grid; gap: 2px; }
-.detail-item strong { font-size: clamp(12px,1.3cqw,19.5px); }
+.detail-item strong { display: flex; align-items: center; gap: 6px; font-size: clamp(12px,1.3cqw,19.5px); }
+.detail-print-toggle { margin-left: auto; padding: 2px 5px; border: 1px solid #9baabd; border-radius: 10px; color: #65758b; background: white; font: 700 8px "Yu Gothic", sans-serif; white-space: nowrap; }
+.detail-print-toggle.is-visible { border-color: #b78934; color: white; background: var(--gold); }
 .detail-item input, .detail-item select, .detail-item textarea { min-width: 0; width: 100%; height: 31px; padding: 3px 7px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); color: var(--navy); font: 500 clamp(12px,1.45cqw,21.5px)/1.3 "Yu Gothic", sans-serif; }
 .detail-item textarea { height: 42px; overflow: hidden; resize: none; white-space: pre-wrap; overflow-wrap: anywhere; }
 .detail-item small { color: #596b83; font-size: clamp(11px,1.14vw,17px); white-space: nowrap; }
@@ -192,7 +197,7 @@ button { cursor: pointer; }
 .market-range-editor input { min-width: 0; width: 42%; padding: 2px; border: 1px solid var(--edit-border); border-radius: 3px; color: var(--gold); background: white; font: 500 clamp(22px,3.15vw,47px) "Yu Mincho", "Hiragino Mincho ProN", serif; text-align: center; }
 .market-range-editor b { font-size: clamp(17px,2vw,30px); font-weight: 400; }
 .market-range-editor > small { font: 600 clamp(9px,1vw,15px) "Yu Mincho", serif; }
-.market-range-editor .inline-auto { top: -17px; right: 4px; }
+.market-range-editor .inline-auto { top: auto; right: 6px; bottom: 5px; }
 .market-range-box > p { margin: 0; padding: 0 25px; font: 500 clamp(7px,.85vw,13px)/1.8 "Yu Gothic", sans-serif; }
 .market-range-box > .market-commentary { padding: 0 18px; font-size: clamp(8px,.9vw,13.5px); line-height: 1.62; }
 .page-note { position: absolute; bottom: 2.1%; left: 2.6%; font: 500 clamp(6px,.7vw,10px) "Yu Gothic", sans-serif; }
@@ -292,6 +297,7 @@ button { cursor: pointer; }
 .building-note p { margin: 0; }
 
 .price-strategy { position: absolute; top: 22.5%; left: 3.5%; width: 61%; height: 46%; }
+.strategy-reset { position: absolute; z-index: 3; top: 1px; right: 0; padding: 4px 8px; border: 1px solid #a8bdd5; border-radius: 3px; color: #41678e; background: #f4f8ff; font: 700 9px "Yu Gothic", sans-serif; }
 .price-strategy h3, .sales-flow h3 { margin: 0 0 15px; display: flex; align-items: center; gap: 18px; font-size: clamp(13px,1.6vw,24px); font-weight: 500; text-align: center; }
 .price-strategy h3::before, .price-strategy h3::after, .sales-flow h3::before, .sales-flow h3::after { content: ""; flex: 1; max-width: 48px; height: 1px; background: var(--navy); }
 .price-strategy > p { margin: 0 0 20px; font: 500 clamp(8px,.9vw,13px) "Yu Gothic", sans-serif; }
@@ -300,6 +306,8 @@ button { cursor: pointer; }
 .strategy-card h4 { margin: 0; padding: 15px 8px 12px; color: white; background: var(--navy); font: 500 clamp(12px,1.35vw,20px) Georgia, serif; letter-spacing: .04em; }
 .strategy-card h4 small { display: block; margin-top: 5px; font: 500 .68em "Yu Mincho", serif; }
 .strategy-card > strong { display: block; margin: 25px 15px 14px; padding-bottom: 19px; border-bottom: 1px solid #dadde2; font: 500 clamp(25px,3.5vw,52px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.strategy-price-editor { display: flex !important; align-items: baseline; justify-content: center; }
+.strategy-price-editor input { min-width: 0; width: 78%; padding: 0; border: 1px solid var(--edit-border); border-radius: 3px; color: inherit; background: var(--edit); font: inherit; text-align: center; }
 .strategy-card > strong small { margin-left: 5px; font: 500 .42em "Yu Mincho", serif; }
 .strategy-card > p { min-height: 62px; margin: 0 18px; padding-bottom: 14px; border-bottom: 1px solid #dadde2; font: 600 clamp(9px,.92vw,14px)/1.55 "Yu Gothic", sans-serif; }
 .strategy-card ul { margin: 13px 18px; padding: 0; list-style: none; text-align: left; font: 500 clamp(8px,.86vw,13px)/1.85 "Yu Gothic", sans-serif; }
@@ -363,6 +371,7 @@ button { cursor: pointer; }
 }
 
 @media screen {
+  .report-stack { zoom: .8; }
   .cover-fields .field > span:first-child,
   .cover-fields .field-control input,
   .cover-fields .field-control textarea,
@@ -370,14 +379,14 @@ button { cursor: pointer; }
   .cover-fields .cover-address-field textarea { font-size: 25px; }
   .market-range-box { bottom: 4.5%; height: 14.5%; }
   .comparison-table tbody tr:last-child th, .comparison-table tbody tr:last-child td { border-bottom: 0 !important; }
-  .calculation-flow { height: auto; }
+  .calculation-flow { height: fit-content; min-height: 0; padding-bottom: 12px; }
 }
 
 @page { size: A4 landscape; margin: 0; }
 @media print {
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
-  .report-stack { display: block; padding: 0; }
+  .report-stack { display: block; padding: 0; zoom: 1; }
   .report-page { width: 295mm; height: 208mm; margin: 1mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
   .report-page:last-child { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
@@ -396,6 +405,7 @@ button { cursor: pointer; }
   .property-details { top: 58.8%; }
   .detail-grid { margin-top: 5px; grid-auto-rows: 64px; row-gap: 4px; }
   .detail-item { padding: 2px 6px; }
+  .detail-item.print-optional-hidden { display: none !important; }
   .detail-item strong { font-size: clamp(12px,1.3cqw,19.5px); }
   .detail-item input, .detail-item select, .detail-item textarea, .detail-print-value, .area-print-value { color: var(--navy); line-height: 1.22; }
   .detail-item textarea { height: 42px; }
