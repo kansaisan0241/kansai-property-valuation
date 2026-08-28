@@ -69,12 +69,12 @@ button { cursor: pointer; }
 .cover-fields .field > span:first-child { width: 8.5cqw; padding: .47cqw .68cqw; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 1.7cqw "Yu Mincho", serif; }
 .cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 1.7cqw/1.25 "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
-.cover-address-field.field { min-height: 4.35cqw; align-items: center; }
+.cover-address-field.field { width: 72cqw; min-height: 4.35cqw; align-items: center; }
 .cover-address-field.field > span:first-child { align-self: stretch; display: grid; place-items: center; }
 .cover-address-field .field-control { align-self: stretch; }
-.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; font-size: 1.7cqw; line-height: 1.18; }
+.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; background: rgba(255,255,255,.2); font-size: 1.7cqw; line-height: 1.18; text-shadow: 0 0 3px white, 0 0 7px rgba(255,255,255,.95); }
 .cover-date-start { margin-top: 15px; }
-.cover-mansion-field.field > span:first-child { font-size: 1.7cqw; letter-spacing: .03em; }
+.cover-mansion-field.field > span:first-child { font-size: 1.15cqw; letter-spacing: .01em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
 .cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 3 / 1; display: block; background: url("/casa-transparent.png") center / contain no-repeat; }
@@ -375,8 +375,8 @@ button { cursor: pointer; }
   .cover-fields .field > span:first-child,
   .cover-fields .field-control input,
   .cover-fields .field-control textarea,
-  .cover-mansion-field.field > span:first-child,
   .cover-fields .cover-address-field textarea { font-size: 25px; }
+  .cover-mansion-field.field > span:first-child { font-size: 17px; }
   .market-range-box { bottom: 4.5%; height: 14.5%; }
   .comparison-table tbody tr:last-child th, .comparison-table tbody tr:last-child td { border-bottom: 0 !important; }
   .calculation-flow { height: fit-content; min-height: 0; padding-bottom: 12px; }
