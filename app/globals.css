@@ -418,17 +418,16 @@ button { cursor: pointer; }
   .reins-link, .primary-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
   .report-stack {
     width: 100%; max-width: 100vw; padding: 12px 8px 56px; gap: 0; zoom: 1;
-    display: block; overflow-x: auto; overflow-y: visible;
-    overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+    display: block; overflow-x: hidden; overflow-y: visible;
   }
   .report-stack::before {
-    content: "査定書は左右にスワイプして編集できます";
+    content: "スマホ幅に合わせて査定書全体を表示しています";
     position: sticky; left: 8px; width: fit-content; margin: 0 0 8px; padding: 5px 9px;
     display: block; border-radius: 12px; color: #51627a; background: rgba(255,255,255,.94);
     box-shadow: 0 2px 8px rgba(10,30,60,.12); font: 700 10px "Yu Gothic", sans-serif;
   }
   .report-page {
-    width: 1180px; max-width: none; margin: 0 0 24px; aspect-ratio: 297 / 210;
+    width: 1180px; max-width: none; margin: 0 0 24px; aspect-ratio: 297 / 210; zoom: .46;
     box-shadow: 0 8px 24px rgba(21,39,68,.18);
   }
   .modal-backdrop { padding: 10px; }
@@ -437,6 +436,15 @@ button { cursor: pointer; }
   .import-modal > textarea { height: 42dvh; font-size: 11px; }
   .modal-actions { position: sticky; bottom: 0; padding-top: 10px; background: white; }
 }
+
+@media screen and (max-width: 340px) { .report-page { zoom: .255; } }
+@media screen and (min-width: 341px) and (max-width: 370px) { .report-page { zoom: .275; } }
+@media screen and (min-width: 371px) and (max-width: 400px) { .report-page { zoom: .3; } }
+@media screen and (min-width: 401px) and (max-width: 440px) { .report-page { zoom: .325; } }
+@media screen and (min-width: 441px) and (max-width: 480px) { .report-page { zoom: .36; } }
+@media screen and (min-width: 481px) and (max-width: 520px) { .report-page { zoom: .395; } }
+@media screen and (min-width: 521px) and (max-width: 560px) { .report-page { zoom: .425; } }
+@media screen and (min-width: 561px) and (max-width: 600px) { .report-page { zoom: .46; } }
 
 @page { size: A4 landscape; margin: 0; }
 @media print {
