@@ -72,7 +72,7 @@ button { cursor: pointer; }
 .cover-address-field.field { width: 72cqw; min-height: 4.35cqw; align-items: center; }
 .cover-address-field.field > span:first-child { align-self: stretch; display: grid; place-items: center; }
 .cover-address-field .field-control { align-self: stretch; }
-.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; background: rgba(238,246,255,.88); font-size: 1.7cqw; line-height: 1.18; text-shadow: -1.6px -1.6px 0 rgba(255,255,255,.98), 1.6px -1.6px 0 rgba(255,255,255,.98), -1.6px 1.6px 0 rgba(255,255,255,.98), 1.6px 1.6px 0 rgba(255,255,255,.98), 0 0 6px rgba(255,255,255,.9), 0 0 12px rgba(255,255,255,.52); }
+.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; background: rgba(238,246,255,.88); font-size: 1.7cqw; line-height: 1.18; text-shadow: -1.6px -1.6px 0 rgba(247,240,228,.98), 1.6px -1.6px 0 rgba(247,240,228,.98), -1.6px 1.6px 0 rgba(247,240,228,.98), 1.6px 1.6px 0 rgba(247,240,228,.98), 0 0 6px rgba(247,240,228,.9), 0 0 12px rgba(247,240,228,.56); }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: 1.15cqw; letter-spacing: .01em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
@@ -91,10 +91,11 @@ button { cursor: pointer; }
 .header-rule { width: 81%; height: 1px; margin-top: 19px; background: linear-gradient(90deg, var(--gold-light), rgba(195,154,75,0)); }
 .header-description { margin: 15px 0 0; max-width: 65%; font: 600 clamp(8px,1.05vw,15px)/1.65 "Yu Gothic", sans-serif; letter-spacing: .02em; white-space: pre-line; }
 .result-page { isolation: isolate; }
-.result-photo { position: absolute; z-index: 0; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); pointer-events: none; }
+.result-photo { position: absolute; z-index: 2; top: 0; right: 0; width: 38%; height: 35%; background: url("/cover-report.png") 83% 63%/230% auto no-repeat; opacity: .86; mask-image: linear-gradient(to right, transparent, black 24%); pointer-events: none; }
 .result-page > *:not(.result-photo) { z-index: 1; }
+.result-page .valuation-box, .result-page .property-details, .result-page .disclaimer-box { z-index: 3; }
 
-.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 32%; padding: 2.2% 3.35% 1.5%; border: 1px solid var(--gold-light); background: rgba(255,255,255,.93); }
+.valuation-box { position: absolute; top: 25%; left: 3.2%; width: 64.5%; height: 32%; padding: 2.2% 3.35% 1.5%; border: 1px solid var(--gold-light); background: #fff; }
 .section-tab { position: absolute; top: -24px; left: 3%; padding: 10px 18px; color: white; background: var(--navy); font-size: clamp(11px,1.45vw,21px); letter-spacing: .08em; }
 .section-tab small { font-size: .75em; }
 .valuation-range { display: flex; align-items: center; gap: 12px; }
@@ -143,7 +144,7 @@ button { cursor: pointer; }
 .disclaimer-box span { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); font-weight: 800; }
 .disclaimer-box p { margin: 0; }
 
-.target-summary { position: absolute; top: 3.2%; right: 2.8%; width: 29%; height: 19%; min-height: 0; padding: 14px 25px; overflow: hidden; border: 1px solid #d3ba8b; background: white; font: 500 clamp(9px,1vw,15px)/1.4 "Yu Gothic", sans-serif; }
+.target-summary { position: absolute; z-index: 6; top: 3.2%; right: 2.8%; width: 29%; height: 19%; min-height: 0; padding: 14px 25px; overflow: hidden; border: 1px solid #d3ba8b; background: #fff; opacity: 1; font: 500 clamp(9px,1vw,15px)/1.4 "Yu Gothic", sans-serif; }
 .target-summary b { display: block; width: 95px; margin-bottom: 9px; padding: 6px; color: white; background: var(--navy); text-align: center; }
 .target-summary p { margin: 2px 0; }
 .unit-lead { position: absolute; top: 15.7%; left: 10.7%; margin: 0; font: 600 clamp(10px,1.2vw,18px) "Yu Gothic", sans-serif; }
@@ -201,6 +202,8 @@ button { cursor: pointer; }
 .market-range-editor b { font-size: clamp(17px,2vw,30px); font-weight: 400; }
 .market-range-editor > small { font: 600 clamp(9px,1vw,15px) "Yu Mincho", serif; }
 .market-range-editor .inline-auto { top: auto; right: 6px; bottom: 5px; }
+.range-mode-toggle { position: absolute; top: 5px; left: 6px; padding: 2px 7px; border: 1px solid #b88a38; border-radius: 10px; color: #8b6115; background: #fffaf0; font: 700 9px "Yu Gothic", sans-serif; }
+.market-range-editor.is-single input.single-unit-input { width: 68%; }
 .market-range-box > p { margin: 0; padding: 0 25px; font: 500 clamp(7px,.85vw,13px)/1.8 "Yu Gothic", sans-serif; }
 .market-range-box > .market-commentary { padding: 0 18px; font-size: clamp(8px,.9vw,13.5px); line-height: 1.62; }
 .page-note { position: absolute; bottom: 2.1%; left: 2.6%; font: 500 clamp(6px,.7vw,10px) "Yu Gothic", sans-serif; }
@@ -240,6 +243,9 @@ button { cursor: pointer; }
 .editable-flow input, .unit-edit-row input, .target-unit-edit input { min-width: 0; width: 35%; height: 34px; padding: 3px 5px; border: 1px solid var(--edit-border); border-radius: 3px; background: var(--edit); text-align: center; }
 .editable-flow input, .unit-edit-row input { color: var(--navy); font: 600 clamp(15px,1.72vw,26px) "Yu Mincho", "Hiragino Mincho ProN", serif; }
 .editable-flow > div > small, .unit-edit-row > small, .target-unit-edit > small { font-size: 10px; }
+.single-flow .editable-flow input.single-unit-input, .single-flow .unit-edit-row input.single-unit-input, .single-flow .target-unit-edit input.single-unit-input { width: 58%; }
+.adjust-stepper { position: absolute; top: 50%; right: 5px; display: grid; gap: 2px; transform: translateY(-50%); }
+.adjust-stepper button { width: 22px; height: 18px; padding: 0; border: 1px solid #a8bdd5; border-radius: 3px; color: var(--navy); background: #f3f8ff; font-size: 9px; line-height: 1; }
 .inline-auto { position: absolute; top: 6px; right: 7px; padding: 2px 5px; border: 1px solid #a8bdd5; border-radius: 3px; color: #41678e; background: #f4f8ff; font: 700 8px "Yu Gothic", sans-serif; }
 .gold-box { border-color: #d6a64e; color: var(--gold); }
 .gold-box > span { color: var(--gold); }
@@ -406,6 +412,7 @@ button { cursor: pointer; }
   .cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; font-size: 1.7cqw; }
   .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 4.35cqw; height: 4.35cqw; font-size: 1.7cqw; line-height: 1.18; }
   .cover-fields .cover-mansion-field.field > span:first-child { padding-inline: .25cqw; font-size: 1.08cqw; letter-spacing: 0; }
+  .valuation-box, .target-summary { background: #fff !important; opacity: 1 !important; }
   .market-range-box { bottom: 6.8%; height: 15%; }
   .calculation-flow { height: 76.5%; }
   .detail-item input[type="month"] { display: none !important; }
@@ -428,6 +435,8 @@ button { cursor: pointer; }
   .comparison-table input { padding: 0; }
   .comparison-edit-only { display: none !important; }
   .comparison-print-only { display: block; width: 100%; color: var(--navy); text-align: center; }
+  .factor-columns { height: 49%; }
+  .overall-box { top: 77%; height: 12%; }
   .strategy-card { height: 295px; }
   .strategy-card h4 { padding: 10px 7px 8px; }
   .strategy-card > strong { margin: 14px 13px 10px; padding-bottom: 10px; }
