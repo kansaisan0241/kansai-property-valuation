@@ -72,7 +72,7 @@ button { cursor: pointer; }
 .cover-address-field.field { width: 72cqw; min-height: 4.35cqw; align-items: center; }
 .cover-address-field.field > span:first-child { align-self: stretch; display: grid; place-items: center; }
 .cover-address-field .field-control { align-self: stretch; }
-.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; background: rgba(255,255,255,.2); font-size: 1.7cqw; line-height: 1.18; text-shadow: 0 0 3px white, 0 0 7px rgba(255,255,255,.95); }
+.cover-fields .cover-address-field textarea { height: 4.35cqw; padding-block: .15cqw; align-content: center; background: rgba(255,255,255,.2); font-size: 1.7cqw; line-height: 1.18; text-shadow: -1.2px -1.2px 0 rgba(255,255,255,.98), 1.2px -1.2px 0 rgba(255,255,255,.98), -1.2px 1.2px 0 rgba(255,255,255,.98), 1.2px 1.2px 0 rgba(255,255,255,.98), 0 0 4px rgba(255,255,255,.88), 0 0 9px rgba(255,255,255,.48); }
 .cover-date-start { margin-top: 15px; }
 .cover-mansion-field.field > span:first-child { font-size: 1.15cqw; letter-spacing: .01em; }
 .cover-message { position: absolute; left: 5.2%; bottom: 18.5%; margin: 0; color: #9a6815; font-size: clamp(12px,1.35vw,21px); font-weight: 700; line-height: 1.65; letter-spacing: .08em; }
@@ -130,9 +130,10 @@ button { cursor: pointer; }
 .area-detail input { width: 6.3em !important; text-align: left; }
 .area-detail small { align-self: center; }
 .editable-choice { position: relative; min-width: 0; display: block; }
+.editable-choice.is-open { z-index: 1000; }
 .editable-choice > input { padding-right: 35px; }
 .choice-toggle { position: absolute; z-index: 3; top: 0; right: 0; width: 32px; height: 30px; padding: 0; border: 0; border-left: 1px solid var(--edit-border); border-radius: 0 3px 3px 0; color: var(--navy); background: #dceaff; font-size: 12px; }
-.choice-menu { position: absolute; z-index: 30; top: calc(100% + 3px); right: 0; width: max(100%, 180px); padding: 4px; display: grid; gap: 2px; border: 1px solid #8caacb; border-radius: 4px; background: white; box-shadow: 0 10px 24px rgba(7,26,67,.2); }
+.choice-menu { position: absolute; z-index: 1001; top: calc(100% + 3px); right: 0; width: max(100%, 180px); max-height: 240px; padding: 4px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; display: grid; gap: 2px; border: 1px solid #8caacb; border-radius: 4px; background: white; box-shadow: 0 10px 24px rgba(7,26,67,.2); }
 .choice-menu button { width: 100%; padding: 7px 10px; border: 0; border-radius: 2px; color: var(--navy); background: white; font: 600 14px "Yu Gothic", sans-serif; text-align: left; white-space: nowrap; }
 .choice-menu button:hover { background: #eaf3ff; }
 .detail-item:nth-child(n+7) .choice-menu { top: auto; bottom: calc(100% + 3px); }
@@ -379,7 +380,10 @@ button { cursor: pointer; }
   .cover-mansion-field.field > span:first-child { font-size: 17px; }
   .market-range-box { bottom: 4.5%; height: 14.5%; }
   .comparison-table tbody tr:last-child th, .comparison-table tbody tr:last-child td { border-bottom: 0 !important; }
-  .calculation-flow { height: fit-content; min-height: 0; padding-bottom: 12px; }
+  .calculation-flow { height: 76.5%; min-height: 0; padding-bottom: 12px; display: flex; flex-direction: column; }
+  .calculation-flow h3, .calculation-flow .flow-symbol, .calculation-flow .down-arrow { flex: 0 0 auto; }
+  .calculation-flow .flow-box { flex: 1 1 0; min-height: 96px; }
+  .calculation-flow .final-flow { flex-grow: 1.08; min-height: 108px; }
 }
 
 @page { size: A4 landscape; margin: 0; }
