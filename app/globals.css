@@ -427,7 +427,8 @@ button { cursor: pointer; }
     box-shadow: 0 2px 8px rgba(10,30,60,.12); font: 700 10px "Yu Gothic", sans-serif;
   }
   .report-page {
-    width: 1180px; max-width: none; margin: 0 0 24px; aspect-ratio: 297 / 210; zoom: .46;
+    width: 1180px; max-width: none; margin: 0 0 -426px; aspect-ratio: 297 / 210;
+    transform: scale(.46); transform-origin: top left;
     box-shadow: 0 8px 24px rgba(21,39,68,.18);
   }
   .modal-backdrop { padding: 10px; }
@@ -437,14 +438,14 @@ button { cursor: pointer; }
   .modal-actions { position: sticky; bottom: 0; padding-top: 10px; background: white; }
 }
 
-@media screen and (max-width: 340px) { .report-page { zoom: .255; } }
-@media screen and (min-width: 341px) and (max-width: 370px) { .report-page { zoom: .275; } }
-@media screen and (min-width: 371px) and (max-width: 400px) { .report-page { zoom: .3; } }
-@media screen and (min-width: 401px) and (max-width: 440px) { .report-page { zoom: .325; } }
-@media screen and (min-width: 441px) and (max-width: 480px) { .report-page { zoom: .36; } }
-@media screen and (min-width: 481px) and (max-width: 520px) { .report-page { zoom: .395; } }
-@media screen and (min-width: 521px) and (max-width: 560px) { .report-page { zoom: .425; } }
-@media screen and (min-width: 561px) and (max-width: 600px) { .report-page { zoom: .46; } }
+@media screen and (max-width: 340px) { .report-page { margin-bottom: -597px; transform: scale(.255); } }
+@media screen and (min-width: 341px) and (max-width: 370px) { .report-page { margin-bottom: -581px; transform: scale(.275); } }
+@media screen and (min-width: 371px) and (max-width: 400px) { .report-page { margin-bottom: -560px; transform: scale(.3); } }
+@media screen and (min-width: 401px) and (max-width: 440px) { .report-page { margin-bottom: -539px; transform: scale(.325); } }
+@media screen and (min-width: 441px) and (max-width: 480px) { .report-page { margin-bottom: -510px; transform: scale(.36); } }
+@media screen and (min-width: 481px) and (max-width: 520px) { .report-page { margin-bottom: -481px; transform: scale(.395); } }
+@media screen and (min-width: 521px) and (max-width: 560px) { .report-page { margin-bottom: -456px; transform: scale(.425); } }
+@media screen and (min-width: 561px) and (max-width: 600px) { .report-page { margin-bottom: -426px; transform: scale(.46); } }
 
 @page { size: A4 landscape; margin: 0; }
 @media print {
