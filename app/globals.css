@@ -400,6 +400,44 @@ button { cursor: pointer; }
   .calculation-flow .final-flow { flex-grow: 1.08; min-height: 108px; }
 }
 
+@media screen and (max-width: 600px) {
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  body { background: #e7ecf2; }
+  .editor-toolbar {
+    position: sticky; top: 0; min-height: 0; padding: 8px; gap: 8px;
+    display: grid; grid-template-columns: 1fr; align-items: stretch;
+  }
+  .type-switch {
+    width: 100%; max-width: none; padding: 3px; display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px;
+  }
+  .toolbar-type-label { grid-column: 1 / -1; padding: 5px 7px 2px; font-size: 10px; }
+  .type-switch button { min-width: 0; padding: 9px 3px; font-size: 11px; white-space: nowrap; }
+  .toolbar-actions { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .toolbar-actions > small, .toolbar-actions .ghost-button { display: none; }
+  .reins-link, .primary-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
+  .report-stack {
+    width: 100%; max-width: 100vw; padding: 12px 8px 56px; gap: 0; zoom: 1;
+    display: block; overflow-x: auto; overflow-y: visible;
+    overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+  }
+  .report-stack::before {
+    content: "査定書は左右にスワイプして編集できます";
+    position: sticky; left: 8px; width: fit-content; margin: 0 0 8px; padding: 5px 9px;
+    display: block; border-radius: 12px; color: #51627a; background: rgba(255,255,255,.94);
+    box-shadow: 0 2px 8px rgba(10,30,60,.12); font: 700 10px "Yu Gothic", sans-serif;
+  }
+  .report-page {
+    width: 1180px; max-width: none; margin: 0 0 24px; aspect-ratio: 297 / 210;
+    box-shadow: 0 8px 24px rgba(21,39,68,.18);
+  }
+  .modal-backdrop { padding: 10px; }
+  .import-modal { width: calc(100vw - 20px); max-height: calc(100dvh - 20px); padding: 22px 15px 15px; overflow-y: auto; }
+  .import-modal h2 { padding-right: 35px; font-size: 20px; }
+  .import-modal > textarea { height: 42dvh; font-size: 11px; }
+  .modal-actions { position: sticky; bottom: 0; padding-top: 10px; background: white; }
+}
+
 @page { size: A4 landscape; margin: 0; }
 @media print {
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
