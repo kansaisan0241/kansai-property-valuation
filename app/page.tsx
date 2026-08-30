@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type PropertyType = "house" | "land" | "mansion";
-type SaveState = "idle" | "saving" | "saved" | "local" | "error";
 
 type Comparable = {
   id: number;
@@ -297,8 +296,7 @@ export default function Home() {
   const [surroundLow, setSurroundLow] = useState(0); const [surroundHigh, setSurroundHigh] = useState(0); const [unitManual, setUnitManual] = useState(false); const [unitRangeMode, setUnitRangeMode] = useState(true); const [adjustLow, setAdjustLow] = useState(0); const [adjustHigh, setAdjustHigh] = useState(0); const [targetUnitLowManual, setTargetUnitLowManual] = useState(0); const [targetUnitHighManual, setTargetUnitHighManual] = useState(0); const [targetUnitManual, setTargetUnitManual] = useState(false);
   const [buildingUnit, setBuildingUnit] = useState(66); const [usefulLife, setUsefulLife] = useState(25); const [buildingAdjustmentUnit, setBuildingAdjustmentUnit] = useState(0); const [newBuildingPriceManual, setNewBuildingPriceManual] = useState(0); const [appraisalLowManual, setAppraisalLowManual] = useState(0); const [appraisalHighManual, setAppraisalHighManual] = useState(0); const [recommendedManual, setRecommendedManual] = useState(0); const [speedManual, setSpeedManual] = useState(0); const [challengeManual, setChallengeManual] = useState(0);
   const [showRoadInPrint, setShowRoadInPrint] = useState(true); const [showTransportInPrint, setShowTransportInPrint] = useState(true);
-  const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState(""); const loadedRef = useRef(false);
-  const [employeeInput, setEmployeeInput] = useState(""); const [employeeId, setEmployeeId] = useState(""); const [isAuthenticated, setIsAuthenticated] = useState(false); const [loginLoading, setLoginLoading] = useState(false); const [loginError, setLoginError] = useState(""); const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState("");
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -309,69 +307,14 @@ export default function Home() {
     applyDraft({ type: "house", appraisalDate: localToday(), structure: "木造", buildingUnit: 66, usefulLife: 25, comparables: Array.from({ length: 5 }, (_, i) => emptyComp(i + 1)), factors: defaultFactors.house });
   }
 
-  async function loginEmployee(event?: React.FormEvent) {
-    event?.preventDefault();
-    const normalized = toHalfWidth(employeeInput).trim();
-    if (!/^[A-Za-z0-9_-]{1,32}$/.test(normalized)) { setLoginError("社員番号は半角英数字・ハイフン・アンダーバーで入力してください。"); return; }
-    setLoginLoading(true); setLoginError(""); loadedRef.current = false;
-    let remoteLoaded = false;
-    try {
-      const response = await fetch(`/api/employee-draft?employeeId=${encodeURIComponent(normalized)}`, { cache: "no-store" });
-      if (response.ok) {
-        const result = await response.json() as { draft?: Record<string, any> | null };
-        if (result.draft) { applyDraft(result.draft); remoteLoaded = true; }
-        setSaveState("saved");
-      } else if (response.status === 503) setSaveState("local");
-      else throw new Error("load failed");
-    } catch { setSaveState("local"); }
-    if (!remoteLoaded) {
-      try {
-        const localDraft = localStorage.getItem(`kansai-valuation-report-v2:${normalized}`);
-        if (localDraft) applyDraft(JSON.parse(localDraft)); else resetDraftValues();
-      } catch { resetDraftValues(); }
-    }
-    setEmployeeId(normalized); setIsAuthenticated(true); setLoginLoading(false);
-    window.setTimeout(() => { loadedRef.current = true; }, 0);
-  }
-
   const validUnits = useMemo(() => comparables.map((comp) => compUnit(comp, type)).filter((value) => value > 0), [comparables, type]);
   const averageUnit = useMemo(() => validUnits.reduce((sum, value) => sum + value, 0) / Math.max(1, validUnits.length), [validUnits]);
   useEffect(() => { if (!unitManual) { const center = averageUnit ? roundOne(averageUnit) : 0; setSurroundLow(unitRangeMode && averageUnit ? roundOne(averageUnit * 0.95) : center); setSurroundHigh(unitRangeMode && averageUnit ? roundOne(averageUnit * 1.05) : center); } }, [averageUnit, unitManual, unitRangeMode]);
 
-  useEffect(() => {
-    if (!loadedRef.current || !isAuthenticated || !employeeId) return;
-    const payload = { type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors };
-    setSaveState("idle");
-    const timer = window.setTimeout(() => { void saveEmployeeDraft(payload); }, 1800);
-    return () => window.clearTimeout(timer);
-  }, [isAuthenticated, employeeId, type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors]);
-
-  function currentDraftPayload() {
-    return { type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors };
-  }
-
-  async function saveEmployeeDraft(payload = currentDraftPayload()) {
-    if (!employeeId) return;
-    localStorage.setItem(`kansai-valuation-report-v2:${employeeId}`, JSON.stringify(payload));
-    setSaveState("saving");
-    try {
-      const response = await fetch("/api/employee-draft", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ employeeId, payload }) });
-      if (response.ok) setSaveState("saved");
-      else if (response.status === 503) setSaveState("local");
-      else setSaveState("error");
-    } catch { setSaveState("local"); }
-  }
-
-  async function resetEmployeeDraft() {
-    if (!window.confirm("本当にリセットしますか？\n入力内容と保存データがすべて初期化されます。")) return;
-    loadedRef.current = false;
+  function resetReport() {
+    if (!window.confirm("本当にリセットしますか？\n入力内容がすべて初期化されます。")) return;
     resetDraftValues();
-    localStorage.removeItem(`kansai-valuation-report-v2:${employeeId}`);
-    try {
-      const response = await fetch(`/api/employee-draft?employeeId=${encodeURIComponent(employeeId)}`, { method: "DELETE" });
-      setSaveState(response.ok ? "saved" : "local");
-    } catch { setSaveState("local"); }
-    window.setTimeout(() => { loadedRef.current = true; }, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const targetAge = yearsBetween(builtDate, appraisalDate); const residualRate = residualRateAtAge(targetAge, usefulLife); const autoNewBuildingPrice = (buildingArea / TSUBO) * buildingUnit; const newBuildingPrice = newBuildingPriceManual || autoNewBuildingPrice; const baseBuildingValue = type === "house" ? newBuildingPrice * residualRate : 0; const buildingAdjustmentAmount = (buildingArea / TSUBO) * buildingAdjustmentUnit; const buildingValue = type === "house" ? Math.max(0, baseBuildingValue + buildingAdjustmentAmount) : 0; const targetArea = type === "mansion" ? exclusiveArea / TSUBO : landArea / TSUBO; const autoAdjustedLow = surroundLow + adjustLow; const autoAdjustedHigh = surroundHigh + adjustHigh; const adjustedLow = targetUnitManual ? targetUnitLowManual : autoAdjustedLow; const adjustedHigh = targetUnitManual ? targetUnitHighManual : autoAdjustedHigh; const landAppraisalLow = Math.max(0, adjustedLow * targetArea); const landAppraisalHigh = Math.max(0, adjustedHigh * targetArea); const autoAppraisalLow = landAppraisalLow + buildingValue; const autoAppraisalHigh = landAppraisalHigh + buildingValue; const appraisalLow = appraisalLowManual || autoAppraisalLow; const appraisalHigh = appraisalHighManual || autoAppraisalHigh; const recommendedAuto = ceilEnding80(Math.max(appraisalLow, appraisalHigh) * 1.02); const recommended = recommendedManual || recommendedAuto; const challengeAuto = floorEnding80(recommended * 1.05); const speedAuto = floorEnding80(recommended * 0.95); const challenge = challengeManual || challengeAuto; const speed = speedManual || speedAuto;
@@ -435,12 +378,8 @@ export default function Home() {
     <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
   ];
 
-  if (!isAuthenticated) return <main className="login-page"><section className="employee-login-card"><div className="login-brand"><i className="cover-company-logo" /><span>関西不動産販売</span></div><p className="login-eyebrow">PROPERTY VALUATION REPORT</p><h1>簡易査定書ログイン</h1><p>社員番号を入力すると、その社員番号に保存された査定データを読み込みます。</p><form onSubmit={loginEmployee}><label>社員番号<input autoFocus inputMode="text" autoComplete="username" value={employeeInput} onChange={(event) => setEmployeeInput(event.target.value)} placeholder="例）123456" /></label>{loginError && <p className="login-error" role="alert">{loginError}</p>}<button type="submit" disabled={loginLoading}>{loginLoading ? "読み込み中…" : "ログイン"}</button></form><small>※社員番号は半角英数字で入力してください。</small></section></main>;
-
-  const saveStatusLabel = saveState === "saving" ? "保存中…" : saveState === "saved" ? "D1へ保存済み" : saveState === "local" ? "端末内へ保存済み（D1未設定）" : saveState === "error" ? "保存エラー" : "未保存の変更あり";
-
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="employee-session"><strong>社員番号 {employeeId}</strong><span className={`save-status save-${saveState}`}>{saveStatusLabel}</span></div><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="save-button" onClick={() => void saveEmployeeDraft()}>保存</button><button className="reset-button" onClick={() => void resetEmployeeDraft()}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button><button className="logout-button" onClick={() => { loadedRef.current = false; setIsAuthenticated(false); setEmployeeId(""); setEmployeeInput(""); setSaveState("idle"); }}>ログアウト</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産査定報告書</h1><i /></header>
