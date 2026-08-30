@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type PropertyType = "house" | "land" | "mansion";
+type SaveState = "idle" | "saving" | "saved" | "local" | "error";
 
 type Comparable = {
   id: number;
@@ -206,9 +207,9 @@ function residualRateAtAge(age: number, life: number) {
   return Math.max(0, 1 - Math.max(0, age) / safeLife);
 }
 
-function Field({ label, value, onChange, type = "text", suffix, className = "" }: { label?: string; value: string | number; onChange: (value: string) => void; type?: string; suffix?: string; className?: string }) {
+function Field({ label, value, onChange, type = "text", suffix, className = "", placeholder = "" }: { label?: string; value: string | number; onChange: (value: string) => void; type?: string; suffix?: string; className?: string; placeholder?: string }) {
   const textClass = type === "textarea" ? (String(value).includes("\n") ? "has-explicit-break" : "single-line-value") : "";
-  return <label className={`field ${className}`}>{label && <span>{label}</span>}<span className="field-control">{type === "textarea" ? <textarea className={textClass} rows={2} value={value} onChange={(event) => onChange(event.target.value)} /> : <input type={type} value={value} onChange={(event) => onChange(event.target.value)} />}{suffix && <small>{suffix}</small>}</span></label>;
+  return <label className={`field ${className}`}>{label && <span>{label}</span>}<span className="field-control">{type === "textarea" ? <textarea className={textClass} rows={2} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /> : <input type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />}{suffix && <small className="field-suffix">{suffix}</small>}</span></label>;
 }
 
 function FormattedNumberInput({ value, onChange, decimals = 0, className = "", ariaLabel, showPlus = false, showZero = false, placeholder }: { value: number; onChange: (value: number) => void; decimals?: number; className?: string; ariaLabel?: string; showPlus?: boolean; showZero?: boolean; placeholder?: string }) {
@@ -297,27 +298,81 @@ export default function Home() {
   const [buildingUnit, setBuildingUnit] = useState(66); const [usefulLife, setUsefulLife] = useState(25); const [buildingAdjustmentUnit, setBuildingAdjustmentUnit] = useState(0); const [newBuildingPriceManual, setNewBuildingPriceManual] = useState(0); const [appraisalLowManual, setAppraisalLowManual] = useState(0); const [appraisalHighManual, setAppraisalHighManual] = useState(0); const [recommendedManual, setRecommendedManual] = useState(0); const [speedManual, setSpeedManual] = useState(0); const [challengeManual, setChallengeManual] = useState(0);
   const [showRoadInPrint, setShowRoadInPrint] = useState(true); const [showTransportInPrint, setShowTransportInPrint] = useState(true);
   const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState(""); const loadedRef = useRef(false);
+  const [employeeInput, setEmployeeInput] = useState(""); const [employeeId, setEmployeeId] = useState(""); const [isAuthenticated, setIsAuthenticated] = useState(false); const [loginLoading, setLoginLoading] = useState(false); const [loginError, setLoginError] = useState(""); const [saveState, setSaveState] = useState<SaveState>("idle");
 
-  useEffect(() => {
+  function applyDraft(d: Record<string, any>) {
+    const nextType = (d.type ?? "house") as PropertyType;
+    setType(nextType); setPropertyName(d.propertyName ?? ""); setAddress(d.address ?? ""); setMansionName(d.mansionName ?? ""); setDetailAddressValue(d.detailAddressValue ?? (d.address ?? "").replace(/\r?\n/g, "")); setDetailMansionNameValue(d.detailMansionNameValue ?? (d.mansionName ?? "").replace(/\r?\n/g, "")); setAppraisalDate(d.appraisalDate ?? localToday()); setStaff(d.staff ?? ""); setLandArea(d.landArea ?? 0); setBuildingArea(d.buildingArea ?? 0); setExclusiveArea(d.exclusiveArea ?? 0); setLayout(d.layout ?? ""); setBuiltDate(d.builtDate ?? ""); setTransport(d.transport ?? ""); setRoad(d.road ?? ""); setFloors(d.floors ?? ""); setOther(d.other ?? ""); setStructure(d.structure ?? "木造"); setComparables((d.comparables ?? Array.from({ length: 5 }, (_: unknown, i: number) => emptyComp(i + 1))).map((comp: Comparable, i: number) => ({ ...emptyComp(comp.id ?? i + 1), ...comp }))); setSurroundLow(d.surroundLow ?? 0); setSurroundHigh(d.surroundHigh ?? 0); setUnitManual(d.unitManual ?? false); setUnitRangeMode(d.unitRangeMode ?? true); setAdjustLow(d.adjustLow ?? 0); setAdjustHigh(d.adjustHigh ?? 0); setTargetUnitLowManual(d.targetUnitLowManual ?? 0); setTargetUnitHighManual(d.targetUnitHighManual ?? 0); setTargetUnitManual(d.targetUnitManual ?? false); setBuildingUnit(d.buildingUnit ?? 66); setUsefulLife(d.usefulLife ?? 25); setBuildingAdjustmentUnit(d.buildingAdjustmentUnit ?? 0); setNewBuildingPriceManual(d.newBuildingPriceManual ?? 0); setAppraisalLowManual(d.appraisalLowManual ?? 0); setAppraisalHighManual(d.appraisalHighManual ?? 0); setRecommendedManual(d.recommendedManual ?? 0); setSpeedManual(d.speedManual ?? 0); setChallengeManual(d.challengeManual ?? 0); setShowRoadInPrint(d.showRoadInPrint ?? true); setShowTransportInPrint(d.showTransportInPrint ?? true); setFactors(d.factors ?? defaultFactors[nextType] ?? defaultFactors.house);
+  }
+
+  function resetDraftValues() {
+    applyDraft({ type: "house", appraisalDate: localToday(), structure: "木造", buildingUnit: 66, usefulLife: 25, comparables: Array.from({ length: 5 }, (_, i) => emptyComp(i + 1)), factors: defaultFactors.house });
+  }
+
+  async function loginEmployee(event?: React.FormEvent) {
+    event?.preventDefault();
+    const normalized = toHalfWidth(employeeInput).trim();
+    if (!/^[A-Za-z0-9_-]{1,32}$/.test(normalized)) { setLoginError("社員番号は半角英数字・ハイフン・アンダーバーで入力してください。"); return; }
+    setLoginLoading(true); setLoginError(""); loadedRef.current = false;
+    let remoteLoaded = false;
     try {
-      const stored = localStorage.getItem("kansai-valuation-report-v1");
-      if (stored) {
-        const d = JSON.parse(stored); setType(d.type ?? "house"); setPropertyName(d.propertyName ?? ""); setAddress(d.address ?? ""); setMansionName(d.mansionName ?? ""); setDetailAddressValue(d.detailAddressValue ?? (d.address ?? "").replace(/\r?\n/g, "")); setDetailMansionNameValue(d.detailMansionNameValue ?? (d.mansionName ?? "").replace(/\r?\n/g, "")); setAppraisalDate(d.appraisalDate ?? localToday()); setStaff(d.staff ?? ""); setLandArea(d.landArea ?? 0); setBuildingArea(d.buildingArea ?? 0); setExclusiveArea(d.exclusiveArea ?? 0); setLayout(d.layout ?? ""); setBuiltDate(d.builtDate ?? ""); setTransport(d.transport ?? ""); setRoad(d.road ?? ""); setFloors(d.floors ?? ""); setOther(d.other ?? ""); setStructure(d.structure ?? "木造"); setComparables((d.comparables ?? Array.from({ length: 5 }, (_: unknown, i: number) => emptyComp(i + 1))).map((comp: Comparable, i: number) => ({ ...emptyComp(comp.id ?? i + 1), ...comp }))); setSurroundLow(d.surroundLow ?? 0); setSurroundHigh(d.surroundHigh ?? 0); setUnitManual(d.unitManual ?? false); setUnitRangeMode(d.unitRangeMode ?? true); setAdjustLow(d.adjustLow ?? 0); setAdjustHigh(d.adjustHigh ?? 0); setTargetUnitLowManual(d.targetUnitLowManual ?? 0); setTargetUnitHighManual(d.targetUnitHighManual ?? 0); setTargetUnitManual(d.targetUnitManual ?? false); setBuildingUnit(d.buildingUnit ?? 66); setUsefulLife(d.usefulLife ?? 25); setBuildingAdjustmentUnit(d.buildingAdjustmentUnit ?? 0); setNewBuildingPriceManual(d.newBuildingPriceManual ?? 0); setAppraisalLowManual(d.appraisalLowManual ?? 0); setAppraisalHighManual(d.appraisalHighManual ?? 0); setRecommendedManual(d.recommendedManual ?? 0); setSpeedManual(d.speedManual ?? 0); setChallengeManual(d.challengeManual ?? 0); setShowRoadInPrint(d.showRoadInPrint ?? true); setShowTransportInPrint(d.showTransportInPrint ?? true); setFactors(d.factors ?? defaultFactors[d.type as PropertyType] ?? defaultFactors.house);
-      }
-    } catch { /* ignore corrupt local draft */ }
-    loadedRef.current = true;
-  }, []);
+      const response = await fetch(`/api/employee-draft?employeeId=${encodeURIComponent(normalized)}`, { cache: "no-store" });
+      if (response.ok) {
+        const result = await response.json() as { draft?: Record<string, any> | null };
+        if (result.draft) { applyDraft(result.draft); remoteLoaded = true; }
+        setSaveState("saved");
+      } else if (response.status === 503) setSaveState("local");
+      else throw new Error("load failed");
+    } catch { setSaveState("local"); }
+    if (!remoteLoaded) {
+      try {
+        const localDraft = localStorage.getItem(`kansai-valuation-report-v2:${normalized}`);
+        if (localDraft) applyDraft(JSON.parse(localDraft)); else resetDraftValues();
+      } catch { resetDraftValues(); }
+    }
+    setEmployeeId(normalized); setIsAuthenticated(true); setLoginLoading(false);
+    window.setTimeout(() => { loadedRef.current = true; }, 0);
+  }
 
   const validUnits = useMemo(() => comparables.map((comp) => compUnit(comp, type)).filter((value) => value > 0), [comparables, type]);
   const averageUnit = useMemo(() => validUnits.reduce((sum, value) => sum + value, 0) / Math.max(1, validUnits.length), [validUnits]);
   useEffect(() => { if (!unitManual) { const center = averageUnit ? roundOne(averageUnit) : 0; setSurroundLow(unitRangeMode && averageUnit ? roundOne(averageUnit * 0.95) : center); setSurroundHigh(unitRangeMode && averageUnit ? roundOne(averageUnit * 1.05) : center); } }, [averageUnit, unitManual, unitRangeMode]);
 
   useEffect(() => {
-    if (!loadedRef.current) return;
+    if (!loadedRef.current || !isAuthenticated || !employeeId) return;
     const payload = { type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors };
-    const timer = window.setTimeout(() => { localStorage.setItem("kansai-valuation-report-v1", JSON.stringify(payload)); }, 1200);
+    setSaveState("idle");
+    const timer = window.setTimeout(() => { void saveEmployeeDraft(payload); }, 1800);
     return () => window.clearTimeout(timer);
-  }, [type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors]);
+  }, [isAuthenticated, employeeId, type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors]);
+
+  function currentDraftPayload() {
+    return { type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, adjustHigh, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors };
+  }
+
+  async function saveEmployeeDraft(payload = currentDraftPayload()) {
+    if (!employeeId) return;
+    localStorage.setItem(`kansai-valuation-report-v2:${employeeId}`, JSON.stringify(payload));
+    setSaveState("saving");
+    try {
+      const response = await fetch("/api/employee-draft", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ employeeId, payload }) });
+      if (response.ok) setSaveState("saved");
+      else if (response.status === 503) setSaveState("local");
+      else setSaveState("error");
+    } catch { setSaveState("local"); }
+  }
+
+  async function resetEmployeeDraft() {
+    if (!window.confirm("本当にリセットしますか？\n入力内容と保存データがすべて初期化されます。")) return;
+    loadedRef.current = false;
+    resetDraftValues();
+    localStorage.removeItem(`kansai-valuation-report-v2:${employeeId}`);
+    try {
+      const response = await fetch(`/api/employee-draft?employeeId=${encodeURIComponent(employeeId)}`, { method: "DELETE" });
+      setSaveState(response.ok ? "saved" : "local");
+    } catch { setSaveState("local"); }
+    window.setTimeout(() => { loadedRef.current = true; }, 0);
+  }
 
   const targetAge = yearsBetween(builtDate, appraisalDate); const residualRate = residualRateAtAge(targetAge, usefulLife); const autoNewBuildingPrice = (buildingArea / TSUBO) * buildingUnit; const newBuildingPrice = newBuildingPriceManual || autoNewBuildingPrice; const baseBuildingValue = type === "house" ? newBuildingPrice * residualRate : 0; const buildingAdjustmentAmount = (buildingArea / TSUBO) * buildingAdjustmentUnit; const buildingValue = type === "house" ? Math.max(0, baseBuildingValue + buildingAdjustmentAmount) : 0; const targetArea = type === "mansion" ? exclusiveArea / TSUBO : landArea / TSUBO; const autoAdjustedLow = surroundLow + adjustLow; const autoAdjustedHigh = surroundHigh + adjustHigh; const adjustedLow = targetUnitManual ? targetUnitLowManual : autoAdjustedLow; const adjustedHigh = targetUnitManual ? targetUnitHighManual : autoAdjustedHigh; const landAppraisalLow = Math.max(0, adjustedLow * targetArea); const landAppraisalHigh = Math.max(0, adjustedHigh * targetArea); const autoAppraisalLow = landAppraisalLow + buildingValue; const autoAppraisalHigh = landAppraisalHigh + buildingValue; const appraisalLow = appraisalLowManual || autoAppraisalLow; const appraisalHigh = appraisalHighManual || autoAppraisalHigh; const recommendedAuto = ceilEnding80(Math.max(appraisalLow, appraisalHigh) * 1.02); const recommended = recommendedManual || recommendedAuto; const challengeAuto = floorEnding80(recommended * 1.05); const speedAuto = floorEnding80(recommended * 0.95); const challenge = challengeManual || challengeAuto; const speed = speedManual || speedAuto;
 
@@ -380,12 +435,16 @@ export default function Home() {
     <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
   ];
 
+  if (!isAuthenticated) return <main className="login-page"><section className="employee-login-card"><div className="login-brand"><i className="cover-company-logo" /><span>関西不動産販売</span></div><p className="login-eyebrow">PROPERTY VALUATION REPORT</p><h1>簡易査定書ログイン</h1><p>社員番号を入力すると、その社員番号に保存された査定データを読み込みます。</p><form onSubmit={loginEmployee}><label>社員番号<input autoFocus inputMode="text" autoComplete="username" value={employeeInput} onChange={(event) => setEmployeeInput(event.target.value)} placeholder="例）123456" /></label>{loginError && <p className="login-error" role="alert">{loginError}</p>}<button type="submit" disabled={loginLoading}>{loginLoading ? "読み込み中…" : "ログイン"}</button></form><small>※社員番号は半角英数字で入力してください。</small></section></main>;
+
+  const saveStatusLabel = saveState === "saving" ? "保存中…" : saveState === "saved" ? "D1へ保存済み" : saveState === "local" ? "端末内へ保存済み（D1未設定）" : saveState === "error" ? "保存エラー" : "未保存の変更あり";
+
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><small>入力内容は自動保存されます</small><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="employee-session"><strong>社員番号 {employeeId}</strong><span className={`save-status save-${saveState}`}>{saveStatusLabel}</span></div><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="save-button" onClick={() => void saveEmployeeDraft()}>保存</button><button className="reset-button" onClick={() => void resetEmployeeDraft()}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button><button className="logout-button" onClick={() => { loadedRef.current = false; setIsAuthenticated(false); setEmployeeId(""); setEmployeeInput(""); setSaveState("idle"); }}>ログアウト</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産査定報告書</h1><i /></header>
-        <div className="cover-fields"><Field label="お客様名" value={propertyName} onChange={setPropertyName} /><Field label="所在地" type="textarea" value={address} onChange={(value) => { setAddress(value); setDetailAddressValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field" />{type === "mansion" && <Field label="マンション名" type="textarea" value={mansionName} onChange={(value) => { setMansionName(value); setDetailMansionNameValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field cover-mansion-field" />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} className="cover-date-start" /><Field label="担当者" value={staff} onChange={setStaff} /></div>
+        <div className="cover-fields"><Field label="お客様名" value={propertyName} onChange={(value) => setPropertyName(value.replace(/\s*様\s*$/, ""))} placeholder="例）関西 孝介" suffix="様" className="cover-customer-field" /><Field label="所在地" type="textarea" value={address} placeholder="例）大阪府高槻市明田町1-1" onChange={(value) => { setAddress(value); setDetailAddressValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field" />{type === "mansion" && <Field label="マンション名" type="textarea" value={mansionName} placeholder="例）ブランズ高槻" onChange={(value) => { setMansionName(value); setDetailMansionNameValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field cover-mansion-field" />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} className="cover-date-start" /><Field label="担当者" value={staff} placeholder="例）関西 優" onChange={setStaff} /></div>
         <p className="cover-message">市場動向・周辺成約事例をもとに、<br />現在の市場価値を分析しました。</p>
         <footer className="cover-company"><i className="cover-company-logo" role="img" aria-label="CASA" /><span>関西不動産販売</span></footer>
       </article>

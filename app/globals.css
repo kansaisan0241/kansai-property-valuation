@@ -24,17 +24,42 @@ button { cursor: pointer; }
   box-shadow: 0 8px 30px rgba(5, 20, 45, .24); backdrop-filter: blur(14px);
   font-family: "Yu Gothic", "Noto Sans JP", sans-serif;
 }
-.type-switch { display: flex; flex: 1; max-width: 650px; padding: 4px; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; background: rgba(255,255,255,.05); }
+.employee-session { flex: 0 0 auto; display: grid; gap: 2px; font-size: 11px; white-space: nowrap; }
+.employee-session strong { color: white; }
+.save-status { color: #b9c7de; font-size: 9px; }
+.save-saved { color: #b9e4c5; }
+.save-local { color: #f1d38e; }
+.save-error { color: #ffaaa2; }
+.type-switch { display: flex; flex: 1; max-width: 520px; padding: 4px; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; background: rgba(255,255,255,.05); }
 .toolbar-type-label { flex: none; padding: 10px 16px 10px 12px; color: #d8e1ee; font-weight: 700; font-size: 12px; letter-spacing: .08em; }
 .type-switch button { flex: 1; padding: 10px 14px; border: 0; border-radius: 3px; color: #cfdae9; background: transparent; font-weight: 700; font-size: 13px; transition: .2s; }
 .type-switch button.active { color: #071a43; background: linear-gradient(135deg, #dec287, #b98931); box-shadow: 0 2px 12px rgba(0,0,0,.2); }
 .toolbar-actions { display: flex; align-items: center; gap: 9px; margin-left: auto; }
 .toolbar-actions > small { color: #b9c7de; font-size: 10px; white-space: nowrap; }
 .reins-link { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid #d6b46f; border-radius: 4px; color: white; background: linear-gradient(110deg, #9a6812, #bd9347); font: 700 12px "Yu Gothic", sans-serif; text-decoration: none; white-space: nowrap; }
-.primary-button, .ghost-button { min-height: 42px; padding: 0 18px; border-radius: 4px; font-family: "Yu Gothic", sans-serif; font-weight: 700; }
+.primary-button, .ghost-button, .save-button, .reset-button, .logout-button { min-height: 38px; padding: 0 12px; border-radius: 4px; font: 700 11px "Yu Gothic", sans-serif; white-space: nowrap; }
 .primary-button { border: 1px solid #be923f; color: white; background: linear-gradient(135deg, #bb8a31, #976312); box-shadow: 0 5px 14px rgba(0,0,0,.18); }
 .primary-button:disabled { opacity: .45; cursor: not-allowed; }
 .ghost-button { border: 1px solid #d2dae7; color: inherit; background: rgba(255,255,255,.08); }
+.save-button { border: 1px solid #9fc5ad; color: white; background: #276947; }
+.reset-button { border: 1px solid #d9a6a6; color: white; background: #803c3c; }
+.logout-button { border: 1px solid #77879e; color: #dce4ef; background: transparent; }
+
+.login-page { min-height: 100dvh; padding: 24px; display: grid; place-items: center; background: radial-gradient(circle at 50% 0, #16345f, #071a43 58%, #041129); font-family: "Yu Gothic", "Noto Sans JP", sans-serif; }
+.employee-login-card { width: min(460px, 100%); padding: 42px 44px 38px; border-top: 5px solid var(--gold-light); border-radius: 4px; color: var(--navy); background: rgba(255,255,255,.98); box-shadow: 0 28px 90px rgba(0,0,0,.35); }
+.login-brand { display: flex; align-items: center; gap: 14px; font-weight: 800; }
+.login-brand .cover-company-logo { width: 80px; }
+.login-eyebrow { margin: 30px 0 7px; color: var(--gold); font: 700 11px Georgia, serif; letter-spacing: .16em; }
+.employee-login-card h1 { margin: 0 0 10px; font: 600 28px "Yu Mincho", serif; letter-spacing: .06em; }
+.employee-login-card > p:not(.login-eyebrow) { margin: 0 0 26px; color: #596a81; font-size: 13px; line-height: 1.7; }
+.employee-login-card form { display: grid; gap: 12px; }
+.employee-login-card label { display: grid; gap: 8px; font-size: 13px; font-weight: 800; }
+.employee-login-card input { height: 50px; padding: 8px 13px; border: 1px solid #9bb0ca; border-radius: 4px; background: #f3f8ff; font-size: 18px; letter-spacing: .06em; outline: none; }
+.employee-login-card input:focus { border-color: #b1812d; box-shadow: 0 0 0 4px rgba(177,129,45,.14); }
+.employee-login-card form > button { height: 50px; border: 0; border-radius: 4px; color: white; background: linear-gradient(120deg, #bd9140, #936010); font-size: 15px; font-weight: 800; }
+.employee-login-card form > button:disabled { opacity: .6; cursor: wait; }
+.employee-login-card .login-error { margin: -2px 0 0; color: #a52828; font-size: 12px; }
+.employee-login-card > small { display: block; margin-top: 17px; color: #7a8798; font-size: 11px; }
 
 .setup-panel { max-width: 1420px; margin: 34px auto 26px; padding: 26px 32px; display: grid; grid-template-columns: 1fr 1.35fr; gap: 36px; align-items: end; border: 1px solid #d7dfe9; background: rgba(255,255,255,.88); box-shadow: 0 12px 35px rgba(27,48,77,.08); font-family: "Yu Gothic", sans-serif; }
 .eyebrow { color: var(--gold); font: 700 11px Georgia, serif; letter-spacing: .2em; }
@@ -51,6 +76,7 @@ button { cursor: pointer; }
 .field select { height: 34px; padding: 5px 9px; }
 .field input:focus, input:focus, textarea:focus, select:focus { border-color: #477db8; box-shadow: 0 0 0 3px rgba(71,125,184,.13); }
 .field-control small { flex: none; margin-left: 7px; white-space: nowrap; font-weight: 700; }
+input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-weight: 400; }
 
 .report-stack { display: grid; gap: 44px; padding: 0 16px 80px; }
 .report-page { container-type: inline-size; position: relative; width: min(1480px, calc(100vw - 32px)); aspect-ratio: 297 / 210; margin: 0 auto; overflow: hidden; color: var(--ink); background: var(--paper); box-shadow: 0 20px 55px rgba(21,39,68,.2), 0 2px 6px rgba(21,39,68,.1); border: 1px solid #cfd5df; }
@@ -69,6 +95,9 @@ button { cursor: pointer; }
 .cover-fields .field { min-height: 2.8cqw; gap: .61cqw; }
 .cover-fields .field > span:first-child { width: 8.5cqw; padding: .47cqw .68cqw; color: white; text-align: center; white-space: nowrap; letter-spacing: .1em; background: var(--navy); font: 500 1.7cqw "Yu Mincho", serif; }
 .cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; border: 0; border-radius: 0; background: rgba(238,246,255,.82); color: var(--navy); font: 500 1.7cqw/1.25 "Yu Mincho", serif; }
+.cover-customer-field .field-control { position: relative; }
+.cover-customer-field .field-control input { padding-right: 2.6cqw; }
+.cover-customer-field .field-suffix { position: absolute; right: .55cqw; margin: 0; color: var(--navy); font: 500 1.7cqw "Yu Mincho", serif; }
 .cover-fields .field-control textarea { height: 52px; overflow: hidden; resize: none; overflow-wrap: anywhere; }
 .cover-address-field.field { width: 72cqw; min-height: 4.35cqw; align-items: center; }
 .cover-address-field.field > span:first-child { align-self: stretch; display: grid; place-items: center; }
@@ -372,6 +401,7 @@ button { cursor: pointer; }
 
 @media (max-width: 900px) {
   .editor-toolbar { flex-wrap: wrap; gap: 9px 16px; }
+  .employee-session { flex: 1; }
   .type-switch { width: 100%; max-width: none; flex-basis: 100%; }
   .toolbar-actions > small { display: none; }
   .toolbar-actions .ghost-button { display: none; }
@@ -407,6 +437,7 @@ button { cursor: pointer; }
     position: sticky; top: 0; min-height: 0; padding: 8px; gap: 8px;
     display: grid; grid-template-columns: 1fr; align-items: stretch;
   }
+  .employee-session { padding: 2px 4px; display: flex; align-items: center; justify-content: space-between; }
   .type-switch {
     width: 100%; max-width: none; padding: 3px; display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px;
@@ -415,7 +446,10 @@ button { cursor: pointer; }
   .type-switch button { min-width: 0; padding: 9px 3px; font-size: 11px; white-space: nowrap; }
   .toolbar-actions { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .toolbar-actions > small, .toolbar-actions .ghost-button { display: none; }
-  .reins-link, .primary-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
+  .reins-link, .primary-button, .save-button, .reset-button, .logout-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
+  .login-page { padding: 14px; }
+  .employee-login-card { padding: 30px 22px 27px; }
+  .employee-login-card h1 { font-size: 24px; }
   .report-stack {
     width: 100%; max-width: 100vw; padding: 12px 8px 56px; gap: 0; zoom: 1;
     display: block; overflow-x: hidden; overflow-y: visible;
@@ -458,6 +492,7 @@ button { cursor: pointer; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
   input[type="month"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
   input[type="date"], input[type="month"] { appearance: none !important; -webkit-appearance: none !important; }
+  input::placeholder, textarea::placeholder { color: transparent !important; }
   textarea { overflow: hidden; resize: none; }
   .cover-fields { padding: .47cqw; gap: .47cqw; background: transparent !important; backdrop-filter: none; }
   .cover-fields .field { min-height: 2.8cqw; gap: .61cqw; }
