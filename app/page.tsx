@@ -200,6 +200,9 @@ function compUnit(comp: Comparable, type: PropertyType) {
 function roundOne(value: number) { return Math.round(value * 10) / 10; }
 function formatNumber(value: number, digits = 0) { return Number.isFinite(value) ? value.toLocaleString("ja-JP", { minimumFractionDigits: digits, maximumFractionDigits: digits }) : "0"; }
 function ceilEnding80(value: number) { return value ? Math.ceil((value - 80) / 100) * 100 + 80 : 0; }
+function safeFilePart(value: string, fallback: string) {
+  return value.replace(/\r?\n/g, " ").replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ").trim() || fallback;
+}
 
 function residualRateAtAge(age: number, life: number) {
   const safeLife = Math.max(1, life);
@@ -300,6 +303,7 @@ export default function Home() {
   const [showRoadInPrint, setShowRoadInPrint] = useState(true); const [showTransportInPrint, setShowTransportInPrint] = useState(true);
   const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState("");
   const [storageHydrated, setStorageHydrated] = useState(false);
+  const draftFileInputRef = useRef<HTMLInputElement>(null);
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -308,6 +312,22 @@ export default function Home() {
 
   function resetDraftValues() {
     applyDraft({ type: "house", appraisalDate: localToday(), structure: "木造", buildingUnit: 66, usefulLife: 25, comparables: Array.from({ length: 5 }, (_, i) => emptyComp(i + 1)), factors: defaultFactors.house });
+  }
+
+  function collectDraft() {
+    return {
+      type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff,
+      landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure,
+      comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, targetUnitLowManual,
+      targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit,
+      newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual,
+      challengeManual, showRoadInPrint, showTransportInPrint, factors,
+    };
+  }
+
+  function reportFileBaseName() {
+    const propertyPart = type === "mansion" ? safeFilePart(mansionName, "マンション名未入力") : safeFilePart(address, "所在地未入力");
+    return `不動産簡易査定書_${propertyPart}_${safeFilePart(propertyName, "お客様名未入力")}`;
   }
 
   useEffect(() => {
@@ -325,14 +345,7 @@ export default function Home() {
     if (!storageHydrated) return;
     const timer = window.setTimeout(() => {
       try {
-        window.localStorage.setItem(LOCAL_DRAFT_KEY, JSON.stringify({
-          type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff,
-          landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure,
-          comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, targetUnitLowManual,
-          targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit,
-          newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual,
-          challengeManual, showRoadInPrint, showTransportInPrint, factors,
-        }));
+        window.localStorage.setItem(LOCAL_DRAFT_KEY, JSON.stringify(collectDraft()));
       } catch {
         // Storage may be unavailable in private browsing or when the browser quota is full.
       }
@@ -349,6 +362,43 @@ export default function Home() {
     try { window.localStorage.removeItem(LOCAL_DRAFT_KEY); } catch { /* Reset the form even if storage is unavailable. */ }
     resetDraftValues();
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function printReport() {
+    const originalTitle = document.title;
+    document.title = reportFileBaseName();
+    const restoreTitle = () => { document.title = originalTitle; };
+    window.addEventListener("afterprint", restoreTitle, { once: true });
+    window.print();
+    window.setTimeout(restoreTitle, 60_000);
+  }
+
+  function downloadDraft() {
+    const payload = { format: "kansai-property-valuation", version: 1, savedAt: new Date().toISOString(), ...collectDraft() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${reportFileBaseName()}.json`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  async function importDraftFile(file: File | undefined) {
+    if (!file) return;
+    try {
+      const draft = JSON.parse((await file.text()).replace(/^\uFEFF/, ""));
+      if (!draft || typeof draft !== "object" || !["house", "land", "mansion"].includes(draft.type)) throw new Error("invalid draft");
+      if (draft.comparables && !Array.isArray(draft.comparables)) throw new Error("invalid comparables");
+      if (draft.factors && (!Array.isArray(draft.factors.plus) || !Array.isArray(draft.factors.minus))) throw new Error("invalid factors");
+      if (!window.confirm("現在の入力内容を、選択した保存データで置き換えますか？")) return;
+      applyDraft(draft);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      window.alert("このファイルは査定書の保存データとして読み込めませんでした。");
+    } finally {
+      if (draftFileInputRef.current) draftFileInputRef.current.value = "";
+    }
   }
 
   const targetAge = yearsBetween(builtDate, appraisalDate); const residualRate = residualRateAtAge(targetAge, usefulLife); const autoNewBuildingPrice = (buildingArea / TSUBO) * buildingUnit; const newBuildingPrice = newBuildingPriceManual || autoNewBuildingPrice; const baseBuildingValue = type === "house" ? newBuildingPrice * residualRate : 0; const buildingAdjustmentAmount = (buildingArea / TSUBO) * buildingAdjustmentUnit; const buildingValue = type === "house" ? Math.max(0, baseBuildingValue + buildingAdjustmentAmount) : 0; const targetArea = type === "mansion" ? exclusiveArea / TSUBO : landArea / TSUBO; const autoAdjustedLow = surroundLow + adjustLow; const autoAdjustedHigh = surroundHigh + adjustLow; const adjustedLow = targetUnitManual ? targetUnitLowManual : autoAdjustedLow; const adjustedHigh = targetUnitManual ? targetUnitHighManual : autoAdjustedHigh; const landAppraisalLow = Math.max(0, adjustedLow * targetArea); const landAppraisalHigh = Math.max(0, adjustedHigh * targetArea); const autoAppraisalLow = landAppraisalLow + buildingValue; const autoAppraisalHigh = landAppraisalHigh + buildingValue; const appraisalLow = appraisalLowManual || autoAppraisalLow; const appraisalHigh = unitRangeMode ? (appraisalHighManual || autoAppraisalHigh) : appraisalLow; const recommendedAuto = ceilEnding80(unitRangeMode ? Math.max(appraisalLow, appraisalHigh) : appraisalLow); const recommended = recommendedManual || recommendedAuto; const challengeAuto = recommended ? ceilEnding80(Math.max(recommended * 1.03, recommended + 200)) : 0; const speedAuto = recommended ? ceilEnding80(Math.max(0, Math.min(recommended * 0.98, recommended - 200))) : 0; const challenge = challengeManual || challengeAuto; const speed = speedManual || speedAuto;
@@ -409,7 +459,7 @@ export default function Home() {
   ];
 
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={() => window.print()}>印刷・PDF保存</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>PC保存</button><button className="save-button" onClick={() => draftFileInputRef.current?.click()}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={printReport}>印刷・PDF保存</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産簡易査定書</h1><i /></header>
