@@ -501,6 +501,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .cover-fields .field { min-height: 2.8cqw; gap: .61cqw; }
   .cover-fields .field > span:first-child { width: 8.5cqw; padding: .47cqw .68cqw; font-size: 1.7cqw; letter-spacing: .1em; }
   .cover-fields .field-control input, .cover-fields .field-control textarea { height: 2.55cqw; padding: .34cqw .61cqw; font-size: 1.7cqw; }
+  .cover-customer-field .inline-suffix-control { background: transparent !important; }
   .cover-fields .cover-address-field, .cover-fields .cover-address-field textarea { min-height: 4.35cqw; height: 4.35cqw; font-size: 1.7cqw; line-height: 1.18; }
   .cover-fields .cover-mansion-field.field > span:first-child { padding-inline: .25cqw; font-size: 1.08cqw; letter-spacing: 0; }
   .valuation-box, .target-summary { background: #fff !important; opacity: 1 !important; }
