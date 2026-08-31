@@ -22,6 +22,7 @@ type Comparable = {
 type Factor = { title: string; description: string };
 
 const TSUBO = 3.30578;
+const LOCAL_DRAFT_KEY = "kansai-property-valuation:draft:v1";
 const propertyLabels: Record<PropertyType, string> = {
   house: "中古戸建て",
   land: "土地",
@@ -298,6 +299,7 @@ export default function Home() {
   const [buildingUnit, setBuildingUnit] = useState(66); const [usefulLife, setUsefulLife] = useState(25); const [buildingAdjustmentUnit, setBuildingAdjustmentUnit] = useState(0); const [newBuildingPriceManual, setNewBuildingPriceManual] = useState(0); const [appraisalLowManual, setAppraisalLowManual] = useState(0); const [appraisalHighManual, setAppraisalHighManual] = useState(0); const [recommendedManual, setRecommendedManual] = useState(0); const [speedManual, setSpeedManual] = useState(0); const [challengeManual, setChallengeManual] = useState(0);
   const [showRoadInPrint, setShowRoadInPrint] = useState(true); const [showTransportInPrint, setShowTransportInPrint] = useState(true);
   const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState("");
+  const [storageHydrated, setStorageHydrated] = useState(false);
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -308,12 +310,43 @@ export default function Home() {
     applyDraft({ type: "house", appraisalDate: localToday(), structure: "木造", buildingUnit: 66, usefulLife: 25, comparables: Array.from({ length: 5 }, (_, i) => emptyComp(i + 1)), factors: defaultFactors.house });
   }
 
+  useEffect(() => {
+    try {
+      const savedDraft = window.localStorage.getItem(LOCAL_DRAFT_KEY);
+      if (savedDraft) applyDraft(JSON.parse(savedDraft));
+    } catch {
+      try { window.localStorage.removeItem(LOCAL_DRAFT_KEY); } catch { /* Storage is unavailable. */ }
+    } finally {
+      setStorageHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!storageHydrated) return;
+    const timer = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(LOCAL_DRAFT_KEY, JSON.stringify({
+          type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff,
+          landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure,
+          comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, targetUnitLowManual,
+          targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit,
+          newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual,
+          challengeManual, showRoadInPrint, showTransportInPrint, factors,
+        }));
+      } catch {
+        // Storage may be unavailable in private browsing or when the browser quota is full.
+      }
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [storageHydrated, type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors]);
+
   const validUnits = useMemo(() => comparables.map((comp) => compUnit(comp, type)).filter((value) => value > 0), [comparables, type]);
   const averageUnit = useMemo(() => validUnits.reduce((sum, value) => sum + value, 0) / Math.max(1, validUnits.length), [validUnits]);
   useEffect(() => { if (!unitManual) { const center = averageUnit ? roundOne(averageUnit) : 0; setSurroundLow(unitRangeMode && averageUnit ? roundOne(averageUnit * 0.98) : center); setSurroundHigh(unitRangeMode && averageUnit ? roundOne(averageUnit * 1.02) : center); } }, [averageUnit, unitManual, unitRangeMode]);
 
   function resetReport() {
     if (!window.confirm("本当にリセットしますか？\n入力内容がすべて初期化されます。")) return;
+    try { window.localStorage.removeItem(LOCAL_DRAFT_KEY); } catch { /* Reset the form even if storage is unavailable. */ }
     resetDraftValues();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
