@@ -37,11 +37,13 @@ button { cursor: pointer; }
 .toolbar-actions { display: flex; align-items: center; gap: 9px; margin-left: auto; }
 .toolbar-actions > small { color: #b9c7de; font-size: 10px; white-space: nowrap; }
 .reins-link { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid #d6b46f; border-radius: 4px; color: white; background: linear-gradient(110deg, #9a6812, #bd9347); font: 700 12px "Yu Gothic", sans-serif; text-decoration: none; white-space: nowrap; }
-.primary-button, .ghost-button, .save-button, .reset-button, .logout-button { min-height: 38px; padding: 0 12px; border-radius: 4px; font: 700 11px "Yu Gothic", sans-serif; white-space: nowrap; }
+.primary-button, .ghost-button, .save-button, .reset-button, .logout-button, .history-button { min-height: 38px; padding: 0 12px; border-radius: 4px; font: 700 11px "Yu Gothic", sans-serif; white-space: nowrap; }
 .primary-button { border: 1px solid #be923f; color: white; background: linear-gradient(135deg, #bb8a31, #976312); box-shadow: 0 5px 14px rgba(0,0,0,.18); }
 .primary-button:disabled { opacity: .45; cursor: not-allowed; }
 .ghost-button { border: 1px solid #d2dae7; color: inherit; background: rgba(255,255,255,.08); }
 .save-button { border: 1px solid #9fc5ad; color: white; background: #276947; }
+.history-button { border: 1px solid #8fa0b8; color: white; background: rgba(255,255,255,.08); }
+.history-button:disabled { opacity: .35; cursor: not-allowed; }
 .reset-button { border: 1px solid #d9a6a6; color: white; background: #803c3c; }
 .logout-button { border: 1px solid #77879e; color: #dce4ef; background: transparent; }
 
@@ -327,6 +329,8 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
 .building-adjustment-step > span { display: grid; place-items: center; padding: 7px; color: white; background: var(--navy); font: 500 clamp(10px,1.08vw,16px) "Yu Mincho", serif; }
 .building-adjustment-step > div { display: flex; align-items: center; justify-content: center; gap: 7px; background: white; }
 .building-adjustment-step input { width: 55%; min-width: 0; padding: 3px 5px; border: 1px solid var(--edit-border); border-radius: 3px; color: var(--navy); background: var(--edit); font: 600 clamp(17px,2vw,30px) "Yu Mincho", serif; text-align: center; }
+.building-adjustment-step .step-input-wrap { width: 55%; }
+.building-adjustment-step .step-input-wrap input { width: 100%; padding-right: 19px; }
 .building-adjustment-step small { font-size: clamp(8px,.78vw,12px); white-space: nowrap; }
 .building-total { width: 100%; min-height: 90px; display: grid; grid-template-columns: 40% 1fr; color: white; background: linear-gradient(120deg, #061a42, #0c3569); }
 .building-total > span { display: grid; place-items: center; font-size: clamp(12px,1.35vw,20px); }
@@ -449,7 +453,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .type-switch button { min-width: 0; padding: 9px 3px; font-size: 11px; white-space: nowrap; }
   .toolbar-actions { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .toolbar-actions > small, .toolbar-actions .ghost-button { display: none; }
-  .reins-link, .primary-button, .save-button, .reset-button, .logout-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
+  .reins-link, .primary-button, .save-button, .reset-button, .logout-button, .history-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
   .login-page { padding: 14px; }
   .employee-login-card { padding: 30px 22px 27px; }
   .employee-login-card h1 { font-size: 24px; }
@@ -489,7 +493,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
   .report-stack { display: block; padding: 0; zoom: 1; }
-  .report-page { width: 295mm; height: 208mm; margin: 1mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
+  .report-page { width: 294mm; height: 207mm; margin: 1.5mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
   .report-page:last-child { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }

@@ -304,6 +304,10 @@ export default function Home() {
   const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState("");
   const [storageHydrated, setStorageHydrated] = useState(false);
   const draftFileInputRef = useRef<HTMLInputElement>(null);
+  const historyRef = useRef<string[]>([]);
+  const historyIndexRef = useRef(-1);
+  const applyingHistoryRef = useRef(false);
+  const [historyVersion, setHistoryVersion] = useState(0);
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -330,6 +334,10 @@ export default function Home() {
     return `不動産簡易査定書_${propertyPart}_${safeFilePart(propertyName, "お客様名未入力")}`;
   }
 
+  const draftSignature = JSON.stringify(collectDraft());
+  const canUndo = historyVersion >= 0 && historyIndexRef.current > 0;
+  const canRedo = historyVersion >= 0 && historyIndexRef.current >= 0 && historyIndexRef.current < historyRef.current.length - 1;
+
   useEffect(() => {
     try {
       const savedDraft = window.localStorage.getItem(LOCAL_DRAFT_KEY);
@@ -345,13 +353,32 @@ export default function Home() {
     if (!storageHydrated) return;
     const timer = window.setTimeout(() => {
       try {
-        window.localStorage.setItem(LOCAL_DRAFT_KEY, JSON.stringify(collectDraft()));
+        window.localStorage.setItem(LOCAL_DRAFT_KEY, draftSignature);
       } catch {
         // Storage may be unavailable in private browsing or when the browser quota is full.
       }
     }, 300);
     return () => window.clearTimeout(timer);
-  }, [storageHydrated, type, propertyName, address, mansionName, detailAddressValue, detailMansionNameValue, appraisalDate, staff, landArea, buildingArea, exclusiveArea, layout, builtDate, transport, road, floors, other, structure, comparables, surroundLow, surroundHigh, unitManual, unitRangeMode, adjustLow, targetUnitLowManual, targetUnitHighManual, targetUnitManual, buildingUnit, usefulLife, buildingAdjustmentUnit, newBuildingPriceManual, appraisalLowManual, appraisalHighManual, recommendedManual, speedManual, challengeManual, showRoadInPrint, showTransportInPrint, factors]);
+  }, [storageHydrated, draftSignature]);
+
+  useEffect(() => {
+    if (!storageHydrated) return;
+    if (applyingHistoryRef.current) {
+      applyingHistoryRef.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      const currentHistory = historyRef.current;
+      if (currentHistory[historyIndexRef.current] === draftSignature) return;
+      const nextHistory = currentHistory.slice(0, historyIndexRef.current + 1);
+      nextHistory.push(draftSignature);
+      if (nextHistory.length > 60) nextHistory.shift();
+      historyRef.current = nextHistory;
+      historyIndexRef.current = nextHistory.length - 1;
+      setHistoryVersion((current) => current + 1);
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [storageHydrated, draftSignature]);
 
   const validUnits = useMemo(() => comparables.map((comp) => compUnit(comp, type)).filter((value) => value > 0), [comparables, type]);
   const averageUnit = useMemo(() => validUnits.reduce((sum, value) => sum + value, 0) / Math.max(1, validUnits.length), [validUnits]);
@@ -362,6 +389,15 @@ export default function Home() {
     try { window.localStorage.removeItem(LOCAL_DRAFT_KEY); } catch { /* Reset the form even if storage is unavailable. */ }
     resetDraftValues();
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function moveHistory(direction: -1 | 1) {
+    const nextIndex = historyIndexRef.current + direction;
+    if (nextIndex < 0 || nextIndex >= historyRef.current.length) return;
+    applyingHistoryRef.current = true;
+    historyIndexRef.current = nextIndex;
+    applyDraft(JSON.parse(historyRef.current[nextIndex]));
+    setHistoryVersion((current) => current + 1);
   }
 
   function printReport() {
@@ -418,6 +454,7 @@ export default function Home() {
     setAdjustLow((current) => roundOne(current + amount));
     setTargetUnitManual(false);
   }
+  function shiftBuildingAdjustment(amount: number) { setBuildingAdjustmentUnit((current) => roundOne(current + amount)); }
   function addComparable() { setComparables((current) => current.length >= 5 ? current : [...current, emptyComp(Math.max(...current.map((comp) => comp.id), 0) + 1)]); }
   function removeComparable() { setComparables((current) => current.length <= 1 ? current : current.slice(0, -1)); }
   function importReins() { if (activeImport === null || !pasteText.trim()) return; const parsed = parseReins(pasteText, activeImport, type); setComparables((current) => current.map((comp) => comp.id === activeImport ? { ...comp, ...parsed } : comp)); setPasteText(""); setActiveImport(null); setUnitManual(false); }
@@ -459,7 +496,7 @@ export default function Home() {
   ];
 
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>PC保存</button><button className="save-button" onClick={() => draftFileInputRef.current?.click()}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={printReport}>印刷・PDF保存</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>PC保存</button><button className="save-button" onClick={() => draftFileInputRef.current?.click()}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={printReport}>印刷・PDF保存</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産簡易査定書</h1><i /></header>
@@ -509,7 +546,7 @@ export default function Home() {
       </article>
       {type === "house" && <article id="page-5" className="report-page building-page">
         <PageHeader number="05" title="建物の経年減価による評価" english="PROPERTY VALUE ANALYSIS" description="築年数・構造・建物状態・設備仕様等を考慮し、建物の経年減価を反映した評価額を算出しました。" />
-        <section className="building-flow"><div className="building-step"><span>新築時想定建物価格</span><MoneyEditor className="building-money" value={Math.round(newBuildingPrice)} onChange={setNewBuildingPriceManual} /><button className="mini-reset no-print" onClick={() => setNewBuildingPriceManual(0)}>面積×単価へ戻す</button></div><b>▼</b><div className="building-step dual-step"><span>築年数</span><strong>{targetAge}<small>年</small></strong></div><b>▼</b><div className="building-step structure-step"><span>構造</span><EditableChoice value={structure} onChange={handleStructureChange} options={structureOptions} label="構造" /></div><div className="building-config print-hidden-preserve"><Field label="建物単価" value={buildingUnit} type="number" onChange={(v) => setBuildingUnit(Number(v))} suffix="万円/坪" /><Field label="耐用年数" value={usefulLife} type="number" onChange={(v) => setUsefulLife(Number(v))} suffix="年" /></div><b>▼</b><div className="building-step dual-step depreciation-step"><span>経年による減価を考慮</span><strong className="residual-copy"><span>残存価値率　約</span><b>{Math.round(residualRate * 100)}</b><small>％</small></strong></div><div className="building-adjustment-step"><span>建物評価補正</span><div><FormattedNumberInput value={buildingAdjustmentUnit} decimals={1} showPlus showZero onChange={setBuildingAdjustmentUnit} ariaLabel="建物評価補正" /><small>万円／坪</small></div></div><b>▼</b><div className="building-total"><span>建物評価額</span><strong>{formatNumber(Math.round(buildingValue))}<small>万円</small></strong></div></section>
+        <section className="building-flow"><div className="building-step"><span>新築時想定建物価格</span><MoneyEditor className="building-money" value={Math.round(newBuildingPrice)} onChange={setNewBuildingPriceManual} /><button className="mini-reset no-print" onClick={() => setNewBuildingPriceManual(0)}>面積×単価へ戻す</button></div><b>▼</b><div className="building-step dual-step"><span>築年数</span><strong>{targetAge}<small>年</small></strong></div><b>▼</b><div className="building-step structure-step"><span>構造</span><EditableChoice value={structure} onChange={handleStructureChange} options={structureOptions} label="構造" /></div><div className="building-config print-hidden-preserve"><Field label="建物単価" value={buildingUnit} type="number" onChange={(v) => setBuildingUnit(Number(v))} suffix="万円/坪" /><Field label="耐用年数" value={usefulLife} type="number" onChange={(v) => setUsefulLife(Number(v))} suffix="年" /></div><b>▼</b><div className="building-step dual-step depreciation-step"><span>経年による減価を考慮</span><strong className="residual-copy"><span>残存価値率　約</span><b>{Math.round(residualRate * 100)}</b><small>％</small></strong></div><div className="building-adjustment-step"><span>建物評価補正</span><div><span className="step-input-wrap"><FormattedNumberInput value={buildingAdjustmentUnit} decimals={1} showPlus showZero onChange={setBuildingAdjustmentUnit} ariaLabel="建物評価補正" /><span className="input-stepper no-print"><button type="button" onClick={() => shiftBuildingAdjustment(.1)}>▲</button><button type="button" onClick={() => shiftBuildingAdjustment(-.1)}>▼</button></span></span><small>万円／坪</small></div></div><b>▼</b><div className="building-total"><span>建物評価額</span><strong>{formatNumber(Math.round(buildingValue))}<small>万円</small></strong></div></section>
         <section className="building-chart"><h3>建物の残存価値の目安（{structure}の場合）</h3><DepreciationChart age={targetAge} life={usefulLife} /><div className="chart-label">対象物件　築{targetAge}年</div></section><section className="evaluation-points"><strong>評価のポイント</strong><p>✓ 建物の維持管理状況・劣化状況を確認</p><p>✓ 設備のグレード・仕様を考慮</p><p>✓ リフォーム・修繕履歴を考慮</p><p>✓ 周辺の中古建物の取引動向を参考</p></section><footer className="building-note"><b>i</b><p>建物評価額は、税務上の減価償却費を算出するものではありません。<br />築年数・構造・施工状況・維持管理状態・設備仕様・リフォーム履歴等を総合的に考慮した査定上の参考価格です。</p></footer>
       </article>}
       <article id="page-strategy" className="report-page strategy-page">
@@ -519,6 +556,6 @@ export default function Home() {
         <section className="strengths"><b>当社の<br />強み</b>{[["豊富な購入希望顧客", "多数の購入希望顧客へ早期にご紹介"], ["幅広い広告展開力", "各種媒体を活用して効果的に訴求"], ["地域密着の販売力", "地域の相場と需要を熟知したご提案"], ["安心のサポート体制", "お引渡しまで専門スタッフが対応"], ["売却後のご相談も対応", "住み替え・税務相談もワンストップ"]].map(([title, text], index) => <div key={title}><i className={`strength-icon strength-icon-${index}`} aria-hidden="true" /><strong>{title}</strong><p>{text}</p></div>)}</section><footer className="strategy-footer"><strong>お客様のご希望や状況に合わせて、最適な販売プランをご提案いたします。</strong><span>ご不明点やご要望がございましたら、どうぞお気軽にご相談ください。</span></footer>
       </article>
     </div>
-    {activeImport !== null && <div className="modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="REINS文字列取込"><div className="import-modal"><button className="modal-close" onClick={() => setActiveImport(null)}>×</button><span className="eyebrow">事例 {activeImport}</span><h2>REINSの文字列を貼り付け</h2><p>物件詳細画面をすべてコピーして貼り付けると、所在地・面積・間取り・築年月・価格・時期を自動抽出します。</p><textarea autoFocus value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="ここにREINSの文字列を貼り付けてください" /><div className="modal-actions"><button className="ghost-button" onClick={() => setActiveImport(null)}>キャンセル</button><button className="primary-button" onClick={importReins} disabled={!pasteText.trim()}>抽出して事例へ反映</button></div></div></div>}
+    {activeImport !== null && <div className="modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="REINS文字列取込"><div className="import-modal"><button className="modal-close" onClick={() => setActiveImport(null)}>×</button><span className="eyebrow">事例 {activeImport}</span><h2>REINSの文字列を貼り付け</h2><p>物件詳細画面をすべてコピーして貼り付けると、所在地・面積・間取り・築年月・価格・時期を自動抽出します。</p><textarea autoFocus value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="ここにREINSの文字列を貼り付けてください" /><div className="modal-actions"><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => setActiveImport(null)}>キャンセル</button><button className="primary-button" onClick={importReins} disabled={!pasteText.trim()}>抽出して事例へ反映</button></div></div></div>}
   </main>;
 }
