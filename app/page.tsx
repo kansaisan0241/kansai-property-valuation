@@ -304,10 +304,13 @@ export default function Home() {
   const [factors, setFactors] = useState(defaultFactors.house); const [activeImport, setActiveImport] = useState<number | null>(null); const [pasteText, setPasteText] = useState("");
   const [storageHydrated, setStorageHydrated] = useState(false);
   const draftFileInputRef = useRef<HTMLInputElement>(null);
+  const draftPdfInputRef = useRef<HTMLInputElement>(null);
   const historyRef = useRef<string[]>([]);
   const historyIndexRef = useRef(-1);
   const applyingHistoryRef = useRef(false);
   const [historyVersion, setHistoryVersion] = useState(0);
+  const [importChoiceOpen, setImportChoiceOpen] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -420,20 +423,129 @@ export default function Home() {
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 
+  function validateImportedDraft(draft: any) {
+    if (!draft || typeof draft !== "object" || !["house", "land", "mansion"].includes(draft.type)) throw new Error("invalid draft");
+    if (draft.comparables && !Array.isArray(draft.comparables)) throw new Error("invalid comparables");
+    if (draft.factors && (!Array.isArray(draft.factors.plus) || !Array.isArray(draft.factors.minus))) throw new Error("invalid factors");
+    return draft;
+  }
+
+  function confirmAndApplyDraft(draft: any) {
+    if (!window.confirm("現在の入力内容を、選択した保存データで置き換えますか？")) return;
+    applyDraft(draft);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function importDraftFile(file: File | undefined) {
     if (!file) return;
     try {
-      const draft = JSON.parse((await file.text()).replace(/^\uFEFF/, ""));
-      if (!draft || typeof draft !== "object" || !["house", "land", "mansion"].includes(draft.type)) throw new Error("invalid draft");
-      if (draft.comparables && !Array.isArray(draft.comparables)) throw new Error("invalid comparables");
-      if (draft.factors && (!Array.isArray(draft.factors.plus) || !Array.isArray(draft.factors.minus))) throw new Error("invalid factors");
-      if (!window.confirm("現在の入力内容を、選択した保存データで置き換えますか？")) return;
-      applyDraft(draft);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      confirmAndApplyDraft(validateImportedDraft(JSON.parse((await file.text()).replace(/^\uFEFF/, ""))));
     } catch {
       window.alert("このファイルは査定書の保存データとして読み込めませんでした。");
     } finally {
       if (draftFileInputRef.current) draftFileInputRef.current.value = "";
+    }
+  }
+
+  async function downloadPdf() {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      await document.fonts.ready;
+      const [{ default: html2canvas }, pdfLib] = await Promise.all([import("html2canvas"), import("pdf-lib")]);
+      const pdf = await pdfLib.PDFDocument.create();
+      pdf.setTitle(reportFileBaseName());
+      pdf.setAuthor("関西不動産販売");
+      pdf.setSubject("不動産簡易査定書（再編集データ付き）");
+      pdf.setCreator("不動産簡易査定書");
+      const pageWidth = pdfLib.PageSizes.A4[1];
+      const pageHeight = pdfLib.PageSizes.A4[0];
+      const reportPages = Array.from(document.querySelectorAll<HTMLElement>(".report-page"));
+      if (!reportPages.length) throw new Error("report pages not found");
+
+      for (const reportPage of reportPages) {
+        const canvas = await html2canvas(reportPage, {
+          backgroundColor: "#ffffff",
+          logging: false,
+          scale: 1.7,
+          useCORS: true,
+          onclone: (clonedDocument) => {
+            const printCss: string[] = [];
+            for (const sheet of Array.from(clonedDocument.styleSheets)) {
+              try {
+                for (const rule of Array.from(sheet.cssRules)) {
+                  if (rule.type !== 4 || !(rule as CSSMediaRule).conditionText.includes("print")) continue;
+                  for (const printRule of Array.from((rule as CSSMediaRule).cssRules)) printCss.push(printRule.cssText);
+                }
+              } catch { /* Ignore stylesheets that cannot be inspected. */ }
+            }
+            const style = clonedDocument.createElement("style");
+            style.textContent = `${printCss.join("\n")}\n.report-page{transform:none!important;}`;
+            clonedDocument.head.append(style);
+          },
+        });
+        const imageBlob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("image conversion failed")), "image/jpeg", .94));
+        const image = await pdf.embedJpg(new Uint8Array(await imageBlob.arrayBuffer()));
+        const page = pdf.addPage([pageWidth, pageHeight]);
+        const scale = Math.min(pageWidth / image.width, pageHeight / image.height);
+        const width = image.width * scale;
+        const height = image.height * scale;
+        page.drawImage(image, { x: (pageWidth - width) / 2, y: (pageHeight - height) / 2, width, height });
+        canvas.width = 1;
+        canvas.height = 1;
+      }
+
+      const payload = { format: "kansai-property-valuation", version: 1, savedAt: new Date().toISOString(), ...collectDraft() };
+      await pdf.attach(new TextEncoder().encode(JSON.stringify(payload)), "valuation-data.json", {
+        mimeType: "application/json",
+        description: "不動産簡易査定書の再編集データ",
+        creationDate: new Date(),
+        modificationDate: new Date(),
+        afRelationship: pdfLib.AFRelationship.Data,
+      });
+      const pdfBytes = await pdf.save();
+      const blob = new Blob([pdfBytes as BlobPart], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${reportFileBaseName()}.pdf`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    } catch (error) {
+      console.error(error);
+      window.alert("PDFを作成できませんでした。画面を再読み込みして、もう一度お試しください。");
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
+  async function importDraftPdf(file: File | undefined) {
+    if (!file) return;
+    try {
+      if (file.size > 50 * 1024 * 1024) throw new Error("pdf is too large");
+      const pdfLib = await import("pdf-lib");
+      const pdf = await pdfLib.PDFDocument.load(await file.arrayBuffer());
+      const names = pdf.catalog.lookup(pdfLib.PDFName.of("Names"), pdfLib.PDFDict)
+        .lookup(pdfLib.PDFName.of("EmbeddedFiles"), pdfLib.PDFDict)
+        .lookup(pdfLib.PDFName.of("Names"), pdfLib.PDFArray);
+      let draft: any = null;
+      for (let index = 0; index < names.size(); index += 2) {
+        const nameObject = names.lookup(index) as { decodeText?: () => string };
+        if (nameObject.decodeText?.() !== "valuation-data.json") continue;
+        const fileSpec = names.lookup(index + 1, pdfLib.PDFDict);
+        const embeddedFiles = fileSpec.lookup(pdfLib.PDFName.of("EF"), pdfLib.PDFDict);
+        const stream = embeddedFiles.lookup(pdfLib.PDFName.of("F"), pdfLib.PDFRawStream);
+        const bytes = pdfLib.decodePDFRawStream(stream).decode();
+        draft = JSON.parse(new TextDecoder().decode(bytes));
+        break;
+      }
+      if (!draft) throw new Error("embedded draft not found");
+      confirmAndApplyDraft(validateImportedDraft(draft));
+    } catch (error) {
+      console.error(error);
+      window.alert("このPDFには取り込み可能な査定書データが見つかりませんでした。");
+    } finally {
+      if (draftPdfInputRef.current) draftPdfInputRef.current.value = "";
     }
   }
 
@@ -496,7 +608,7 @@ export default function Home() {
   ];
 
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>PC保存</button><button className="save-button" onClick={() => draftFileInputRef.current?.click()}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><button className="ghost-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>表紙へ</button><button className="primary-button" onClick={printReport}>印刷・PDF保存</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>JSON保存</button><button className="save-button" onClick={() => setImportChoiceOpen(true)}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><input ref={draftPdfInputRef} type="file" accept=".pdf,application/pdf" hidden onChange={(event) => void importDraftPdf(event.target.files?.[0])} /><button className="ghost-button print-button" onClick={printReport}>印刷</button><button className="primary-button" disabled={pdfBusy} onClick={() => void downloadPdf()}>{pdfBusy ? "PDF作成中…" : "PDF保存"}</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産簡易査定書</h1><i /></header>
@@ -556,6 +668,7 @@ export default function Home() {
         <section className="strengths"><b>当社の<br />強み</b>{[["豊富な購入希望顧客", "多数の購入希望顧客へ早期にご紹介"], ["幅広い広告展開力", "各種媒体を活用して効果的に訴求"], ["地域密着の販売力", "地域の相場と需要を熟知したご提案"], ["安心のサポート体制", "お引渡しまで専門スタッフが対応"], ["売却後のご相談も対応", "住み替え・税務相談もワンストップ"]].map(([title, text], index) => <div key={title}><i className={`strength-icon strength-icon-${index}`} aria-hidden="true" /><strong>{title}</strong><p>{text}</p></div>)}</section><footer className="strategy-footer"><strong>お客様のご希望や状況に合わせて、最適な販売プランをご提案いたします。</strong><span>ご不明点やご要望がございましたら、どうぞお気軽にご相談ください。</span></footer>
       </article>
     </div>
+    {importChoiceOpen && <div className="modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="保存データの取込方法"><div className="import-modal data-import-modal"><button className="modal-close" onClick={() => setImportChoiceOpen(false)}>×</button><span className="eyebrow">PC取込</span><h2>取り込むファイルを選択</h2><p>この査定書で保存したJSON、または編集データ付きPDFから入力内容を復元します。</p><div className="data-import-options"><button className="save-button" onClick={() => { setImportChoiceOpen(false); draftFileInputRef.current?.click(); }}>JSONから</button><button className="primary-button" onClick={() => { setImportChoiceOpen(false); draftPdfInputRef.current?.click(); }}>PDFから</button></div></div></div>}
     {activeImport !== null && <div className="modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="REINS文字列取込"><div className="import-modal"><button className="modal-close" onClick={() => setActiveImport(null)}>×</button><span className="eyebrow">事例 {activeImport}</span><h2>REINSの文字列を貼り付け</h2><p>物件詳細画面をすべてコピーして貼り付けると、所在地・面積・間取り・築年月・価格・時期を自動抽出します。</p><textarea autoFocus value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="ここにREINSの文字列を貼り付けてください" /><div className="modal-actions"><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => setActiveImport(null)}>キャンセル</button><button className="primary-button" onClick={importReins} disabled={!pasteText.trim()}>抽出して事例へ反映</button></div></div></div>}
   </main>;
 }

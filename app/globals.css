@@ -405,13 +405,16 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
 .modal-close { position: absolute; top: 14px; right: 15px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #edf1f6; font-size: 23px; }
 .modal-actions { margin-top: 18px; display: flex; justify-content: flex-end; gap: 10px; }
 .import-modal .ghost-button { color: var(--navy); background: white; }
+.data-import-modal { width: min(500px, 94vw); }
+.data-import-options { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.data-import-options button { min-height: 52px; font-size: 14px; }
 
 @media (max-width: 900px) {
   .editor-toolbar { flex-wrap: wrap; gap: 9px 16px; }
   .employee-session { flex: 1; }
   .type-switch { width: 100%; max-width: none; flex-basis: 100%; }
   .toolbar-actions > small { display: none; }
-  .toolbar-actions .ghost-button { display: none; }
+  .toolbar-actions .ghost-button:not(.print-button) { display: none; }
   .setup-panel { margin: 18px 16px; grid-template-columns: 1fr; gap: 18px; }
   .quick-inputs { grid-template-columns: 1fr; }
   .target-inputs { grid-template-columns: 1fr; }
@@ -452,7 +455,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .toolbar-type-label { grid-column: 1 / -1; padding: 5px 7px 2px; font-size: 10px; }
   .type-switch button { min-width: 0; padding: 9px 3px; font-size: 11px; white-space: nowrap; }
   .toolbar-actions { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  .toolbar-actions > small, .toolbar-actions .ghost-button { display: none; }
+  .toolbar-actions > small, .toolbar-actions .ghost-button:not(.print-button) { display: none; }
   .reins-link, .primary-button, .save-button, .reset-button, .logout-button, .history-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
   .login-page { padding: 14px; }
   .employee-login-card { padding: 30px 22px 27px; }
@@ -493,7 +496,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
   .report-stack { display: block; padding: 0; zoom: 1; }
-  .report-page { width: 294mm; height: 207mm; margin: 1.5mm; border: 0; box-shadow: none; break-after: page; page-break-after: always; }
+  .report-page { width: 292.5mm; height: 206mm; margin: 2mm auto; border: 0; box-shadow: none; transform: none !important; break-after: page; page-break-after: always; }
   .report-page:last-child { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
