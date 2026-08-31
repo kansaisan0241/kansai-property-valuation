@@ -204,6 +204,41 @@ function safeFilePart(value: string, fallback: string) {
   return value.replace(/\r?\n/g, " ").replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ").trim() || fallback;
 }
 
+function bytesToBase64Url(bytes: Uint8Array) {
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  return window.btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function base64UrlToBytes(value: string) {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  const binary = window.atob(base64);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+async function encodeDraftLink(draft: Record<string, any>) {
+  let bytes = new TextEncoder().encode(JSON.stringify(draft));
+  let mode = "raw";
+  if (typeof CompressionStream !== "undefined") {
+    const compressed = await new Response(new Blob([bytes as BlobPart]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer();
+    bytes = new Uint8Array(compressed);
+    mode = "gzip";
+  }
+  return `https://kansai-property-valuation.invalid/v1/${mode}#${bytesToBase64Url(bytes)}`;
+}
+
+async function decodeDraftLink(uri: string) {
+  const match = uri.match(/^https:\/\/kansai-property-valuation\.invalid\/v1\/(raw|gzip)#([A-Za-z0-9_-]+)$/);
+  if (!match) return null;
+  let bytes = base64UrlToBytes(match[2]);
+  if (match[1] === "gzip") {
+    if (typeof DecompressionStream === "undefined") throw new Error("gzip is unavailable");
+    const decompressed = await new Response(new Blob([bytes as BlobPart]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    bytes = new Uint8Array(decompressed);
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 function residualRateAtAge(age: number, life: number) {
   const safeLife = Math.max(1, life);
   return Math.max(0, 1 - Math.max(0, age) / safeLife);
@@ -311,6 +346,7 @@ export default function Home() {
   const [historyVersion, setHistoryVersion] = useState(0);
   const [importChoiceOpen, setImportChoiceOpen] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfDraftLink, setPdfDraftLink] = useState("");
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -451,70 +487,26 @@ export default function Home() {
     if (pdfBusy) return;
     setPdfBusy(true);
     try {
-      await document.fonts.ready;
-      const [{ default: html2canvas }, pdfLib] = await Promise.all([import("html2canvas"), import("pdf-lib")]);
-      const pdf = await pdfLib.PDFDocument.create();
-      pdf.setTitle(reportFileBaseName());
-      pdf.setAuthor("関西不動産販売");
-      pdf.setSubject("不動産簡易査定書（再編集データ付き）");
-      pdf.setCreator("不動産簡易査定書");
-      const pageWidth = pdfLib.PageSizes.A4[1];
-      const pageHeight = pdfLib.PageSizes.A4[0];
-      const reportPages = Array.from(document.querySelectorAll<HTMLElement>(".report-page"));
-      if (!reportPages.length) throw new Error("report pages not found");
-
-      for (const reportPage of reportPages) {
-        const canvas = await html2canvas(reportPage, {
-          backgroundColor: "#ffffff",
-          logging: false,
-          scale: 1.7,
-          useCORS: true,
-          onclone: (clonedDocument) => {
-            const printCss: string[] = [];
-            for (const sheet of Array.from(clonedDocument.styleSheets)) {
-              try {
-                for (const rule of Array.from(sheet.cssRules)) {
-                  if (rule.type !== 4 || !(rule as CSSMediaRule).conditionText.includes("print")) continue;
-                  for (const printRule of Array.from((rule as CSSMediaRule).cssRules)) printCss.push(printRule.cssText);
-                }
-              } catch { /* Ignore stylesheets that cannot be inspected. */ }
-            }
-            const style = clonedDocument.createElement("style");
-            style.textContent = `${printCss.join("\n")}\n.report-page{transform:none!important;}`;
-            clonedDocument.head.append(style);
-          },
-        });
-        const imageBlob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("image conversion failed")), "image/jpeg", .94));
-        const image = await pdf.embedJpg(new Uint8Array(await imageBlob.arrayBuffer()));
-        const page = pdf.addPage([pageWidth, pageHeight]);
-        const scale = Math.min(pageWidth / image.width, pageHeight / image.height);
-        const width = image.width * scale;
-        const height = image.height * scale;
-        page.drawImage(image, { x: (pageWidth - width) / 2, y: (pageHeight - height) / 2, width, height });
-        canvas.width = 1;
-        canvas.height = 1;
-      }
-
       const payload = { format: "kansai-property-valuation", version: 1, savedAt: new Date().toISOString(), ...collectDraft() };
-      await pdf.attach(new TextEncoder().encode(JSON.stringify(payload)), "valuation-data.json", {
-        mimeType: "application/json",
-        description: "不動産簡易査定書の再編集データ",
-        creationDate: new Date(),
-        modificationDate: new Date(),
-        afRelationship: pdfLib.AFRelationship.Data,
-      });
-      const pdfBytes = await pdf.save();
-      const blob = new Blob([pdfBytes as BlobPart], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${reportFileBaseName()}.pdf`;
-      link.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      setPdfDraftLink(await encodeDraftLink(payload));
+      await new Promise<void>((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve())));
+      const originalTitle = document.title;
+      document.title = reportFileBaseName();
+      let cleaned = false;
+      const cleanup = () => {
+        if (cleaned) return;
+        cleaned = true;
+        document.title = originalTitle;
+        setPdfDraftLink("");
+        setPdfBusy(false);
+      };
+      window.addEventListener("afterprint", cleanup, { once: true });
+      window.print();
+      window.setTimeout(cleanup, 60_000);
     } catch (error) {
       console.error(error);
-      window.alert("PDFを作成できませんでした。画面を再読み込みして、もう一度お試しください。");
-    } finally {
+      window.alert("PDF保存を開始できませんでした。画面を再読み込みして、もう一度お試しください。");
+      setPdfDraftLink("");
       setPdfBusy(false);
     }
   }
@@ -525,19 +517,35 @@ export default function Home() {
       if (file.size > 50 * 1024 * 1024) throw new Error("pdf is too large");
       const pdfLib = await import("pdf-lib");
       const pdf = await pdfLib.PDFDocument.load(await file.arrayBuffer());
-      const names = pdf.catalog.lookup(pdfLib.PDFName.of("Names"), pdfLib.PDFDict)
-        .lookup(pdfLib.PDFName.of("EmbeddedFiles"), pdfLib.PDFDict)
-        .lookup(pdfLib.PDFName.of("Names"), pdfLib.PDFArray);
       let draft: any = null;
-      for (let index = 0; index < names.size(); index += 2) {
-        const nameObject = names.lookup(index) as { decodeText?: () => string };
-        if (nameObject.decodeText?.() !== "valuation-data.json") continue;
-        const fileSpec = names.lookup(index + 1, pdfLib.PDFDict);
-        const embeddedFiles = fileSpec.lookup(pdfLib.PDFName.of("EF"), pdfLib.PDFDict);
-        const stream = embeddedFiles.lookup(pdfLib.PDFName.of("F"), pdfLib.PDFRawStream);
-        const bytes = pdfLib.decodePDFRawStream(stream).decode();
-        draft = JSON.parse(new TextDecoder().decode(bytes));
-        break;
+      try {
+        const names = pdf.catalog.lookup(pdfLib.PDFName.of("Names"), pdfLib.PDFDict)
+          .lookup(pdfLib.PDFName.of("EmbeddedFiles"), pdfLib.PDFDict)
+          .lookup(pdfLib.PDFName.of("Names"), pdfLib.PDFArray);
+        for (let index = 0; index < names.size(); index += 2) {
+          const nameObject = names.lookup(index) as { decodeText?: () => string };
+          if (nameObject.decodeText?.() !== "valuation-data.json") continue;
+          const fileSpec = names.lookup(index + 1, pdfLib.PDFDict);
+          const embeddedFiles = fileSpec.lookup(pdfLib.PDFName.of("EF"), pdfLib.PDFDict);
+          const stream = embeddedFiles.lookup(pdfLib.PDFName.of("F"), pdfLib.PDFRawStream);
+          draft = JSON.parse(new TextDecoder().decode(pdfLib.decodePDFRawStream(stream).decode()));
+          break;
+        }
+      } catch { /* New PDFs keep the draft in a print-safe link annotation instead. */ }
+      if (!draft) {
+        for (const page of pdf.getPages()) {
+          const annotations = page.node.Annots();
+          if (!annotations) continue;
+          for (let index = 0; index < annotations.size(); index += 1) {
+            const annotation = annotations.lookup(index, pdfLib.PDFDict);
+            const action = annotation.lookupMaybe(pdfLib.PDFName.of("A"), pdfLib.PDFDict);
+            const uri = action?.lookupMaybe(pdfLib.PDFName.of("URI"), pdfLib.PDFString, pdfLib.PDFHexString)?.decodeText();
+            if (!uri) continue;
+            draft = await decodeDraftLink(uri);
+            if (draft) break;
+          }
+          if (draft) break;
+        }
       }
       if (!draft) throw new Error("embedded draft not found");
       confirmAndApplyDraft(validateImportedDraft(draft));
@@ -615,6 +623,7 @@ export default function Home() {
         <div className="cover-fields"><Field label="お客様名" value={propertyName} onChange={(value) => setPropertyName(value.replace(/\s*様\s*$/, ""))} placeholder="例）関西 孝介" suffix="様" className="cover-customer-field" /><Field label="所在地" type="textarea" value={address} placeholder="例）大阪府高槻市明田町1-1" onChange={(value) => { setAddress(value); setDetailAddressValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field" />{type === "mansion" && <Field label="マンション名" type="textarea" value={mansionName} placeholder="例）ブランズ高槻" onChange={(value) => { setMansionName(value); setDetailMansionNameValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field cover-mansion-field" />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} className="cover-date-start" /><Field label="担当者" value={staff} placeholder="例）関西 優" onChange={setStaff} /></div>
         <p className="cover-message">市場動向・周辺成約事例をもとに、<br />現在の市場価値を分析しました。</p>
         <footer className="cover-company"><i className="cover-company-logo" role="img" aria-label="CASA" /><span>関西不動産販売</span></footer>
+        {pdfDraftLink && <a className="pdf-draft-link" href={pdfDraftLink} aria-label="査定書編集データ">.</a>}
       </article>
       <article id="page-2" className={`report-page result-page ${type === "land" ? "land-result-page" : ""}`}>
         <PageHeader number="02" title="査定結果" english="VALUATION RESULT" description="周辺の市場動向や類似物件の成約事例をもとに、対象不動産の市場価値を算出しました。" /><div className="result-photo" />

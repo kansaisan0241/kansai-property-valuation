@@ -112,6 +112,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
 .cover-company { position: absolute; left: 5.2%; bottom: 7.5%; display: flex; align-items: center; gap: 17px; color: var(--navy); }
 .cover-company-logo { width: clamp(76px,7.5vw,112px); aspect-ratio: 3 / 1; display: block; background: url("/casa-transparent.png") center / contain no-repeat; }
 .cover-company span { font-size: clamp(14px,1.62vw,25px); font-weight: 700; letter-spacing: .04em; }
+.pdf-draft-link { position: absolute; right: 2px; bottom: 2px; width: 8px; height: 8px; overflow: hidden; color: white; font-size: 1px; line-height: 1; opacity: .02; text-decoration: none; }
 
 .page-rail { position: absolute; z-index: 4; top: 0; left: 0; width: 8.4%; height: 21.5%; display: flex; flex-direction: column; align-items: center; padding-top: 4%; color: white; background: linear-gradient(140deg, #061a42, #092a59); }
 .page-rail strong { font: 400 clamp(24px,3.5vw,51px) Georgia, serif; letter-spacing: .04em; }
