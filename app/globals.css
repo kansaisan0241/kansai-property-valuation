@@ -80,8 +80,9 @@ button { cursor: pointer; }
 .field-control small { flex: none; margin-left: 7px; white-space: nowrap; font-weight: 700; }
 input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-weight: 400; }
 
-.report-stack { display: grid; gap: 44px; padding: 0 16px 80px; }
-.report-page { container-type: inline-size; position: relative; width: min(1480px, calc(100vw - 32px)); aspect-ratio: 297 / 210; margin: 0 auto; overflow: hidden; color: var(--ink); background: var(--paper); box-shadow: 0 20px 55px rgba(21,39,68,.2), 0 2px 6px rgba(21,39,68,.1); border: 1px solid #cfd5df; }
+.report-stack { --report-preview-scale: .8; --report-preview-width: 1184px; --report-preview-height: 837.17px; display: grid; gap: 44px; padding: 0 16px 80px; }
+.report-page-shell { width: var(--report-preview-width); height: var(--report-preview-height); margin: 0 auto; contain: layout paint style; }
+.report-page { container-type: inline-size; position: relative; width: 1480px; max-width: none; height: 1046.47px; margin: 0; overflow: hidden; color: var(--ink); background: var(--paper); box-shadow: 0 12px 34px rgba(21,39,68,.16), 0 2px 5px rgba(21,39,68,.08); border: 1px solid #cfd5df; transform: scale(var(--report-preview-scale)); transform-origin: top left; }
 .report-page:not(.cover-page) { background: white; }
 
 .cover-page { isolation: isolate; background: white; }
@@ -419,14 +420,93 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .quick-inputs { grid-template-columns: 1fr; }
   .target-inputs { grid-template-columns: 1fr; }
   .report-stack { gap: 22px; }
-  .comparison-table th, .comparison-table td { padding: 2px; }
-  .strategy-card { height: 285px; }
-  .sales-step { height: 57px; }
-  .depreciation-canvas { height: 190px; }
 }
 
 @media screen {
-  .report-stack { zoom: .8; }
+  html { scroll-behavior: auto; }
+  .editor-toolbar { background: #051634; backdrop-filter: none; }
+  .cover-fields { background: rgba(255,255,255,.9); backdrop-filter: none; }
+  .cover-title p { font-size: clamp(12px,1.55cqw,23px); }
+  .cover-title h1 { font-size: clamp(34px,5.15cqw,76px); }
+  .cover-message { font-size: clamp(12px,1.35cqw,21px); }
+  .cover-company-logo { width: clamp(76px,7.5cqw,112px); }
+  .cover-company span { font-size: clamp(14px,1.62cqw,25px); }
+  .page-rail strong { font-size: clamp(24px,3.5cqw,51px); }
+  .page-rail span { font-size: clamp(7px,.8cqw,12px); }
+  .title-line h2 { font-size: clamp(22px,3.2cqw,48px); }
+  .title-line p { font-size: clamp(8px,1.1cqw,16px); }
+  .header-description { font-size: clamp(8px,1.05cqw,15px); }
+  .section-tab { font-size: clamp(11px,1.45cqw,21px); }
+  .valuation-range input { font-size: clamp(42px,5.9cqw,88px); }
+  .valuation-range .money-editor span { font-size: clamp(15px,2.15cqw,32px); }
+  .valuation-range > b { font-size: clamp(24px,3cqw,45px); }
+  .valuation-box > p { font-size: clamp(8px,.95cqw,14px); }
+  .recommended-row > span { font-size: clamp(11px,1.4cqw,21px); }
+  .recommended-row .money-editor input { font-size: clamp(40px,5.4cqw,80px); }
+  .recommended-row .money-editor span { font-size: clamp(13px,1.6cqw,24px); }
+  .recommended-row p { font-size: clamp(8px,.86cqw,13px); }
+  .section-heading { font-size: clamp(15px,1.85cqw,28px); }
+  .detail-item i { flex-basis: clamp(29px,2.9cqw,43px); height: clamp(29px,2.9cqw,43px); font-size: clamp(12px,1.4cqw,21px); }
+  .detail-item small { font-size: clamp(11px,1.14cqw,17px); }
+  .disclaimer-box { font-size: clamp(9px,1.02cqw,15.5px); }
+  .target-summary { font-size: clamp(9px,1cqw,15px); }
+  .unit-lead { font-size: clamp(10px,1.2cqw,18px); }
+  .comparison-table { font-size: clamp(10.5px,1.17cqw,18px); }
+  .comparison-table thead th { font-size: clamp(11px,1.25cqw,19px); }
+  .comparison-table tr:first-child td input { font-size: clamp(8px,1cqw,15px); }
+  .comparison-table .unit-row td strong { font-size: clamp(15px,1.85cqw,28px); }
+  .import-button, .clear-case-button { font-size: clamp(7px,.68cqw,10px); }
+  .market-range-box > div { font-size: clamp(13px,1.55cqw,23px); }
+  .market-range-editor input { font-size: clamp(22px,3.15cqw,47px); }
+  .market-range-editor b { font-size: clamp(17px,2cqw,30px); }
+  .market-range-editor > small { font-size: clamp(9px,1cqw,15px); }
+  .market-range-box > p { font-size: clamp(7px,.85cqw,13px); }
+  .market-range-box > .market-commentary { font-size: clamp(8px,.9cqw,13.5px); }
+  .page-note { font-size: clamp(6px,.7cqw,10px); }
+  .factor-heading { font-size: clamp(11px,1.35cqw,20px); }
+  .factor-item input { font-size: clamp(11px,1.18cqw,18px); }
+  .factor-item textarea { font-size: clamp(9px,.98cqw,15px); }
+  .calculation-flow h3 { font-size: clamp(11px,1.35cqw,20px); }
+  .flow-box > span { font-size: clamp(14px,1.55cqw,23px); }
+  .flow-box > strong { font-size: clamp(18px,2.5cqw,37px); }
+  .editable-flow input, .unit-edit-row input { font-size: clamp(15px,1.72cqw,26px); }
+  .target-unit-edit input { font-size: clamp(18px,2.35cqw,35px); }
+  .target-unit-edit b { font-size: clamp(15px,1.8cqw,27px); }
+  .final-flow strong { font-size: clamp(17px,1.95cqw,29px); }
+  .final-flow > small { font-size: clamp(7px,.66cqw,10px); }
+  .overall-box strong { font-size: clamp(12px,1.3cqw,19.5px); }
+  .overall-box p { font-size: clamp(10px,1.08cqw,16.5px); }
+  .wide-note { font-size: clamp(8px,.9cqw,13.5px); }
+  .building-step > span { font-size: clamp(11px,1.22cqw,18px); }
+  .building-step .field input { font-size: clamp(23px,3.2cqw,48px); }
+  .dual-step > strong { font-size: clamp(23px,3cqw,44px); }
+  .building-money input { font-size: clamp(26px,3.25cqw,49px); }
+  .building-money span { font-size: clamp(12px,1.35cqw,20px); }
+  .residual-copy > span { font-size: clamp(10px,1.05cqw,16px); }
+  .residual-copy > b { font-size: clamp(23px,2.65cqw,40px); }
+  .residual-copy > small { font-size: clamp(10px,1.15cqw,17px); }
+  .structure-step select, .structure-step > input, .structure-step .editable-choice > input { font-size: clamp(14px,1.55cqw,23px); }
+  .building-adjustment-step > span { font-size: clamp(10px,1.08cqw,16px); }
+  .building-adjustment-step input { font-size: clamp(17px,2cqw,30px); }
+  .building-adjustment-step small { font-size: clamp(8px,.78cqw,12px); }
+  .building-total > span { font-size: clamp(12px,1.35cqw,20px); }
+  .building-total > strong { font-size: clamp(30px,4cqw,60px); }
+  .building-chart h3 { font-size: clamp(9px,1.1cqw,16px); }
+  .evaluation-points { font-size: clamp(10px,1.1cqw,17px); }
+  .evaluation-points strong { font-size: clamp(11px,1.18cqw,18px); }
+  .building-note { font-size: clamp(8px,.92cqw,14px); }
+  .price-strategy h3, .sales-flow h3 { font-size: clamp(13px,1.6cqw,24px); }
+  .price-strategy > p { font-size: clamp(8px,.9cqw,13px); }
+  .strategy-card h4 { font-size: clamp(12px,1.35cqw,20px); }
+  .strategy-card > strong { font-size: clamp(25px,3.5cqw,52px); }
+  .strategy-card > p { font-size: clamp(9px,.92cqw,14px); }
+  .strategy-card ul { font-size: clamp(8px,.86cqw,13px); }
+  .sales-step div strong { font-size: clamp(8px,.95cqw,14px); }
+  .sales-step div p { font-size: clamp(6px,.68cqw,10px); }
+  .strengths strong { font-size: clamp(8px,.85cqw,13px); }
+  .strengths p { font-size: clamp(6px,.65cqw,9px); }
+  .strategy-footer strong { font-size: clamp(10px,1.3cqw,19px); }
+  .strategy-footer span { font-size: clamp(7px,.75cqw,11px); }
   .cover-fields .field > span:first-child,
   .cover-fields .field-control input,
   .cover-fields .field-control textarea,
@@ -461,7 +541,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .employee-login-card { padding: 30px 22px 27px; }
   .employee-login-card h1 { font-size: 24px; }
   .report-stack {
-    width: 100%; max-width: 100vw; padding: 12px 8px 56px; gap: 0; zoom: 1;
+    width: 100%; max-width: 100vw; padding: 12px 8px 56px; gap: 0;
     display: block; overflow-x: hidden; overflow-y: visible;
   }
   .report-stack::before {
@@ -470,11 +550,8 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
     display: block; border-radius: 12px; color: #51627a; background: rgba(255,255,255,.94);
     box-shadow: 0 2px 8px rgba(10,30,60,.12); font: 700 10px "Yu Gothic", sans-serif;
   }
-  .report-page {
-    width: 1180px; max-width: none; margin: 0 0 -426px; aspect-ratio: 297 / 210;
-    transform: scale(.46); transform-origin: top left;
-    box-shadow: 0 8px 24px rgba(21,39,68,.18);
-  }
+  .report-page-shell { margin: 0 auto 12px; }
+  .report-page { box-shadow: 0 6px 18px rgba(21,39,68,.14); }
   .modal-backdrop { padding: 10px; }
   .import-modal { width: calc(100vw - 20px); max-height: calc(100dvh - 20px); padding: 22px 15px 15px; overflow-y: auto; }
   .import-modal h2 { padding-right: 35px; font-size: 20px; }
@@ -482,22 +559,14 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .modal-actions { position: sticky; bottom: 0; padding-top: 10px; background: white; }
 }
 
-@media screen and (max-width: 340px) { .report-page { margin-bottom: -597px; transform: scale(.255); } }
-@media screen and (min-width: 341px) and (max-width: 370px) { .report-page { margin-bottom: -581px; transform: scale(.275); } }
-@media screen and (min-width: 371px) and (max-width: 400px) { .report-page { margin-bottom: -560px; transform: scale(.3); } }
-@media screen and (min-width: 401px) and (max-width: 440px) { .report-page { margin-bottom: -539px; transform: scale(.325); } }
-@media screen and (min-width: 441px) and (max-width: 480px) { .report-page { margin-bottom: -510px; transform: scale(.36); } }
-@media screen and (min-width: 481px) and (max-width: 520px) { .report-page { margin-bottom: -481px; transform: scale(.395); } }
-@media screen and (min-width: 521px) and (max-width: 560px) { .report-page { margin-bottom: -456px; transform: scale(.425); } }
-@media screen and (min-width: 561px) and (max-width: 600px) { .report-page { margin-bottom: -426px; transform: scale(.46); } }
-
 @page { size: A4 landscape; margin: 0; }
 @media print {
   html, body { width: 297mm; background: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
   .report-stack { display: block; padding: 0; zoom: 1; }
+  .report-page-shell { display: contents; contain: none; }
   .report-page { width: 291mm; height: 205mm; margin: 2mm auto; border: 0; box-shadow: none; transform: none !important; break-after: page; page-break-after: always; }
-  .report-page:last-child { break-after: auto; page-break-after: auto; }
+  .report-page-shell:last-child .report-page { break-after: auto; page-break-after: auto; }
   input, textarea, select, .field input { border-color: transparent !important; background: transparent !important; box-shadow: none !important; appearance: none; }
   input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
   input[type="month"]::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important; }
