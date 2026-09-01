@@ -245,11 +245,10 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
 .market-range-box > .market-commentary { padding: 0 18px; font-size: clamp(8px,.9vw,13.5px); line-height: 1.62; }
 .page-note { position: absolute; bottom: 2.1%; left: 2.6%; font: 500 clamp(6px,.7vw,10px) "Yu Gothic", sans-serif; }
 
-.factor-columns { position: absolute; top: 23%; left: 2.5%; width: 60.5%; height: 50.3%; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.factor-column { border: 1px solid #d7d8dc; }
-.factor-column h3 { height: 48px; margin: 0; display: grid; place-items: center; color: white; background: var(--navy); font-size: clamp(11px,1.35vw,20px); font-weight: 500; letter-spacing: .08em; }
-.factor-column.minus h3 { background: linear-gradient(100deg, #986811, #bb8b30); }
-.factor-item { height: calc((100% - 48px) / 4); padding: 10px 14px; display: grid; grid-template-columns: 55px 1fr; align-items: center; border-bottom: 1px solid #dedede; }
+.factor-columns { position: absolute; top: 23%; left: 2.5%; width: 60.5%; height: 50.3%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 48px minmax(0,1fr); column-gap: 16px; }
+.factor-heading { grid-column: 1 / -1; height: 48px; margin: 0; display: grid; place-items: center; color: white; background: var(--navy); font-size: clamp(11px,1.35vw,20px); font-weight: 500; letter-spacing: .08em; }
+.factor-column { min-height: 0; display: grid; grid-template-rows: repeat(4,minmax(0,1fr)); border: 1px solid #d7d8dc; }
+.factor-item { min-height: 0; padding: 10px 14px; display: grid; grid-template-columns: 55px 1fr; align-items: center; border-bottom: 1px solid #dedede; }
 .factor-item:last-child { border-bottom: 0; }
 .factor-item i { width: 48px; height: 48px; display: block; background-image: url("/valuation-icons.png"); background-repeat: no-repeat; background-size: 300% 300%; font-style: normal; }
 .factor-icon-plus-0 { background-position: 0 0; }

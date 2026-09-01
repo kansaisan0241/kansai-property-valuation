@@ -29,7 +29,7 @@ const propertyLabels: Record<PropertyType, string> = {
   mansion: "マンション",
 };
 
-const defaultFactors: Record<PropertyType, { plus: Factor[]; minus: Factor[] }> = {
+const legacyDefaultFactors: Record<PropertyType, { plus: Factor[]; minus: Factor[] }> = {
   house: {
     plus: [
       { title: "立地・利便性が良好", description: "最寄り駅や生活施設へのアクセスに優れています。" },
@@ -73,6 +73,62 @@ const defaultFactors: Record<PropertyType, { plus: Factor[]; minus: Factor[] }> 
     ],
   },
 };
+
+const defaultFactors: Record<PropertyType, { plus: Factor[]; minus: Factor[] }> = {
+  house: {
+    plus: [
+      { title: "立地・利便性", description: "最寄り駅や生活施設への距離、交通・買い物の利便性を評価します。" },
+      { title: "日当たり・開放感", description: "方位や周辺建物との位置関係、採光・通風の条件を評価します。" },
+      { title: "建物の維持管理状態", description: "建物の劣化状況や維持管理、修繕状況を評価します。" },
+      { title: "間取り・使い勝手", description: "生活動線や部屋数、現在の需要との適合性を評価します。" },
+    ],
+    minus: [
+      { title: "築年数・設備更新状況", description: "築年数や設備の仕様、更新・交換状況を評価します。" },
+      { title: "周辺の競合状況", description: "販売中の類似物件や周辺の需給状況を評価します。" },
+      { title: "前面道路・接道条件", description: "道路幅員や接道状況、車両の出入りなどを評価します。" },
+      { title: "高低差・地勢", description: "敷地の高低差や地勢、利用上の条件を評価します。" },
+    ],
+  },
+  land: {
+    plus: [
+      { title: "駅・生活施設への利便性", description: "駅や生活施設への距離、交通・買い物の利便性を評価します。" },
+      { title: "敷地面積・間口", description: "敷地面積や間口、建築計画のしやすさを評価します。" },
+      { title: "日当たり・方位", description: "道路付けや方位、採光・通風の条件を評価します。" },
+      { title: "住環境・街並み", description: "周辺環境や街並み、住宅地としての需要を評価します。" },
+    ],
+    minus: [
+      { title: "前面道路・接道条件", description: "道路幅員や接道状況、セットバックの有無を評価します。" },
+      { title: "高低差・擁壁", description: "敷地の高低差や擁壁、造成に関する条件を評価します。" },
+      { title: "敷地形状・建築条件", description: "敷地形状や法令上の制限、建築計画への影響を評価します。" },
+      { title: "周辺の競合状況", description: "販売中の類似土地や周辺の需給状況を評価します。" },
+    ],
+  },
+  mansion: {
+    plus: [
+      { title: "駅・生活利便性", description: "駅や生活施設への距離、複数沿線の利用状況を評価します。" },
+      { title: "所在階・眺望", description: "所在階や周辺建物との位置関係、眺望を評価します。" },
+      { title: "管理・共用部の状態", description: "共用部の維持管理や修繕、管理体制を評価します。" },
+      { title: "間取り・専有面積", description: "間取りや専有面積、現在の需要との適合性を評価します。" },
+    ],
+    minus: [
+      { title: "築年数・設備更新状況", description: "築年数や専有部・共用部設備の更新状況を評価します。" },
+      { title: "管理費・修繕積立金", description: "管理費や修繕積立金、将来の修繕計画を評価します。" },
+      { title: "方位・日当たり", description: "住戸の方位や採光・通風、周辺環境の影響を評価します。" },
+      { title: "周辺・同一棟の競合状況", description: "同一棟や近隣マンションの売出状況を評価します。" },
+    ],
+  },
+};
+
+function migrateFactors(type: PropertyType, saved: any): { plus: Factor[]; minus: Factor[] } {
+  if (!saved || !Array.isArray(saved.plus) || !Array.isArray(saved.minus)) return defaultFactors[type];
+  const migrateSide = (side: "plus" | "minus") => defaultFactors[type][side].map((replacement, index) => {
+    const current = saved[side][index] as Factor | undefined;
+    const legacy = legacyDefaultFactors[type][side][index];
+    if (!current) return replacement;
+    return current.title === legacy.title && current.description === legacy.description ? replacement : current;
+  });
+  return { plus: migrateSide("plus"), minus: migrateSide("minus") };
+}
 
 const emptyComp = (id: number): Comparable => ({ id, address: "", mansionName: "", landArea: 0, buildingArea: 0, exclusiveArea: 0, layout: "", builtDate: "", soldPrice: 0, soldDate: "", constructionUnit: 66, usefulLife: 25 });
 
@@ -350,7 +406,7 @@ export default function Home() {
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
-    setType(nextType); setPropertyName(d.propertyName ?? ""); setAddress(d.address ?? ""); setMansionName(d.mansionName ?? ""); setDetailAddressValue(d.detailAddressValue ?? (d.address ?? "").replace(/\r?\n/g, "")); setDetailMansionNameValue(d.detailMansionNameValue ?? (d.mansionName ?? "").replace(/\r?\n/g, "")); setAppraisalDate(d.appraisalDate ?? localToday()); setStaff(d.staff ?? ""); setLandArea(d.landArea ?? 0); setBuildingArea(d.buildingArea ?? 0); setExclusiveArea(d.exclusiveArea ?? 0); setLayout(d.layout ?? ""); setBuiltDate(d.builtDate ?? ""); setTransport(d.transport ?? ""); setRoad(d.road ?? ""); setFloors(d.floors ?? ""); setOther(d.other ?? ""); setStructure(d.structure ?? "木造"); setComparables((d.comparables ?? Array.from({ length: 5 }, (_: unknown, i: number) => emptyComp(i + 1))).map((comp: Comparable, i: number) => ({ ...emptyComp(comp.id ?? i + 1), ...comp }))); setSurroundLow(d.surroundLow ?? 0); setSurroundHigh(d.surroundHigh ?? 0); setUnitManual(d.unitManual ?? false); setUnitRangeMode(d.unitRangeMode ?? true); setAdjustLow(d.adjustLow ?? 0); setTargetUnitLowManual(d.targetUnitLowManual ?? 0); setTargetUnitHighManual(d.targetUnitHighManual ?? 0); setTargetUnitManual(d.targetUnitManual ?? false); setBuildingUnit(d.buildingUnit ?? 66); setUsefulLife(d.usefulLife ?? 25); setBuildingAdjustmentUnit(d.buildingAdjustmentUnit ?? 0); setNewBuildingPriceManual(d.newBuildingPriceManual ?? 0); setAppraisalLowManual(d.appraisalLowManual ?? 0); setAppraisalHighManual(d.appraisalHighManual ?? 0); setRecommendedManual(d.recommendedManual ?? 0); setSpeedManual(d.speedManual ?? 0); setChallengeManual(d.challengeManual ?? 0); setShowRoadInPrint(d.showRoadInPrint ?? true); setShowTransportInPrint(d.showTransportInPrint ?? true); setFactors(d.factors ?? defaultFactors[nextType] ?? defaultFactors.house);
+    setType(nextType); setPropertyName(d.propertyName ?? ""); setAddress(d.address ?? ""); setMansionName(d.mansionName ?? ""); setDetailAddressValue(d.detailAddressValue ?? (d.address ?? "").replace(/\r?\n/g, "")); setDetailMansionNameValue(d.detailMansionNameValue ?? (d.mansionName ?? "").replace(/\r?\n/g, "")); setAppraisalDate(d.appraisalDate ?? localToday()); setStaff(d.staff ?? ""); setLandArea(d.landArea ?? 0); setBuildingArea(d.buildingArea ?? 0); setExclusiveArea(d.exclusiveArea ?? 0); setLayout(d.layout ?? ""); setBuiltDate(d.builtDate ?? ""); setTransport(d.transport ?? ""); setRoad(d.road ?? ""); setFloors(d.floors ?? ""); setOther(d.other ?? ""); setStructure(d.structure ?? "木造"); setComparables((d.comparables ?? Array.from({ length: 5 }, (_: unknown, i: number) => emptyComp(i + 1))).map((comp: Comparable, i: number) => ({ ...emptyComp(comp.id ?? i + 1), ...comp }))); setSurroundLow(d.surroundLow ?? 0); setSurroundHigh(d.surroundHigh ?? 0); setUnitManual(d.unitManual ?? false); setUnitRangeMode(d.unitRangeMode ?? true); setAdjustLow(d.adjustLow ?? 0); setTargetUnitLowManual(d.targetUnitLowManual ?? 0); setTargetUnitHighManual(d.targetUnitHighManual ?? 0); setTargetUnitManual(d.targetUnitManual ?? false); setBuildingUnit(d.buildingUnit ?? 66); setUsefulLife(d.usefulLife ?? 25); setBuildingAdjustmentUnit(d.buildingAdjustmentUnit ?? 0); setNewBuildingPriceManual(d.newBuildingPriceManual ?? 0); setAppraisalLowManual(d.appraisalLowManual ?? 0); setAppraisalHighManual(d.appraisalHighManual ?? 0); setRecommendedManual(d.recommendedManual ?? 0); setSpeedManual(d.speedManual ?? 0); setChallengeManual(d.challengeManual ?? 0); setShowRoadInPrint(d.showRoadInPrint ?? true); setShowTransportInPrint(d.showTransportInPrint ?? true); setFactors(migrateFactors(nextType, d.factors));
   }
 
   function resetDraftValues() {
@@ -439,15 +495,6 @@ export default function Home() {
     setHistoryVersion((current) => current + 1);
   }
 
-  function printReport() {
-    const originalTitle = document.title;
-    document.title = reportFileBaseName();
-    const restoreTitle = () => { document.title = originalTitle; };
-    window.addEventListener("afterprint", restoreTitle, { once: true });
-    window.print();
-    window.setTimeout(restoreTitle, 60_000);
-  }
-
   function downloadDraft() {
     const payload = { format: "kansai-property-valuation", version: 1, savedAt: new Date().toISOString(), ...collectDraft() };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
@@ -483,7 +530,7 @@ export default function Home() {
     }
   }
 
-  async function downloadPdf() {
+  async function printReport() {
     if (pdfBusy) return;
     setPdfBusy(true);
     try {
@@ -505,7 +552,7 @@ export default function Home() {
       window.setTimeout(cleanup, 60_000);
     } catch (error) {
       console.error(error);
-      window.alert("PDF保存を開始できませんでした。画面を再読み込みして、もう一度お試しください。");
+      window.alert("印刷・PDF保存を開始できませんでした。画面を再読み込みして、もう一度お試しください。");
       setPdfDraftLink("");
       setPdfBusy(false);
     }
@@ -616,7 +663,7 @@ export default function Home() {
   ];
 
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>JSON保存</button><button className="save-button" onClick={() => setImportChoiceOpen(true)}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><input ref={draftPdfInputRef} type="file" accept=".pdf,application/pdf" hidden onChange={(event) => void importDraftPdf(event.target.files?.[0])} /><button className="ghost-button print-button" onClick={printReport}>印刷</button><button className="primary-button" disabled={pdfBusy} onClick={() => void downloadPdf()}>{pdfBusy ? "PDF作成中…" : "PDF保存"}</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>JSON保存</button><button className="save-button" onClick={() => setImportChoiceOpen(true)}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><input ref={draftPdfInputRef} type="file" accept=".pdf,application/pdf" hidden onChange={(event) => void importDraftPdf(event.target.files?.[0])} /><button className="primary-button print-button" disabled={pdfBusy} onClick={() => void printReport()}>{pdfBusy ? "印刷準備中…" : "印刷・PDF保存"}</button></div></section>
     <div className="report-stack">
       <article id="page-1" className={`report-page cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産簡易査定書</h1><i /></header>
@@ -651,8 +698,8 @@ export default function Home() {
         <section className="market-range-box"><div>周辺の成約坪単価<small>（{type === "mansion" ? "マンション" : "土地"}）</small></div><div className={`market-range-editor ${unitRangeMode ? "is-range" : "is-single"}`}><button className="range-mode-toggle no-print" onClick={() => changeUnitRangeMode(!unitRangeMode)}>{unitRangeMode ? "価格幅あり" : "価格幅なし"}</button><div>{unitRangeMode ? <><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /></> : <FormattedNumberInput className="single-unit-input" value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価" />}</div><small>万円／坪</small><button className="inline-auto no-print" onClick={() => setUnitManual(false)}>自動値に戻す</button></div><p className="market-commentary">上記成約は、対象物件と立地・土地広さ・建物面積・築年数・間取り等が<br />近い物件を抽出したものです。<br />周辺の{type === "mansion" ? "マンション" : "土地"}成約坪単価は{unitRangeMode ? `${formatNumber(surroundLow, 1)}～${formatNumber(surroundHigh, 1)}` : formatNumber(surroundLow, 1)}万円で推移しており、<br />対象物件の条件を踏まえた価格水準の判断材料としています。</p></section><footer className="page-note">※成約価格は市場事例をもとに作成しており、実際の成約価格を保証するものではありません。</footer>
       </article>
       <article id="page-4" className="report-page analysis-page">
-        <PageHeader number="04" title={type === "mansion" ? "マンション評点" : "土地評点"} english="VALUE ANALYSIS" description="対象物件の特徴や市場動向をもとに、プラス要因・マイナス要因を整理し、査定価格を算出しました。" />
-        <section className="factor-columns">{(["plus", "minus"] as const).map((side) => <div className={`factor-column ${side}`} key={side}><h3>{side === "plus" ? "+ PLUS（主なプラス要因）" : "− MINUS（主なマイナス要因）"}</h3>{factors[side].map((factor, index) => <div className="factor-item" key={index}><i className={`factor-icon factor-icon-${side}-${index}`} aria-hidden="true" /><div><input value={factor.title} onChange={(e) => updateFactor(side, index, "title", e.target.value)} /><textarea value={factor.description} onChange={(e) => updateFactor(side, index, "description", e.target.value)} /></div></div>)}</div>)}</section>
+        <PageHeader number="04" title={type === "mansion" ? "マンション評点" : "土地評点"} english="VALUE ANALYSIS" description="対象物件固有の8つの評価項目と市場動向を総合的に判断し、査定価格を算出しました。" />
+        <section className="factor-columns"><h3 className="factor-heading">対象物件の個別評価項目</h3>{(["plus", "minus"] as const).map((side) => <div className={`factor-column ${side}`} key={side}>{factors[side].map((factor, index) => <div className="factor-item" key={index}><i className={`factor-icon factor-icon-${side}-${index}`} aria-hidden="true" /><div><input value={factor.title} onChange={(e) => updateFactor(side, index, "title", e.target.value)} /><textarea value={factor.description} onChange={(e) => updateFactor(side, index, "description", e.target.value)} /></div></div>)}</div>)}</section>
         <aside className={`calculation-flow ${unitRangeMode ? "range-flow" : "single-flow"}`}>
           <h3>査定価格の算出フロー</h3>
           <div className="flow-box"><span>周辺成約坪単価</span><div className="unit-edit-row">{unitRangeMode ? <><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /></> : <FormattedNumberInput className="single-unit-input" value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価" />}<small>万円／坪</small></div><button className="flow-mode-toggle no-print" onClick={() => changeUnitRangeMode(!unitRangeMode)}>{unitRangeMode ? "価格幅あり" : "価格幅なし"}</button></div>
@@ -663,7 +710,7 @@ export default function Home() {
           <div className="down-arrow">▼</div>
           <div className="flow-box final-flow"><span>{type === "mansion" ? "マンションの査定価格" : "土地の査定価格"}</span><strong><PriceValue value={landAppraisalLow} />{unitRangeMode && <>〜<PriceValue value={landAppraisalHigh} /></>}</strong><small>※上記価格は、対象物件の条件・市場動向を総合的に判断した目安です。</small></div>
         </aside>
-        <section className="overall-box"><i className="overall-icon" aria-hidden="true" /><div><strong>総合評価</strong><p>周辺成約事例から算出した坪単価に、対象物件固有の評価補正を加え、現在の市場性を総合的に反映した査定価格です。</p></div></section><footer className="wide-note">※実際の成約価格は、売却時期・市場動向・物件の状態・交渉条件等により変動する可能性があります。</footer>
+        <section className="overall-box"><i className="overall-icon" aria-hidden="true" /><div><strong>個別評価の反映</strong><p>これらの評価項目をもとに、対象物件固有の条件や市場性を総合的に判断し、右側の「対象物件の評価補正」に反映しています。</p></div></section><footer className="wide-note">※実際の成約価格は、売却時期・市場動向・物件の状態・交渉条件等により変動する可能性があります。</footer>
       </article>
       {type === "house" && <article id="page-5" className="report-page building-page">
         <PageHeader number="05" title="建物の経年減価による評価" english="PROPERTY VALUE ANALYSIS" description="築年数・構造・建物状態・設備仕様等を考慮し、建物の経年減価を反映した評価額を算出しました。" />
