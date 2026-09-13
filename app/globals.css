@@ -37,7 +37,7 @@ button { cursor: pointer; }
 .toolbar-actions { display: flex; align-items: center; gap: 9px; margin-left: auto; }
 .toolbar-actions > small { color: #b9c7de; font-size: 10px; white-space: nowrap; }
 .reins-link { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid #d6b46f; border-radius: 4px; color: white; background: linear-gradient(110deg, #9a6812, #bd9347); font: 700 12px "Yu Gothic", sans-serif; text-decoration: none; white-space: nowrap; }
-.primary-button, .ghost-button, .save-button, .reset-button, .logout-button, .history-button { min-height: 38px; padding: 0 12px; border-radius: 4px; font: 700 11px "Yu Gothic", sans-serif; white-space: nowrap; }
+.primary-button, .ghost-button, .save-button, .reset-button, .logout-button, .history-button, .assist-start-button { min-height: 38px; padding: 0 12px; border-radius: 4px; font: 700 11px "Yu Gothic", sans-serif; white-space: nowrap; }
 .primary-button { border: 1px solid #be923f; color: white; background: linear-gradient(135deg, #bb8a31, #976312); box-shadow: 0 5px 14px rgba(0,0,0,.18); }
 .primary-button:disabled { opacity: .45; cursor: not-allowed; }
 .ghost-button { border: 1px solid #d2dae7; color: inherit; background: rgba(255,255,255,.08); }
@@ -46,6 +46,31 @@ button { cursor: pointer; }
 .history-button:disabled { opacity: .35; cursor: not-allowed; }
 .reset-button { border: 1px solid #d9a6a6; color: white; background: #803c3c; }
 .logout-button { border: 1px solid #77879e; color: #dce4ef; background: transparent; }
+.assist-start-button { border: 1px solid #9fc7f1; color: #09264f; background: #e9f4ff; box-shadow: 0 0 0 2px rgba(121,178,235,.12); }
+
+.input-guide-layer { position: fixed; z-index: 80; inset: 0; pointer-events: none; font-family: "Yu Gothic", "Noto Sans JP", sans-serif; }
+.guide-shade { position: fixed; z-index: 0; background: rgba(3,14,35,.68); pointer-events: auto; }
+.guide-spotlight-ring { position: fixed; z-index: 1; border: 3px solid #75baff; border-radius: 7px; box-shadow: 0 0 0 3px rgba(255,255,255,.92), 0 0 22px rgba(91,171,249,.9); pointer-events: none; animation: guide-ring-pulse 1.6s ease-in-out infinite; }
+.input-guide-card { position: fixed; z-index: 2; width: 360px; padding: 16px 18px 17px; border: 1px solid #a9c7e7; border-top: 4px solid #b78327; border-radius: 8px; color: #0a2047; background: #fff; box-shadow: 0 18px 52px rgba(0,10,30,.34); pointer-events: auto; }
+.input-guide-card > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.input-guide-card > header span { color: #9b6712; font-size: 13px; font-weight: 800; letter-spacing: .08em; }
+.input-guide-card > header button { padding: 4px 7px; border: 0; color: #617087; background: transparent; font-size: 12px; font-weight: 700; }
+.guide-progress { height: 4px; margin: 10px 0 8px; overflow: hidden; border-radius: 4px; background: #e7edf4; }
+.guide-progress span { height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg, #b17a16, #ddb969); transition: width .18s ease-out; }
+.guide-count { margin: 0; display: flex; align-items: center; justify-content: space-between; color: #7a8798; font-size: 11px; font-weight: 700; }
+.guide-count b { padding: 3px 7px; border-radius: 10px; color: #fff; background: #be7a2e; font-size: 10px; }
+.guide-count b.is-complete { background: #27845a; }
+.guide-count b.is-optional { color: #70531c; background: #f3e1b9; }
+.input-guide-card h2 { margin: 8px 0 5px; font: 700 20px/1.4 "Yu Gothic", "Noto Sans JP", sans-serif; }
+.guide-description { min-height: 42px; margin: 0; color: #344861; font-size: 14px; line-height: 1.55; }
+.guide-hint { margin: 8px 0 13px; color: #62738a; font-size: 11px; }
+.input-guide-card > footer { display: grid; grid-template-columns: auto 1fr auto; gap: 7px; }
+.input-guide-card > footer button { min-height: 38px; padding: 0 12px; border-radius: 4px; font-size: 12px; font-weight: 800; }
+.guide-back { border: 1px solid #c8d1dd; color: #4d6078; background: white; }
+.guide-back:disabled { opacity: .35; cursor: not-allowed; }
+.guide-focus { border: 1px solid #86b5e7; color: #123d70; background: #edf6ff; }
+.guide-next { border: 1px solid #9a6915; color: white; background: #a9751b; }
+@keyframes guide-ring-pulse { 0%,100% { box-shadow: 0 0 0 3px rgba(255,255,255,.92), 0 0 18px rgba(91,171,249,.7); } 50% { box-shadow: 0 0 0 4px rgba(255,255,255,.96), 0 0 28px rgba(91,171,249,1); } }
 
 .login-page { min-height: 100dvh; padding: 24px; display: grid; place-items: center; background: radial-gradient(circle at 50% 0, #16345f, #071a43 58%, #041129); font-family: "Yu Gothic", "Noto Sans JP", sans-serif; }
 .employee-login-card { width: min(460px, 100%); padding: 42px 44px 38px; border-top: 5px solid var(--gold-light); border-radius: 4px; color: var(--navy); background: rgba(255,255,255,.98); box-shadow: 0 28px 90px rgba(0,0,0,.35); }
@@ -536,7 +561,7 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .type-switch button { min-width: 0; padding: 9px 3px; font-size: 11px; white-space: nowrap; }
   .toolbar-actions { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .toolbar-actions > small, .toolbar-actions .ghost-button:not(.print-button) { display: none; }
-  .reins-link, .primary-button, .save-button, .reset-button, .logout-button, .history-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
+  .reins-link, .primary-button, .save-button, .reset-button, .logout-button, .history-button, .assist-start-button { min-width: 0; min-height: 38px; padding: 0 7px; justify-content: center; font-size: 11px; text-align: center; }
   .login-page { padding: 14px; }
   .employee-login-card { padding: 30px 22px 27px; }
   .employee-login-card h1 { font-size: 24px; }
@@ -557,6 +582,16 @@ input::placeholder, textarea::placeholder { color: #8794a8; opacity: .42; font-w
   .import-modal h2 { padding-right: 35px; font-size: 20px; }
   .import-modal > textarea { height: 42dvh; font-size: 11px; }
   .modal-actions { position: sticky; bottom: 0; padding-top: 10px; background: white; }
+  .input-guide-card { left: 10px !important; right: 10px; top: auto !important; bottom: 10px; width: auto; max-height: min(310px, calc(100dvh - 20px)); padding: 13px 14px 14px; overflow-y: auto; }
+  .input-guide-card h2 { font-size: 17px; }
+  .guide-description { min-height: 0; font-size: 13px; }
+  .guide-hint { margin-bottom: 10px; }
+  .input-guide-card > footer button { min-height: 40px; padding-inline: 8px; font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-spotlight-ring { animation: none; }
+  .guide-progress span { transition: none; }
 }
 
 @page { size: A4 landscape; margin: 0; }

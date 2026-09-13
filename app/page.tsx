@@ -22,6 +22,24 @@ type Comparable = {
 
 type Factor = { title: string; description: string };
 
+type GuideStep = {
+  id: string;
+  selector: string;
+  title: string;
+  description: string;
+  complete: boolean;
+  optional?: boolean;
+};
+
+type GuideSpotlight = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  viewportWidth: number;
+  viewportHeight: number;
+};
+
 const TSUBO = 3.30578;
 const REPORT_PREVIEW_WIDTH = 1480;
 const REPORT_PREVIEW_HEIGHT = REPORT_PREVIEW_WIDTH * 210 / 297;
@@ -303,11 +321,11 @@ function residualRateAtAge(age: number, life: number) {
   return Math.max(0, 1 - Math.max(0, age) / safeLife);
 }
 
-function Field({ label, value, onChange, type = "text", suffix, className = "", placeholder = "" }: { label?: string; value: string | number; onChange: (value: string) => void; type?: string; suffix?: string; className?: string; placeholder?: string }) {
+function Field({ label, value, onChange, type = "text", suffix, className = "", placeholder = "", guideId }: { label?: string; value: string | number; onChange: (value: string) => void; type?: string; suffix?: string; className?: string; placeholder?: string; guideId?: string }) {
   const textClass = type === "textarea" ? (String(value).includes("\n") ? "has-explicit-break" : "single-line-value") : "";
   const inlineSuffix = Boolean(suffix && className.includes("cover-customer-field"));
   const inlineInputWidth = value ? `${Math.max(Array.from(String(value)).length + 1, 3)}em` : "12em";
-  return <label className={`field ${className}`}>{label && <span>{label}</span>}<span className={`field-control ${inlineSuffix ? "inline-suffix-control" : ""}`}>{type === "textarea" ? <textarea className={textClass} rows={2} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /> : <input type={type} value={value} placeholder={placeholder} style={inlineSuffix ? { width: inlineInputWidth } : undefined} onChange={(event) => onChange(event.target.value)} />}{suffix && <small className="field-suffix">{inlineSuffix ? `　${suffix}` : suffix}</small>}</span></label>;
+  return <label className={`field ${className}`} data-guide={guideId}>{label && <span>{label}</span>}<span className={`field-control ${inlineSuffix ? "inline-suffix-control" : ""}`}>{type === "textarea" ? <textarea className={textClass} rows={2} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /> : <input type={type} value={value} placeholder={placeholder} style={inlineSuffix ? { width: inlineInputWidth } : undefined} onChange={(event) => onChange(event.target.value)} />}{suffix && <small className="field-suffix">{inlineSuffix ? `　${suffix}` : suffix}</small>}</span></label>;
 }
 
 function FormattedNumberInput({ value, onChange, decimals = 0, className = "", ariaLabel, showPlus = false, showZero = false, placeholder }: { value: number; onChange: (value: number) => void; decimals?: number; className?: string; ariaLabel?: string; showPlus?: boolean; showZero?: boolean; placeholder?: string }) {
@@ -347,8 +365,8 @@ function DetailIcon({ label }: { label: string }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path {...common} d="M3 11.5 12 4l9 7.5M5.5 10v10h13V10M9 20v-6h6v6" /></svg>;
 }
 
-function DetailEditor({ icon: _icon, label, value, onChange, type = "text", secondary, options, className = "", placeholder = "", printVisible = true, onTogglePrint }: { icon: string; label: string; value: string | number; onChange: (value: string) => void; type?: string; secondary?: string; options?: { value: string; label: string }[]; className?: string; placeholder?: string; printVisible?: boolean; onTogglePrint?: () => void }) {
-  return <label className={`detail-item ${type === "textarea" ? "multiline-detail" : ""} ${!printVisible ? "print-optional-hidden" : ""} ${className}`}><i><DetailIcon label={label} /></i><div><strong><span>{label}</span>{onTogglePrint && <button type="button" className={`detail-print-toggle no-print ${printVisible ? "is-visible" : ""}`} onClick={(event) => { event.preventDefault(); onTogglePrint(); }}>{printVisible ? "印刷あり" : "印刷なし"}</button>}</strong>{type === "area" ? <FormattedNumberInput value={Number(value)} decimals={2} onChange={(next) => onChange(String(next))} ariaLabel={label} /> : options ? <EditableChoice value={value} onChange={onChange} options={options} label={label} /> : type === "textarea" ? <textarea rows={2} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /> : <input type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />}{secondary && <small>{secondary}</small>}{type === "area" && <span className="area-print-value">{formatNumber(Number(value), 2)}{secondary}</span>}{type === "month" && <span className="detail-print-value">{formatMonthJa(String(value))}</span>}</div></label>;
+function DetailEditor({ icon: _icon, label, value, onChange, type = "text", secondary, options, className = "", placeholder = "", printVisible = true, onTogglePrint, guideId }: { icon: string; label: string; value: string | number; onChange: (value: string) => void; type?: string; secondary?: string; options?: { value: string; label: string }[]; className?: string; placeholder?: string; printVisible?: boolean; onTogglePrint?: () => void; guideId?: string }) {
+  return <label className={`detail-item ${type === "textarea" ? "multiline-detail" : ""} ${!printVisible ? "print-optional-hidden" : ""} ${className}`} data-guide={guideId}><i><DetailIcon label={label} /></i><div><strong><span>{label}</span>{onTogglePrint && <button type="button" className={`detail-print-toggle no-print ${printVisible ? "is-visible" : ""}`} onClick={(event) => { event.preventDefault(); onTogglePrint(); }}>{printVisible ? "印刷あり" : "印刷なし"}</button>}</strong>{type === "area" ? <FormattedNumberInput value={Number(value)} decimals={2} onChange={(next) => onChange(String(next))} ariaLabel={label} /> : options ? <EditableChoice value={value} onChange={onChange} options={options} label={label} /> : type === "textarea" ? <textarea rows={2} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /> : <input type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />}{secondary && <small>{secondary}</small>}{type === "area" && <span className="area-print-value">{formatNumber(Number(value), 2)}{secondary}</span>}{type === "month" && <span className="detail-print-value">{formatMonthJa(String(value))}</span>}</div></label>;
 }
 
 function PageHeader({ number, title, english, description }: { number: string; title: string; english: string; description: string }) {
@@ -411,6 +429,9 @@ export default function Home() {
   const [importChoiceOpen, setImportChoiceOpen] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfDraftLink, setPdfDraftLink] = useState("");
+  const [guideActive, setGuideActive] = useState(false);
+  const [guideIndex, setGuideIndex] = useState(0);
+  const [guideSpotlight, setGuideSpotlight] = useState<GuideSpotlight | null>(null);
 
   function applyDraft(d: Record<string, any>) {
     const nextType = (d.type ?? "house") as PropertyType;
@@ -640,6 +661,95 @@ export default function Home() {
 
   const targetAge = yearsBetween(builtDate, appraisalDate); const residualRate = residualRateAtAge(targetAge, usefulLife); const autoNewBuildingPrice = (buildingArea / TSUBO) * buildingUnit; const newBuildingPrice = newBuildingPriceManual || autoNewBuildingPrice; const baseBuildingValue = type === "house" ? newBuildingPrice * residualRate : 0; const buildingAdjustmentAmount = (buildingArea / TSUBO) * buildingAdjustmentUnit; const buildingValue = type === "house" ? Math.max(0, baseBuildingValue + buildingAdjustmentAmount) : 0; const targetArea = type === "mansion" ? exclusiveArea / TSUBO : landArea / TSUBO; const autoAdjustedLow = surroundLow + adjustLow; const autoAdjustedHigh = surroundHigh + adjustLow; const adjustedLow = targetUnitManual ? targetUnitLowManual : autoAdjustedLow; const adjustedHigh = targetUnitManual ? targetUnitHighManual : autoAdjustedHigh; const landAppraisalLow = Math.max(0, adjustedLow * targetArea); const landAppraisalHigh = Math.max(0, adjustedHigh * targetArea); const autoAppraisalLow = landAppraisalLow + buildingValue; const autoAppraisalHigh = landAppraisalHigh + buildingValue; const appraisalLow = appraisalLowManual || autoAppraisalLow; const appraisalHigh = unitRangeMode ? (appraisalHighManual || autoAppraisalHigh) : appraisalLow; const recommendedAuto = ceilEnding80(unitRangeMode ? Math.max(appraisalLow, appraisalHigh) : appraisalLow); const recommended = recommendedManual || recommendedAuto; const challengeAuto = recommended ? ceilEnding80(Math.max(recommended * 1.03, recommended + 200)) : 0; const speedAuto = recommended ? ceilEnding80(Math.max(0, Math.min(recommended * 0.98, recommended - 200))) : 0; const challenge = challengeManual || challengeAuto; const speed = speedManual || speedAuto;
 
+  const guideSteps: GuideStep[] = [
+    { id: "property-type", selector: '[data-guide="property-type"]', title: "物件種別を確認", description: "中古戸建て・土地・マンションから、査定する物件を選びます。", complete: Boolean(type) },
+    { id: "customer", selector: '[data-guide="customer"] input', title: "お客さまの氏名を入力", description: "「様」は自動で付くため、お名前だけを入力してください。", complete: Boolean(propertyName.trim()) },
+    { id: "cover-address", selector: '[data-guide="cover-address"] textarea', title: "所在地を入力", description: "必要な場合は、この表紙だけ改行を入れて整えられます。", complete: Boolean(address.trim()) },
+    ...(type === "mansion" ? [{ id: "cover-mansion", selector: '[data-guide="cover-mansion"] textarea', title: "マンション名を入力", description: "表紙に表示するマンション名です。必要に応じて改行できます。", complete: Boolean(mansionName.trim()) }] : []),
+    { id: "staff", selector: '[data-guide="staff"] input', title: "担当者名を入力", description: "この査定書を作成する担当者の氏名を入力します。", complete: Boolean(staff.trim()) },
+    { id: "detail-address", selector: '[data-guide="detail-address"] textarea', title: "詳細の所在地を確認", description: "表紙とは別に改行を調整できます。印刷時はここに入力した形で表示されます。", complete: Boolean(detailAddressValue.trim()) },
+    ...(type === "mansion" ? [{ id: "detail-mansion", selector: '[data-guide="detail-mansion"] textarea', title: "詳細のマンション名を確認", description: "表紙の改行には影響せず、このページだけ整えられます。", complete: Boolean(detailMansionNameValue.trim()) }] : []),
+    type === "mansion"
+      ? { id: "primary-area", selector: '[data-guide="exclusive-area"] input', title: "専有面積を入力", description: "登記簿や販売資料に記載された専有面積を㎡で入力します。", complete: exclusiveArea > 0 }
+      : { id: "primary-area", selector: '[data-guide="land-area"] input', title: "土地面積を入力", description: "土地面積を㎡で入力すると、坪数は自動で計算されます。", complete: landArea > 0 },
+    ...(type === "house" ? [{ id: "building-area", selector: '[data-guide="building-area"] input', title: "建物面積を入力", description: "建物面積を㎡で入力すると、坪数と建物評価へ反映されます。", complete: buildingArea > 0 }] : []),
+    ...(type !== "land" ? [
+      { id: "layout", selector: '[data-guide="layout"] input', title: "間取りを入力", description: "例：3LDK のように入力します。", complete: Boolean(layout.trim()) },
+      { id: "built-date", selector: '[data-guide="built-date"] input', title: "築年月を入力", description: "築年月は建物の経年評価にも使われます。", complete: Boolean(builtDate) },
+      { id: "floors", selector: '[data-guide="floors"] input', title: type === "mansion" ? "所在階を入力" : "階数を入力", description: type === "mansion" ? "一覧から選ぶか、直接入力できます。" : "建物の階数を選ぶか、直接入力します。", complete: Boolean(floors.trim()) },
+    ] : []),
+    ...(type !== "mansion" ? [{ id: "road", selector: '[data-guide="road"] input', title: "接道状況を入力", description: "例：西側 約5.5m。不要な場合は「印刷なし」にできます。", complete: Boolean(road.trim()), optional: true }] : []),
+    { id: "transport", selector: '[data-guide="transport"] textarea', title: "最寄り駅・交通を入力", description: "例：阪急京都線「高槻」駅 徒歩5分。不要な場合は「印刷なし」にできます。", complete: Boolean(transport.trim()), optional: true },
+    { id: "comparable", selector: '[data-guide="first-reins"]', title: "周辺の成約事例を取り込む", description: "レインズの物件詳細をコピーし、「レインズ取込」から貼り付けます。手入力も可能です。", complete: validUnits.length > 0 },
+    { id: "land-adjustment", selector: '[data-guide="land-adjustment"]', title: "評価補正を確認", description: "左側の評価項目を見ながら補正します。補正が不要なら0.0のままで構いません。", complete: adjustLow !== 0, optional: true },
+    ...(type === "house" ? [{ id: "building-adjustment", selector: '[data-guide="building-adjustment"]', title: "建物評価補正を確認", description: "建物状態などを確認し、必要な場合だけ0.1ずつ調整します。", complete: buildingAdjustmentUnit !== 0, optional: true }] : []),
+    { id: "strategy-price", selector: '[data-guide="strategy-price"] input', title: "販売価格を確認", description: "自動計算された3つの価格を確認します。必要な場合は直接修正できます。", complete: recommended > 0 },
+    { id: "print", selector: '[data-guide="print"]', title: "印刷・PDF保存", description: "内容を確認したら、印刷またはPDF保存へ進みます。", complete: false, optional: true },
+  ];
+  const currentGuideStep = guideSteps[Math.min(guideIndex, guideSteps.length - 1)];
+
+  function startGuide() {
+    const firstIncomplete = guideSteps.findIndex((step) => !step.complete && !step.optional);
+    setGuideIndex(firstIncomplete >= 0 ? firstIncomplete : 0);
+    setGuideActive(true);
+  }
+
+  function focusGuideTarget() {
+    if (!currentGuideStep) return;
+    const target = document.querySelector<HTMLElement>(currentGuideStep.selector);
+    const focusable = target?.matches("input, textarea, select, button, a") ? target : target?.querySelector<HTMLElement>("input, textarea, select, button, a");
+    focusable?.focus({ preventScroll: true });
+  }
+
+  useEffect(() => {
+    if (!guideActive || !currentGuideStep) {
+      setGuideSpotlight(null);
+      return;
+    }
+    let animationFrame = 0;
+    let secondFrame = 0;
+    const updateSpotlight = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>(currentGuideStep.selector);
+        if (!target) {
+          setGuideSpotlight(null);
+          return;
+        }
+        const rect = target.getBoundingClientRect();
+        const padding = Math.max(6, Math.min(12, rect.height * .18));
+        const left = Math.max(4, rect.left - padding);
+        const top = Math.max(4, rect.top - padding);
+        const right = Math.min(window.innerWidth - 4, rect.right + padding);
+        const bottom = Math.min(window.innerHeight - 4, rect.bottom + padding);
+        setGuideSpotlight({ top, left, width: Math.max(1, right - left), height: Math.max(1, bottom - top), viewportWidth: window.innerWidth, viewportHeight: window.innerHeight });
+      });
+    };
+    const revealTarget = () => {
+      const target = document.querySelector<HTMLElement>(currentGuideStep.selector);
+      if (!target) return updateSpotlight();
+      const rect = target.getBoundingClientRect();
+      const toolbarBottom = document.querySelector<HTMLElement>(".editor-toolbar")?.getBoundingClientRect().bottom ?? 0;
+      const safeTop = Math.min(window.innerHeight * .38, toolbarBottom + 32);
+      const safeBottom = window.innerHeight - Math.min(270, window.innerHeight * .36);
+      if (rect.top < safeTop || rect.bottom > safeBottom) {
+        window.scrollBy({ top: rect.top - Math.max(safeTop, 24), behavior: "auto" });
+      }
+      secondFrame = window.requestAnimationFrame(updateSpotlight);
+    };
+    revealTarget();
+    window.addEventListener("scroll", updateSpotlight, { passive: true });
+    window.addEventListener("resize", updateSpotlight, { passive: true });
+    window.visualViewport?.addEventListener("resize", updateSpotlight, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.cancelAnimationFrame(secondFrame);
+      window.removeEventListener("scroll", updateSpotlight);
+      window.removeEventListener("resize", updateSpotlight);
+      window.visualViewport?.removeEventListener("resize", updateSpotlight);
+    };
+  }, [guideActive, currentGuideStep?.selector]);
+
   function changeType(next: PropertyType) { setType(next); setFactors(defaultFactors[next]); setStructure(next === "mansion" ? "鉄筋コンクリート造" : "木造"); if (next === "house") { setBuildingUnit(66); setUsefulLife(25); } setBuildingAdjustmentUnit(0); setUnitManual(false); setTargetUnitManual(false); setTargetUnitLowManual(0); setTargetUnitHighManual(0); setAppraisalLowManual(0); setAppraisalHighManual(0); setRecommendedManual(0); setSpeedManual(0); setChallengeManual(0); }
   function updateComp(id: number, key: keyof Comparable, value: string | number) { setComparables((current) => current.map((comp) => comp.id === id ? { ...comp, [key]: value } : comp)); }
   function clearComparable(id: number) { setComparables((current) => current.map((comp) => comp.id === id ? emptyComp(id) : comp)); setUnitManual(false); }
@@ -671,37 +781,45 @@ export default function Home() {
   const mansionFloorOptions = Array.from({ length: 20 }, (_, index) => ({ value: `${index + 1}階`, label: `${index + 1}階` }));
   const comparableTextScale = 5 / Math.max(1, comparables.length);
   const detailEditors = type === "land" ? [
-    <DetailEditor key="address" icon="⌖" label="所在地" type="textarea" value={detailAddressValue} placeholder="例）大阪府高槻市明田町1-1" onChange={setDetailAddressValue} />,
-    <DetailEditor key="land" icon="▦" label="土地面積" type="area" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`㎡（${formatNumber(landArea / TSUBO, 2)}坪）`} className="area-detail" />,
-    <DetailEditor key="road" icon="▤" label="接道状況" value={road} placeholder="例）西側 約5.5m" onChange={setRoad} printVisible={showRoadInPrint} onTogglePrint={() => setShowRoadInPrint((current) => !current)} />,
-    <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} placeholder="例）阪急京都線「高槻」駅 徒歩5分" onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
+    <DetailEditor key="address" guideId="detail-address" icon="⌖" label="所在地" type="textarea" value={detailAddressValue} placeholder="例）大阪府高槻市明田町1-1" onChange={setDetailAddressValue} />,
+    <DetailEditor key="land" guideId="land-area" icon="▦" label="土地面積" type="area" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`㎡（${formatNumber(landArea / TSUBO, 2)}坪）`} className="area-detail" />,
+    <DetailEditor key="road" guideId="road" icon="▤" label="接道状況" value={road} placeholder="例）西側 約5.5m" onChange={setRoad} printVisible={showRoadInPrint} onTogglePrint={() => setShowRoadInPrint((current) => !current)} />,
+    <DetailEditor key="transport" guideId="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} placeholder="例）阪急京都線「高槻」駅 徒歩5分" onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
   ] : type === "mansion" ? [
-    <DetailEditor key="address" icon="⌖" label="所在地" type="textarea" value={detailAddressValue} placeholder="例）大阪府高槻市明田町1-1" onChange={setDetailAddressValue} />,
-    <DetailEditor key="mansion" icon="⌂" label="マンション名" type="textarea" value={detailMansionNameValue} placeholder="例）ブランズ高槻" onChange={setDetailMansionNameValue} />,
-    <DetailEditor key="exclusive" icon="▦" label="専有面積" type="area" value={exclusiveArea || ""} onChange={(value) => setExclusiveArea(Number(value))} secondary={`㎡（${formatNumber(exclusiveArea / TSUBO, 2)}坪）`} className="area-detail" />,
-    <DetailEditor key="layout" icon="▥" label="間取り" value={layout} onChange={setLayout} />,
-    <DetailEditor key="built" icon="▣" label="築年月" type="month" value={builtDate.slice(0, 7)} onChange={setBuiltDate} />,
-    <DetailEditor key="floors" icon="◫" label="所在階" value={floors} onChange={setFloors} options={mansionFloorOptions} />,
+    <DetailEditor key="address" guideId="detail-address" icon="⌖" label="所在地" type="textarea" value={detailAddressValue} placeholder="例）大阪府高槻市明田町1-1" onChange={setDetailAddressValue} />,
+    <DetailEditor key="mansion" guideId="detail-mansion" icon="⌂" label="マンション名" type="textarea" value={detailMansionNameValue} placeholder="例）ブランズ高槻" onChange={setDetailMansionNameValue} />,
+    <DetailEditor key="exclusive" guideId="exclusive-area" icon="▦" label="専有面積" type="area" value={exclusiveArea || ""} onChange={(value) => setExclusiveArea(Number(value))} secondary={`㎡（${formatNumber(exclusiveArea / TSUBO, 2)}坪）`} className="area-detail" />,
+    <DetailEditor key="layout" guideId="layout" icon="▥" label="間取り" value={layout} onChange={setLayout} />,
+    <DetailEditor key="built" guideId="built-date" icon="▣" label="築年月" type="month" value={builtDate.slice(0, 7)} onChange={setBuiltDate} />,
+    <DetailEditor key="floors" guideId="floors" icon="◫" label="所在階" value={floors} onChange={setFloors} options={mansionFloorOptions} />,
     <DetailEditor key="structure" icon="▤" label="構造" value={structure} onChange={handleStructureChange} options={structureOptions} />,
-    <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} placeholder="例）阪急京都線「高槻」駅 徒歩5分" onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
+    <DetailEditor key="transport" guideId="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} placeholder="例）阪急京都線「高槻」駅 徒歩5分" onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
   ] : [
-    <DetailEditor key="address" icon="⌖" label="所在地" type="textarea" value={detailAddressValue} placeholder="例）大阪府高槻市明田町1-1" onChange={setDetailAddressValue} />,
-    <DetailEditor key="land" icon="▦" label="土地面積" type="area" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`㎡（${formatNumber(landArea / TSUBO, 2)}坪）`} className="area-detail" />,
-    <DetailEditor key="building" icon="▥" label="建物面積" type="area" value={buildingArea || ""} onChange={(value) => setBuildingArea(Number(value))} secondary={`㎡（${formatNumber(buildingArea / TSUBO, 2)}坪）`} className="area-detail" />,
-    <DetailEditor key="layout" icon="▤" label="間取り" value={layout} onChange={setLayout} />,
-    <DetailEditor key="built" icon="▣" label="築年月" type="month" value={builtDate.slice(0, 7)} onChange={setBuiltDate} />,
+    <DetailEditor key="address" guideId="detail-address" icon="⌖" label="所在地" type="textarea" value={detailAddressValue} placeholder="例）大阪府高槻市明田町1-1" onChange={setDetailAddressValue} />,
+    <DetailEditor key="land" guideId="land-area" icon="▦" label="土地面積" type="area" value={landArea || ""} onChange={(value) => setLandArea(Number(value))} secondary={`㎡（${formatNumber(landArea / TSUBO, 2)}坪）`} className="area-detail" />,
+    <DetailEditor key="building" guideId="building-area" icon="▥" label="建物面積" type="area" value={buildingArea || ""} onChange={(value) => setBuildingArea(Number(value))} secondary={`㎡（${formatNumber(buildingArea / TSUBO, 2)}坪）`} className="area-detail" />,
+    <DetailEditor key="layout" guideId="layout" icon="▤" label="間取り" value={layout} onChange={setLayout} />,
+    <DetailEditor key="built" guideId="built-date" icon="▣" label="築年月" type="month" value={builtDate.slice(0, 7)} onChange={setBuiltDate} />,
     <DetailEditor key="structure" icon="⌂" label="構造" value={structure} onChange={handleStructureChange} options={structureOptions} />,
-    <DetailEditor key="floors" icon="◫" label="階数" value={floors} onChange={setFloors} options={floorOptions} />,
-    <DetailEditor key="road" icon="▰" label="接道状況" value={road} placeholder="例）西側 約5.5m" onChange={setRoad} printVisible={showRoadInPrint} onTogglePrint={() => setShowRoadInPrint((current) => !current)} />,
-    <DetailEditor key="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} placeholder="例）阪急京都線「高槻」駅 徒歩5分" onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
+    <DetailEditor key="floors" guideId="floors" icon="◫" label="階数" value={floors} onChange={setFloors} options={floorOptions} />,
+    <DetailEditor key="road" guideId="road" icon="▰" label="接道状況" value={road} placeholder="例）西側 約5.5m" onChange={setRoad} printVisible={showRoadInPrint} onTogglePrint={() => setShowRoadInPrint((current) => !current)} />,
+    <DetailEditor key="transport" guideId="transport" icon="◎" label="最寄り駅・交通" type="textarea" value={transport} placeholder="例）阪急京都線「高槻」駅 徒歩5分" onChange={setTransport} printVisible={showTransportInPrint} onTogglePrint={() => setShowTransportInPrint((current) => !current)} />,
   ];
 
+  const visibleGuideIndex = Math.min(guideIndex, guideSteps.length - 1);
+  const guideCardStyle = guideSpotlight ? {
+    left: Math.max(12, Math.min(guideSpotlight.left, guideSpotlight.viewportWidth - 380)),
+    top: guideSpotlight.top + guideSpotlight.height + 238 < guideSpotlight.viewportHeight
+      ? guideSpotlight.top + guideSpotlight.height + 14
+      : Math.max(12, guideSpotlight.top - 224),
+  } : undefined;
+
   return <main>
-    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>JSON保存</button><button className="save-button" onClick={() => setImportChoiceOpen(true)}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><input ref={draftPdfInputRef} type="file" accept=".pdf,application/pdf" hidden onChange={(event) => void importDraftPdf(event.target.files?.[0])} /><button className="primary-button print-button" disabled={pdfBusy} onClick={() => void printReport()}>{pdfBusy ? "印刷準備中…" : "印刷・PDF保存"}</button></div></section>
+    <section className="editor-toolbar no-print" aria-label="査定書の編集メニュー"><div className="type-switch" data-guide="property-type" aria-label="物件種別"><span className="toolbar-type-label">物件種別</span>{(Object.keys(propertyLabels) as PropertyType[]).map((item) => <button key={item} className={type === item ? "active" : ""} onClick={() => changeType(item)}>{propertyLabels[item]}</button>)}</div><div className="toolbar-actions"><button className="assist-start-button" onClick={startGuide}>入力アシスト</button><button className="history-button" disabled={!canUndo} onClick={() => moveHistory(-1)}>戻る</button><button className="history-button" disabled={!canRedo} onClick={() => moveHistory(1)}>進む</button><button className="reset-button" onClick={resetReport}>リセット</button><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="save-button" onClick={downloadDraft}>JSON保存</button><button className="save-button" onClick={() => setImportChoiceOpen(true)}>PC取込</button><input ref={draftFileInputRef} type="file" accept=".json,application/json" hidden onChange={(event) => void importDraftFile(event.target.files?.[0])} /><input ref={draftPdfInputRef} type="file" accept=".pdf,application/pdf" hidden onChange={(event) => void importDraftPdf(event.target.files?.[0])} /><button className="primary-button print-button" data-guide="print" disabled={pdfBusy} onClick={() => void printReport()}>{pdfBusy ? "印刷準備中…" : "印刷・PDF保存"}</button></div></section>
     <div ref={reportStackRef} className="report-stack">
       <ReportPage id="page-1" className={`cover-page ${type === "mansion" ? "mansion-cover" : ""}`}>
         <header className="cover-title"><p>PROPERTY VALUATION REPORT</p><h1>不動産簡易査定書</h1><i /></header>
-        <div className="cover-fields"><Field label="お客様名" value={propertyName} onChange={(value) => setPropertyName(value.replace(/\s*様\s*$/, ""))} placeholder="例）関西 孝介" suffix="様" className="cover-customer-field" /><Field label="所在地" type="textarea" value={address} placeholder="例）大阪府高槻市明田町1-1" onChange={(value) => { setAddress(value); setDetailAddressValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field" />{type === "mansion" && <Field label="マンション名" type="textarea" value={mansionName} placeholder="例）ブランズ高槻" onChange={(value) => { setMansionName(value); setDetailMansionNameValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field cover-mansion-field" />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} className="cover-date-start" /><Field label="担当者" value={staff} placeholder="例）関西 優" onChange={setStaff} /></div>
+        <div className="cover-fields"><Field guideId="customer" label="お客様名" value={propertyName} onChange={(value) => setPropertyName(value.replace(/\s*様\s*$/, ""))} placeholder="例）関西 孝介" suffix="様" className="cover-customer-field" /><Field guideId="cover-address" label="所在地" type="textarea" value={address} placeholder="例）大阪府高槻市明田町1-1" onChange={(value) => { setAddress(value); setDetailAddressValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field" />{type === "mansion" && <Field guideId="cover-mansion" label="マンション名" type="textarea" value={mansionName} placeholder="例）ブランズ高槻" onChange={(value) => { setMansionName(value); setDetailMansionNameValue(value.replace(/\r?\n/g, "")); }} className="cover-address-field cover-mansion-field" />}<Field label="査定日" type="date" value={appraisalDate} onChange={setAppraisalDate} className="cover-date-start" /><Field guideId="staff" label="担当者" value={staff} placeholder="例）関西 優" onChange={setStaff} /></div>
         <p className="cover-message">市場動向・周辺成約事例をもとに、<br />現在の市場価値を分析しました。</p>
         <footer className="cover-company"><i className="cover-company-logo" role="img" aria-label="CASA" /><span>関西不動産販売</span></footer>
         {pdfDraftLink && <a className="pdf-draft-link" href={pdfDraftLink} aria-label="査定書編集データ">.</a>}
@@ -717,7 +835,7 @@ export default function Home() {
         <aside className="target-summary"><b>対象物件</b><p>所在地　：{address || "—"}</p><p>{type === "mansion" ? "専有面積" : "土地面積"}：<AreaValue value={type === "mansion" ? exclusiveArea : landArea} /></p>{type === "house" && <p>建物面積：<AreaValue value={buildingArea} /></p>}{type !== "land" && <p>間取り　：{layout || "—"}</p>}{type !== "land" && <p>築年月　：{formatMonthJa(builtDate)}</p>}</aside>
         <p className="unit-lead">類似物件は <strong>坪単価 {unitRangeMode ? `${formatNumber(surroundLow, 1)}〜${formatNumber(surroundHigh, 1)}` : formatNumber(surroundLow, 1)} 万円</strong> で成約しています。</p>
         <div className="case-controls no-print"><span>事例数</span><button onClick={removeComparable} disabled={comparables.length <= 1}>−</button><strong>{comparables.length}件</strong><button onClick={addComparable} disabled={comparables.length >= 5}>＋</button><small>1〜5件まで調整できます</small></div>
-        <section className="comparison-table-wrap"><table className="comparison-table"><colgroup><col style={{ width: "11.5%" }} />{comparables.map((comp) => <col key={`case-column-${comp.id}`} style={{ width: `${88.5 / comparables.length}%` }} />)}</colgroup><thead><tr><th>事例</th>{comparables.map((comp, index) => <th key={comp.id}><span>事例 {index + 1}</span><span className="case-move-actions no-print"><button type="button" onClick={() => moveComparable(index, -1)} disabled={index === 0}>◀</button><button type="button" onClick={() => moveComparable(index, 1)} disabled={index === comparables.length - 1}>▶</button></span><span className="case-header-actions no-print"><button className="import-button" onClick={() => setActiveImport(comp.id)}>レインズ取込</button><button className="clear-case-button" onClick={() => clearComparable(comp.id)}>クリア</button></span></th>)}</tr></thead><tbody>
+        <section className="comparison-table-wrap"><table className="comparison-table"><colgroup><col style={{ width: "11.5%" }} />{comparables.map((comp) => <col key={`case-column-${comp.id}`} style={{ width: `${88.5 / comparables.length}%` }} />)}</colgroup><thead><tr><th>事例</th>{comparables.map((comp, index) => <th key={comp.id}><span>事例 {index + 1}</span><span className="case-move-actions no-print"><button type="button" onClick={() => moveComparable(index, -1)} disabled={index === 0}>◀</button><button type="button" onClick={() => moveComparable(index, 1)} disabled={index === comparables.length - 1}>▶</button></span><span className="case-header-actions no-print"><button className="import-button" data-guide={index === 0 ? "first-reins" : undefined} onClick={() => setActiveImport(comp.id)}>レインズ取込</button><button className="clear-case-button" onClick={() => clearComparable(comp.id)}>クリア</button></span></th>)}</tr></thead><tbody>
           <tr><th>所在地</th>{comparables.map((comp) => <td key={comp.id}><input className="comparison-edit-only" style={{ fontSize: `${Math.max(6.5, Math.min(15, (182 * comparableTextScale) / Math.max(1, comp.address.length)))}px` }} value={comp.address} onChange={(e) => updateComp(comp.id, "address", e.target.value)} placeholder="ー" /><span className="comparison-print-only comparison-address-print" style={{ fontSize: `${Math.max(6.5, Math.min(15, (182 * comparableTextScale) / Math.max(1, comp.address.length)))}px` }}>{comp.address || "ー"}</span></td>)}</tr>
           {type !== "mansion" && <tr><th>土地面積</th>{comparables.map((comp) => <td key={comp.id}><div className="area-inline"><FormattedNumberInput value={comp.landArea} decimals={2} onChange={(value) => updateComp(comp.id, "landArea", value)} ariaLabel="土地面積" /><small>㎡（約{formatNumber(comp.landArea / TSUBO, 2)}坪）</small></div></td>)}</tr>}
           {type === "mansion" ? <tr><th>マンション名</th>{comparables.map((comp) => <td key={comp.id}><input className="comparison-edit-only" style={{ fontSize: `${Math.max(7, Math.min(15, (190 * comparableTextScale) / Math.max(1, (comp.mansionName ?? "").length)))}px` }} value={comp.mansionName ?? ""} onChange={(e) => updateComp(comp.id, "mansionName", e.target.value)} placeholder="ー" /><span className="comparison-print-only comparison-address-print" style={{ fontSize: `${Math.max(7, Math.min(15, (190 * comparableTextScale) / Math.max(1, (comp.mansionName ?? "").length)))}px` }}>{comp.mansionName || "ー"}</span></td>)}</tr> : <tr><th>建物面積</th>{comparables.map((comp) => <td key={comp.id}>{type === "house" ? <><div className="area-inline comparison-edit-only"><FormattedNumberInput value={comp.buildingArea} decimals={2} placeholder="ー" onChange={(value) => updateComp(comp.id, "buildingArea", value)} ariaLabel="建物面積" />{comp.buildingArea > 0 && <small>㎡（約{formatNumber(comp.buildingArea / TSUBO, 2)}坪）</small>}</div><span className="comparison-print-only">{comp.buildingArea > 0 ? `${formatNumber(comp.buildingArea, 2)}㎡（約${formatNumber(comp.buildingArea / TSUBO, 2)}坪）` : "ー"}</span></> : <span className="empty-value">ー</span>}</td>)}</tr>}
@@ -738,7 +856,7 @@ export default function Home() {
           <h3>査定価格の算出フロー</h3>
           <div className="flow-box"><span>周辺成約坪単価</span><div className="unit-edit-row">{unitRangeMode ? <><FormattedNumberInput value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); }} ariaLabel="周辺成約坪単価 下限" /><b>〜</b><FormattedNumberInput value={surroundHigh} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価 上限" /></> : <FormattedNumberInput className="single-unit-input" value={surroundLow} decimals={1} showZero onChange={(value) => { setUnitManual(true); setSurroundLow(value); setSurroundHigh(value); }} ariaLabel="周辺成約坪単価" />}<small>万円／坪</small></div><button className="flow-mode-toggle no-print" onClick={() => changeUnitRangeMode(!unitRangeMode)}>{unitRangeMode ? "価格幅あり" : "価格幅なし"}</button></div>
           <b className="flow-symbol">×</b>
-          <div className="flow-box editable-flow"><span>対象物件の評価補正</span><div><span className="step-input-wrap single-step-input"><FormattedNumberInput className="single-unit-input" value={adjustLow} decimals={1} showPlus showZero onChange={(value) => { setAdjustLow(value); setTargetUnitManual(false); }} ariaLabel="評価補正" /><span className="input-stepper no-print"><button type="button" onClick={() => shiftAdjustment(.1)}>▲</button><button type="button" onClick={() => shiftAdjustment(-.1)}>▼</button></span></span><small>万円／坪</small></div></div>
+          <div className="flow-box editable-flow"><span>対象物件の評価補正</span><div><span className="step-input-wrap single-step-input" data-guide="land-adjustment"><FormattedNumberInput className="single-unit-input" value={adjustLow} decimals={1} showPlus showZero onChange={(value) => { setAdjustLow(value); setTargetUnitManual(false); }} ariaLabel="評価補正" /><span className="input-stepper no-print"><button type="button" onClick={() => shiftAdjustment(.1)}>▲</button><button type="button" onClick={() => shiftAdjustment(-.1)}>▼</button></span></span><small>万円／坪</small></div></div>
           <b className="flow-symbol equals-symbol">＝</b>
           <div className="flow-box gold-box"><span>対象物件の査定坪単価</span><div className="target-unit-edit">{unitRangeMode ? <><FormattedNumberInput value={adjustedLow} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(value); setTargetUnitHighManual(targetUnitManual ? targetUnitHighManual : adjustedHigh); }} ariaLabel="対象物件の査定坪単価 下限" /><b>〜</b><FormattedNumberInput value={adjustedHigh} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(targetUnitManual ? targetUnitLowManual : adjustedLow); setTargetUnitHighManual(value); }} ariaLabel="対象物件の査定坪単価 上限" /></> : <FormattedNumberInput className="single-unit-input" value={adjustedLow} decimals={1} showZero onChange={(value) => { setTargetUnitManual(true); setTargetUnitLowManual(value); setTargetUnitHighManual(value); }} ariaLabel="対象物件の査定坪単価" />}<small>万円／坪</small></div><button className="inline-auto no-print" onClick={() => setTargetUnitManual(false)}>自動値に戻す</button></div>
           <div className="down-arrow">▼</div>
@@ -748,16 +866,32 @@ export default function Home() {
       </ReportPage>
       {type === "house" && <ReportPage id="page-5" className="building-page">
         <PageHeader number="05" title="建物の経年減価による評価" english="PROPERTY VALUE ANALYSIS" description="築年数・構造・建物状態・設備仕様等を考慮し、建物の経年減価を反映した評価額を算出しました。" />
-        <section className="building-flow"><div className="building-step"><span>新築時想定建物価格</span><MoneyEditor className="building-money" value={Math.round(newBuildingPrice)} onChange={setNewBuildingPriceManual} /><button className="mini-reset no-print" onClick={() => setNewBuildingPriceManual(0)}>面積×単価へ戻す</button></div><b>▼</b><div className="building-step dual-step"><span>築年数</span><strong>{targetAge}<small>年</small></strong></div><b>▼</b><div className="building-step structure-step"><span>構造</span><EditableChoice value={structure} onChange={handleStructureChange} options={structureOptions} label="構造" /></div><div className="building-config print-hidden-preserve"><Field label="建物単価" value={buildingUnit} type="number" onChange={(v) => setBuildingUnit(Number(v))} suffix="万円/坪" /><Field label="耐用年数" value={usefulLife} type="number" onChange={(v) => setUsefulLife(Number(v))} suffix="年" /></div><b>▼</b><div className="building-step dual-step depreciation-step"><span>経年による減価を考慮</span><strong className="residual-copy"><span>残存価値率　約</span><b>{Math.round(residualRate * 100)}</b><small>％</small></strong></div><div className="building-adjustment-step"><span>建物評価補正</span><div><span className="step-input-wrap"><FormattedNumberInput value={buildingAdjustmentUnit} decimals={1} showPlus showZero onChange={setBuildingAdjustmentUnit} ariaLabel="建物評価補正" /><span className="input-stepper no-print"><button type="button" onClick={() => shiftBuildingAdjustment(.1)}>▲</button><button type="button" onClick={() => shiftBuildingAdjustment(-.1)}>▼</button></span></span><small>万円／坪</small></div></div><b>▼</b><div className="building-total"><span>建物評価額</span><strong>{formatNumber(Math.round(buildingValue))}<small>万円</small></strong></div></section>
+        <section className="building-flow"><div className="building-step"><span>新築時想定建物価格</span><MoneyEditor className="building-money" value={Math.round(newBuildingPrice)} onChange={setNewBuildingPriceManual} /><button className="mini-reset no-print" onClick={() => setNewBuildingPriceManual(0)}>面積×単価へ戻す</button></div><b>▼</b><div className="building-step dual-step"><span>築年数</span><strong>{targetAge}<small>年</small></strong></div><b>▼</b><div className="building-step structure-step"><span>構造</span><EditableChoice value={structure} onChange={handleStructureChange} options={structureOptions} label="構造" /></div><div className="building-config print-hidden-preserve"><Field label="建物単価" value={buildingUnit} type="number" onChange={(v) => setBuildingUnit(Number(v))} suffix="万円/坪" /><Field label="耐用年数" value={usefulLife} type="number" onChange={(v) => setUsefulLife(Number(v))} suffix="年" /></div><b>▼</b><div className="building-step dual-step depreciation-step"><span>経年による減価を考慮</span><strong className="residual-copy"><span>残存価値率　約</span><b>{Math.round(residualRate * 100)}</b><small>％</small></strong></div><div className="building-adjustment-step"><span>建物評価補正</span><div><span className="step-input-wrap" data-guide="building-adjustment"><FormattedNumberInput value={buildingAdjustmentUnit} decimals={1} showPlus showZero onChange={setBuildingAdjustmentUnit} ariaLabel="建物評価補正" /><span className="input-stepper no-print"><button type="button" onClick={() => shiftBuildingAdjustment(.1)}>▲</button><button type="button" onClick={() => shiftBuildingAdjustment(-.1)}>▼</button></span></span><small>万円／坪</small></div></div><b>▼</b><div className="building-total"><span>建物評価額</span><strong>{formatNumber(Math.round(buildingValue))}<small>万円</small></strong></div></section>
         <section className="building-chart"><h3>建物の残存価値の目安（{structure}の場合）</h3><DepreciationChart age={targetAge} life={usefulLife} /><div className="chart-label">対象物件　築{targetAge}年</div></section><section className="evaluation-points"><strong>建物評価の<br />確認項目（例）</strong><p>✓ 維持管理・劣化状況</p><p>✓ 設備の仕様・更新状況</p><p>✓ リフォーム・修繕履歴</p><p>✓ 周辺の中古建物の取引動向</p></section><footer className="building-note"><b>i</b><p>建物評価額は、税務上の減価償却費を算出するものではありません。<br />築年数・構造・施工状況・維持管理状態・設備仕様・リフォーム履歴等を総合的に考慮した査定上の参考価格です。</p></footer>
       </ReportPage>}
       <ReportPage id="page-strategy" className="strategy-page">
         <PageHeader number={type === "house" ? "06" : "05"} title="販売戦略のご提案" english="SELLING STRATEGY" description={"市場動向や対象物件の特性を踏まえ、最適な価格で早期に成約できるよう、\n戦略的に販売活動を進めてまいります。"} />
-        <section className="price-strategy"><h3>価格戦略のイメージ</h3><button type="button" className="strategy-reset no-print" onClick={() => { setSpeedManual(0); setRecommendedManual(0); setChallengeManual(0); }}>自動値に戻す</button><p>ご希望に合わせて、以下の3つの価格戦略をご提案いたします。</p><div className="strategy-cards"><div className="strategy-card"><h4>SPEED<small>スピード売却価格</small></h4><strong className="strategy-price-editor"><FormattedNumberInput value={speed} onChange={setSpeedManual} ariaLabel="スピード売却価格" /><small>万円</small></strong><p>早期に売却したい方向けの<br />スピード重視戦略</p><ul><li>早期成約が期待できる</li><li>販売期間：短期での成約を目指す</li><li>早く現金化したい方向け</li></ul></div><div className="strategy-card recommended-card"><em>おすすめ</em><h4>RECOMMEND<small>推奨売出価格</small></h4><strong className="strategy-price-editor"><FormattedNumberInput value={recommended} onChange={setRecommendedManual} ariaLabel="推奨売出価格" /><small>万円</small></strong><p>市場での競争力と成約までの<br />期間を考慮した価格</p><ul><li>成約の可能性が最も高い価格帯</li><li>適正な期間での成約が期待できる</li><li>価格とスピードのバランス重視</li></ul></div><div className="strategy-card"><h4>CHALLENGE<small>チャレンジ価格</small></h4><strong className="strategy-price-editor"><FormattedNumberInput value={challenge} onChange={setChallengeManual} ariaLabel="チャレンジ価格" /><small>万円</small></strong><p>相場より高めの価格から<br />市場の反応を確認する戦略</p><ul><li>高値での成約を目指す</li><li>販売期間：やや長期化の可能性</li><li>できるだけ高く売りたい方向け</li></ul></div></div></section>
+        <section className="price-strategy"><h3>価格戦略のイメージ</h3><button type="button" className="strategy-reset no-print" onClick={() => { setSpeedManual(0); setRecommendedManual(0); setChallengeManual(0); }}>自動値に戻す</button><p>ご希望に合わせて、以下の3つの価格戦略をご提案いたします。</p><div className="strategy-cards"><div className="strategy-card"><h4>SPEED<small>スピード売却価格</small></h4><strong className="strategy-price-editor"><FormattedNumberInput value={speed} onChange={setSpeedManual} ariaLabel="スピード売却価格" /><small>万円</small></strong><p>早期に売却したい方向けの<br />スピード重視戦略</p><ul><li>早期成約が期待できる</li><li>販売期間：短期での成約を目指す</li><li>早く現金化したい方向け</li></ul></div><div className="strategy-card recommended-card"><em>おすすめ</em><h4>RECOMMEND<small>推奨売出価格</small></h4><strong className="strategy-price-editor" data-guide="strategy-price"><FormattedNumberInput value={recommended} onChange={setRecommendedManual} ariaLabel="推奨売出価格" /><small>万円</small></strong><p>市場での競争力と成約までの<br />期間を考慮した価格</p><ul><li>成約の可能性が最も高い価格帯</li><li>適正な期間での成約が期待できる</li><li>価格とスピードのバランス重視</li></ul></div><div className="strategy-card"><h4>CHALLENGE<small>チャレンジ価格</small></h4><strong className="strategy-price-editor"><FormattedNumberInput value={challenge} onChange={setChallengeManual} ariaLabel="チャレンジ価格" /><small>万円</small></strong><p>相場より高めの価格から<br />市場の反応を確認する戦略</p><ul><li>高値での成約を目指す</li><li>販売期間：やや長期化の可能性</li><li>できるだけ高く売りたい方向け</li></ul></div></div></section>
         <section className="sales-flow"><h3>販売活動の流れ <small>（イメージ）</small></h3>{[["01", "販売準備・調査", "物件の魅力を最大限に引き出すための調査・プランニング"], ["02", "広告・情報公開", "ポータルサイトや各種媒体へ掲載し、広く告知"], ["03", "購入希望者へのご紹介", "購入希望顧客やネットワークへ物件情報をご紹介"], ["04", "ご案内・内覧対応", "物件の魅力を丁寧にお伝えする内覧対応"], ["05", "条件交渉・契約", "購入希望者との条件調整からご契約・お引渡しへ"]].map(([num, title, text]) => <div className="sales-step" key={num}><i className={`sales-icon sales-icon-${Number(num) - 1}`} aria-hidden="true" /><b>{num}</b><div><strong>{title}</strong><p>{text}</p></div></div>)}</section>
         <section className="strengths"><b>当社の<br />強み</b>{[["豊富な購入希望顧客", "多数の購入希望顧客へ早期にご紹介"], ["幅広い広告展開力", "各種媒体を活用して効果的に訴求"], ["地域密着の販売力", "地域の相場と需要を熟知したご提案"], ["安心のサポート体制", "お引渡しまで専門スタッフが対応"], ["売却後のご相談も対応", "住み替え・税務相談もワンストップ"]].map(([title, text], index) => <div key={title}><i className={`strength-icon strength-icon-${index}`} aria-hidden="true" /><strong>{title}</strong><p>{text}</p></div>)}</section><footer className="strategy-footer"><strong>お客様のご希望や状況に合わせて、最適な販売プランをご提案いたします。</strong><span>ご不明点やご要望がございましたら、どうぞお気軽にご相談ください。</span></footer>
       </ReportPage>
     </div>
+    {guideActive && currentGuideStep && guideSpotlight && <div className="input-guide-layer no-print">
+      <div className="guide-shade" style={{ top: 0, left: 0, width: guideSpotlight.viewportWidth, height: guideSpotlight.top }} />
+      <div className="guide-shade" style={{ top: guideSpotlight.top + guideSpotlight.height, left: 0, width: guideSpotlight.viewportWidth, height: Math.max(0, guideSpotlight.viewportHeight - guideSpotlight.top - guideSpotlight.height) }} />
+      <div className="guide-shade" style={{ top: guideSpotlight.top, left: 0, width: guideSpotlight.left, height: guideSpotlight.height }} />
+      <div className="guide-shade" style={{ top: guideSpotlight.top, left: guideSpotlight.left + guideSpotlight.width, width: Math.max(0, guideSpotlight.viewportWidth - guideSpotlight.left - guideSpotlight.width), height: guideSpotlight.height }} />
+      <div className="guide-spotlight-ring" style={{ top: guideSpotlight.top, left: guideSpotlight.left, width: guideSpotlight.width, height: guideSpotlight.height }} />
+      <section className="input-guide-card" style={guideCardStyle} role="region" aria-live="polite" aria-label="入力アシスト">
+        <header><span>入力アシスト</span><button type="button" onClick={() => setGuideActive(false)} aria-label="入力アシストを終了">終了</button></header>
+        <div className="guide-progress"><span style={{ width: `${((visibleGuideIndex + 1) / guideSteps.length) * 100}%` }} /></div>
+        <p className="guide-count">{visibleGuideIndex + 1} / {guideSteps.length}<b className={currentGuideStep.complete ? "is-complete" : currentGuideStep.optional ? "is-optional" : ""}>{currentGuideStep.complete ? "入力済み" : currentGuideStep.optional ? "必要に応じて" : "入力してください"}</b></p>
+        <h2>{currentGuideStep.title}</h2>
+        <p className="guide-description">{currentGuideStep.description}</p>
+        <p className="guide-hint">青い枠の箇所を選んで、そのまま操作できます。</p>
+        <footer><button type="button" className="guide-back" disabled={visibleGuideIndex === 0} onClick={() => setGuideIndex((current) => Math.max(0, current - 1))}>戻る</button><button type="button" className="guide-focus" onClick={focusGuideTarget}>ここを操作</button><button type="button" className="guide-next" onClick={() => { if (visibleGuideIndex >= guideSteps.length - 1) setGuideActive(false); else setGuideIndex(visibleGuideIndex + 1); }}>{visibleGuideIndex >= guideSteps.length - 1 ? "完了" : "次へ"}</button></footer>
+      </section>
+    </div>}
     {importChoiceOpen && <div className="modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="保存データの取込方法"><div className="import-modal data-import-modal"><button className="modal-close" onClick={() => setImportChoiceOpen(false)}>×</button><span className="eyebrow">PC取込</span><h2>取り込むファイルを選択</h2><p>この査定書で保存したJSON、または編集データ付きPDFから入力内容を復元します。</p><div className="data-import-options"><button className="save-button" onClick={() => { setImportChoiceOpen(false); draftFileInputRef.current?.click(); }}>JSONから</button><button className="primary-button" onClick={() => { setImportChoiceOpen(false); draftPdfInputRef.current?.click(); }}>PDFから</button></div></div></div>}
     {activeImport !== null && <div className="modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="REINS文字列取込"><div className="import-modal"><button className="modal-close" onClick={() => setActiveImport(null)}>×</button><span className="eyebrow">事例 {activeImport}</span><h2>REINSの文字列を貼り付け</h2><p>物件詳細画面をすべてコピーして貼り付けると、所在地・面積・間取り・築年月・価格・時期を自動抽出します。</p><textarea autoFocus value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="ここにREINSの文字列を貼り付けてください" /><div className="modal-actions"><a className="reins-link" href="https://system.reins.jp/login/main/KG/GKG001200" target="_blank" rel="noreferrer">レインズを開く</a><button className="ghost-button" onClick={() => setActiveImport(null)}>キャンセル</button><button className="primary-button" onClick={importReins} disabled={!pasteText.trim()}>抽出して事例へ反映</button></div></div></div>}
   </main>;
