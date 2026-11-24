@@ -4,6 +4,7 @@ import handler from "vinext/server/app-router-entry";
 
 interface Env {
   ASSETS: Fetcher;
+  ALLOWED_IPS?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -26,6 +27,32 @@ interface ExecutionContext {
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const allowedIps = env.ALLOWED_IPS
+      ?.split(/[\s,]+/)
+      .map((ip) => ip.trim())
+      .filter(Boolean);
+    const clientIp = request.headers.get("CF-Connecting-IP")?.trim();
+
+    if (clientIp && !allowedIps?.length) {
+      return new Response("アクセス制限の設定を確認してください。", {
+        status: 503,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "private, no-store",
+        },
+      });
+    }
+
+    if (allowedIps?.length && (!clientIp || !allowedIps.includes(clientIp))) {
+      return new Response("このページは会社ネットワーク接続時のみ利用できます。", {
+        status: 403,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "private, no-store",
+        },
+      });
+    }
+
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {
