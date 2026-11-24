@@ -9,6 +9,7 @@ import handler from "vinext/server/app-router-entry";
 
 interface Env {
   ALLOWED_IPS?: string;
+  ADDITIONAL_ALLOWED_IPS?: string;
 
   ASSETS: Fetcher;
   IMAGES: {
@@ -42,7 +43,8 @@ const worker = {
     const clientIP =
       request.headers.get("CF-Connecting-IP")?.trim() ?? "";
 
-    const allowedIPs = (env.ALLOWED_IPS ?? "")
+    const allowedIPs = [env.ALLOWED_IPS, env.ADDITIONAL_ALLOWED_IPS]
+      .join(" ")
       .split(/[\s,]+/)
       .map((ip) => ip.trim())
       .filter(Boolean);
