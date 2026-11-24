@@ -136,6 +136,18 @@ footer{
 
     const url = new URL(request.url);
 
+    // `run_worker_first` でも、認証後の静的ファイルは Assets から直接返す。
+    // これがないと CSS / JavaScript / 画像がアプリ側の 404 になる。
+    if (/\.[^/]+$/.test(url.pathname)) {
+      const assetResponse = await env.ASSETS.fetch(request);
+      const securedAssetResponse = new Response(
+        assetResponse.body,
+        assetResponse
+      );
+      securedAssetResponse.headers.set("Cache-Control", "private, no-store");
+      return securedAssetResponse;
+    }
+
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [
         ...DEFAULT_DEVICE_SIZES,
